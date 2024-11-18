@@ -1,0 +1,28 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "A simple 'hello world' bedrock agent.",
+  "Parameters": {
+    "agentName": {
+      "Description": "Provide a unique name for this bedrock agent.",
+      "Type": "String",
+      "AllowedPattern": "^([0-9a-zA-Z][_-]?){1,100}$"
+    }
+  },
+  "Resources": {
+    "bedrockAgent": {
+      "Type": "AWS::Bedrock::Agent",
+      "Properties": {
+        "AgentName": {
+          "Ref": "agentName"
+        },
+        "AgentResourceRoleArn": "arn:aws:iam::050451359079:role/bedrock-agent-role-bedrockAgentRole-uVdCv8WImmcJ",
+        "AutoPrepare": true,
+        "Description": "A simple 'hello world' bedrock agent that will reply with 'world' when given a 'hello'",
+        "FoundationModel": "anthropic.claude-3-sonnet-20240229-v1:0",
+        "IdleSessionTTLInSeconds": 3600,
+        "Instruction": "You are a helpful test agent that when greeted with: 'hello' will always response with: 'world'",
+        "SkipResourceInUseCheckOnDelete": true
+      }
+    }
+  }
+}
