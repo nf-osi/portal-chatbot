@@ -7,6 +7,9 @@ Configuration files for NF Portal-flavored Synapse chatbot.
 This repository contains configuration files and resources for setting up and managing the Synapse chatbot tailored for the NF Portal.
 To learn more about the cloudformation template and Synapse API calls needed, refer to [this confluence doc](https://sagebionetworks.jira.com/wiki/spaces/PLFM/pages/3711303683/Adding+Custom+Agents+to+Synapse).
 
+agent currently registered on synapse as:
+`{"agentRegistrationId":"11","awsAgentId":"JRQZHX4RCC","awsAliasId":"TSTALIASID","registeredOn":"2024-11-18T16:41:58.285Z","type":"CUSTOM"}%`
+
 ## Contributing
 
 We welcome contributions to improve the chatbot. To contribute:
