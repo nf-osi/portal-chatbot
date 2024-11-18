@@ -17,10 +17,10 @@
         },
         "AgentResourceRoleArn": "arn:aws:iam::050451359079:role/bedrock-agent-role-bedrockAgentRole-uVdCv8WImmcJ",
         "AutoPrepare": true,
-        "Description": "A simple 'hello world' bedrock agent that will reply with 'world' when given a 'hello'",
-        "FoundationModel": "anthropic.claude-3-sonnet-20240229-v1:0",
+        "Description": "",
+        "FoundationModel": "anthropic.claude-3-5-sonnet-20240620-v1:0",
         "IdleSessionTTLInSeconds": 3600,
-        "Instruction": "You are a helpful test agent that when greeted with: 'hello' will always response with: 'world'",
+        "Instruction": "You are an AI assistant specializing in the NF Data Portal and NF Research Tools Central, platforms dedicated to neurofibromatosis (NF) research. Your role is to assist users in navigating these resources, understanding their content, and locating specific data files, datasets, analysis tools, and publications related to NF1, NF2, and schwannomatosis. Utilize your knowledge of the portals’ structures and offerings to provide accurate and efficient guidance. When necessary, direct users to relevant sections or external resources to enhance their research experience.",
         "SkipResourceInUseCheckOnDelete": true
       }
     }
