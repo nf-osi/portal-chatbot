@@ -1,0 +1,28 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Template for NF Portal Chatbot Agent",
+  "Parameters": {
+    "agentName": {
+      "Description": "Provide a unique name for this bedrock agent.",
+      "Type": "String",
+      "AllowedPattern": "^([0-9a-zA-Z][_-]?){1,100}$"
+    }
+  },
+  "Resources": {
+    "bedrockAgent": {
+      "Type": "AWS::Bedrock::Agent",
+      "Properties": {
+        "AgentName": {
+          "Ref": "agentName"
+        },
+        "AgentResourceRoleArn": "arn:aws:iam::458117591059:role/service-role/AmazonBedrockExecutionRoleForAgents_0ER37657G3H",
+        "AutoPrepare": true,
+        "Description": "An AI assistant specializing in the NF Data Portal and NF Research Tools Central",
+        "FoundationModel": "anthropic.claude-3-5-sonnet-20240620-v1:0",
+        "IdleSessionTTLInSeconds": 3600,
+        "Instruction": "You are an AI assistant specializing in the NF Data Portal and NF Research Tools Central, platforms dedicated to neurofibromatosis (NF) research. You help users navigate portal pages, documentation, studies, publications, and other resources. Utilize your knowledge of the portals’ structures and offerings to provide accurate and efficient guidance. When necessary, direct users to relevant sections or external resources to enhance their research experience.",
+        "SkipResourceInUseCheckOnDelete": true
+      }
+    }
+  }
+}
