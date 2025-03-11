@@ -29,6 +29,7 @@ Now check that a directory `output_markdown` has been created locally and contai
 
 #### Create synthetic dataset with LLM
 
-
-
-
+TODO:
+- Explain dataset structure and associated prompt/schema here
+- Explain batch API usage here (including OpenAI model used)
+- Explain human validation of synthetic dataset

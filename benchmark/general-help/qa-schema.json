@@ -1,0 +1,36 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Question-Answer Pairs Collection",
+    "type": "array",
+    "items": {
+      "type": "object",
+      "required": ["question", "answer", "context", "source_page_url"],
+      "properties": {
+        "question": {
+          "type": "string",
+          "description": "The primary question to be answered"
+        },
+        "question_variants": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Alternative phrasings of the same question"
+        },
+        "answer": {
+          "type": "string",
+          "description": "The ground truth answer"
+        },
+        "context": {
+          "type": "string",
+          "description": "The text passage containing information needed to answer the question"
+        },
+        "source_page_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL of the source page where the context was found"
+        }
+      }
+    }
+  }
+  
