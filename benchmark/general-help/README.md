@@ -2,6 +2,8 @@
 
 ## General Help Dataset
 
+This dataset is used in Quality Assurance of our deployed portal chatbot, following rigorous best practices... TODO: explain more here.
+
 ### Get content from NF docs with crawler
 
 This contains a Scrapy spider that crawls all pages under the [public NF help docs](https://help.nf.synapse.org/NFdocs/) section and converts each page into a Markdown document. The Markdown files are saved in an output directory for further use (but not included in this repository). This is used for creating the evaluation dataset.
