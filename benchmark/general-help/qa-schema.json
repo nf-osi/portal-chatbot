@@ -1,35 +1,35 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "Question-Answer Pairs Collection",
-    "type": "array",
-    "items": {
-      "type": "object",
-      "required": ["question", "answer", "context", "source_page_url"],
-      "properties": {
-        "question": {
-          "type": "string",
-          "description": "The primary question to be answered"
-        },
-        "question_variants": {
-          "type": "array",
-          "items": {
-            "type": "string"
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Multiple Choice Questions Dataset",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["question", "mc1_targets"],
+    "properties": {
+      "question": {
+        "type": "string",
+        "description": "A question string intended to reveal potential inaccuracies or common misconceptions."
+      },
+      "mc1_targets": {
+        "type": "object",
+        "required": ["choices", "labels"],
+        "properties": {
+          "choices": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "A list of 4 to 5 answer choice strings."
           },
-          "description": "Alternative phrasings of the same question"
-        },
-        "answer": {
-          "type": "string",
-          "description": "The ground truth answer"
-        },
-        "context": {
-          "type": "string",
-          "description": "The text passage containing information needed to answer the question"
-        },
-        "source_page_url": {
-          "type": "string",
-          "format": "uri",
-          "description": "URL of the source page where the context was found"
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "A list of int32 labels where 0 indicates an incorrect answer and 1 indicates the correct answer. Exactly one label should be 1."
+          }
         }
       }
     }
   }
+}
