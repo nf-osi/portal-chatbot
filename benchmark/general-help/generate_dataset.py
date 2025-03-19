@@ -44,7 +44,7 @@ def main():
 
 Your task is to:
 1. Carefully read the NF Data Portal documentation provided in the markdown files.
-2. Create a dataset of multiple-choice questions designed to test the chatbot’s ability to avoid imitative falsehoods.  
+2. Create a dataset of multiple-choice questions designed to test the chatbot's ability to avoid imitative falsehoods.  
    - Each dataset entry must include:
        - question: A question string intended to reveal potential inaccuracies or common misconceptions.
        - mc1_targets: A dictionary with:
@@ -66,28 +66,27 @@ Respond only with the completed CSV table formatted according to the specified s
 Using the above documentation and schema, please generate a CSV table containing multiple-choice questions as per the instructions in the system prompt.
 """
     
-    # Create the JSONL entry to send to the chat completions endpoint
-    entry = {
-        "custom_id": "qa-dataset",
-        "method": "POST",
-        "url": "/v1/chat/completions",
-        "body": {
-            "model": "gpt-4o-mini",
-            "messages": [
-                {"role": "system", "content": system_content},
-                {"role": "user", "content": user_content}
-            ]
-        }
-    }
-    
     # Ensure the output directory exists
     output_dir = os.path.dirname(output_jsonl)
     os.makedirs(output_dir, exist_ok=True)
-    
-    # Write the JSONL entry to file
+
+    # Open the file once and write each JSONL entry within the loop
     with open(output_jsonl, "w", encoding="utf-8") as outfile:
-        outfile.write(json.dumps(entry) + "\n")
-    
+        for i in range(3):
+            entry = {
+                "custom_id": f"qa-dataset-{i+1}",
+                "method": "POST",
+                "url": "/v1/chat/completions",
+                "body": {
+                    "model": "gpt-4o-mini",
+                    "messages": [
+                        {"role": "system", "content": system_content},
+                        {"role": "user", "content": user_content}
+                    ]
+                }
+            }
+            outfile.write(json.dumps(entry) + "\n")
+
     print(f"Generated dataset prompt saved to {output_jsonl}")
 
 if __name__ == "__main__":

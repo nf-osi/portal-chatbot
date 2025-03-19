@@ -29,7 +29,7 @@ scrapy runspider nfdocs_spider.py
 
 Now check that a directory `output_markdown` has been created locally and contains the Markdown files (again, these are git-ignored).
 
-#### BATCH_API for ynthetic dataset with LLM
+#### BATCH_API for synthetic dataset with LLM
 
 This section explains how to generate a synthetic dataset using a large language model (LLM) to produce multiple-choice questions for evaluating the NF portal chatbot.
 
