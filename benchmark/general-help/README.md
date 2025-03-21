@@ -67,6 +67,15 @@ This section explains how to generate a synthetic dataset using a large language
 - **Feedback Loop:**  
   Any issues identified during the review are fed back to improve both the prompt instructions and the overall generation process, ensuring that future iterations produce higher quality datasets.
 
+### Node Setup
+
+Make sure you have Node.js installed. Then, in the `datasets` (or project root) folder, run:
+
+```bash
+npm init -y
+npm install openai
+```
+
 #### Run BATCH API
 
 The batch API pipeline automates a multi-step process using the OpenAI API:
