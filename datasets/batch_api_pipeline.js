@@ -50,7 +50,7 @@ async function main() {
     // --- Step 3: Poll for batch status until output_file_id is available ---
     let outputFileId = null;
     let attempts = 0;
-    const maxAttempts = 120; // e.g., 120 attempts x 5 seconds = 10 minutes maximum.
+    const maxAttempts = 144; // 144 attempts = 24 hours (6 checks per hour * 24 hours)
     while (!outputFileId && attempts < maxAttempts) {
       console.log(`Checking batch status (attempt ${attempts + 1})...`);
       const statusResponse = await openai.batches.retrieve(batchId);
@@ -63,8 +63,8 @@ async function main() {
         break;
       }
       
-      // Wait 5 seconds before checking again.
-      await delay(5000);
+      // Wait 10 minutes before checking again.
+      await delay(600000);
       attempts++;
     }
     if (!outputFileId) {
