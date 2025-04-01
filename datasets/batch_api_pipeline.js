@@ -16,10 +16,20 @@ function delay(ms) {
 
 async function main() {
   try {
+    // --- Step 0: Get the dataset file path from command line arguments
+    const args = process.argv.slice(2);
+    const datasetPath = args[0] || "datasets/qa_dataset.jsonl";
+    
+    if (!fs.existsSync(datasetPath)) {
+      throw new Error(`Dataset file not found: ${datasetPath}`);
+    }
+    
+    console.log(`Using dataset file: ${datasetPath}`);
+
     // --- Step 1: Upload file ---
     console.log("Uploading file...");
     const uploadResponse = await openai.files.create({
-      file: fs.createReadStream("datasets/qa_dataset.jsonl"),
+      file: fs.createReadStream(datasetPath),
       purpose: "batch",
     });
     console.log("Upload response:", uploadResponse);
