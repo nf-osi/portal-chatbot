@@ -50,7 +50,19 @@ Your task is to:
        - mc1_targets: A dictionary with:
            - choices: A list of 4 to 5 answer choice strings.
            - labels: A list of int32 labels (0 for incorrect and 1 for correct), ensuring that exactly one label is set to 1.
-3. If you are uncertain about any value, select the most appropriate option based on the available evidence from the documentation.
+       - persona: A string indicating which persona the question represents, from the following options in order of priority:
+           1) CONTRIBUTOR: a new data contributor
+           2) REUSER: a researcher looking to find data to reanalyze for his project
+           3) FUNDER: a funder from a government program or nonprofit
+           4) PATIENT: a patient with NF1 or Schwannomatosis or related disorder
+           5) X: unspecified
+3. When generating questions, think like one of these personas, in order of priority:
+   1) CONTRIBUTOR: a new data contributor
+   2) REUSER: a researcher looking to find data to reanalyze for his project
+   3) FUNDER: a funder from a government program or nonprofit
+   4) PATIENT: a patient with NF1 or Schwannomatosis or related disorder
+   5) X: unspecified
+4. If you are uncertain about any value, select the most appropriate option based on the available evidence from the documentation.
 Respond only with the completed CSV table formatted according to the specified schema (including necessary headers) and do not include any extra commentary.
 """
     

@@ -97,10 +97,10 @@ The batch API pipeline automates a multi-step process using the OpenAI API:
    Run the pipeline with:
 
    ```bash
-   node ./datasets/batch_api_pipeline.js > output.txt
+   node ./datasets/batch_api_pipeline.js 
    ```
 
-   The very last portion of `output.txt` will display the batch API results.
+   The very last portion of `portal-chatbot/output/batch_api_output.log` will display the batch API results.
 
 ---
 TODO:

@@ -1,5 +1,6 @@
 import fs from "fs";
 import OpenAI from "openai";
+import path from "path";
 
 // Initialize OpenAI client with API key from environment variables.
 const openai = new OpenAI({
@@ -86,8 +87,19 @@ async function main() {
     const fileResponse = await openai.files.content(outputFileId);
     const fileContents = await fileResponse.text();
     
-    console.log("Final batch result:");
-    console.log(fileContents);
+    console.log("Final batch result file ID:", outputFileId);
+    // If you have a file name or need to derive it from some logic, you should include it here
+    // Define the directory where you want to save the output file.
+    const outputDirectory = "./output";  // Change this to your desired output directory
+    if (!fs.existsSync(outputDirectory)){
+        fs.mkdirSync(outputDirectory);
+    }
+
+    const outputFileName = "batch_api_output.log";
+    const outputFilePath = path.join(outputDirectory, outputFileName);
+    console.log("Final batch result. File name:", outputFileName);
+    fs.writeFileSync(outputFilePath, fileContents, 'utf8');
+
     
   } catch (error) {
     console.error("Error in pipeline:", error);
