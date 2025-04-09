@@ -67,12 +67,42 @@ This section explains how to generate a synthetic dataset using a large language
 - **Feedback Loop:**  
   Any issues identified during the review are fed back to improve both the prompt instructions and the overall generation process, ensuring that future iterations produce higher quality datasets.
 
+### Node Setup
+
+Make sure you have Node.js installed. Then, in the `datasets` (or project root) folder, run:
+
+```bash
+npm init -y
+npm install openai
+```
+
 #### Run BATCH API
 
-```
-python benchmark/general-help/generate_dataset.py
-```
+The batch API pipeline automates a multi-step process using the OpenAI API:
 
+1. **Generate the Dataset:**  
+   First, run the Python script to generate your dataset file (typically `qa_dataset.jsonl`):
+
+   ```bash
+   python benchmark/general-help/generate_dataset.py
+   ```
+
+2. **Execute the Batch API Pipeline:**  
+   Next, run the Node.js script to process the dataset through the batch API. This script performs the following steps:
+   - **Upload the File:** The dataset file is uploaded and a file ID is obtained.
+   - **Create the Batch Job:** Using the file ID, a batch job is created.
+   - **Poll for Batch Completion:** The script polls the batch status every 5 seconds until the API produces an output file ID (indicating the batch job is complete).
+   - **Retrieve Results:** Finally, the output file is retrieved and its contents (i.e. the batch API results) are printed.
+
+   Run the pipeline with:
+
+   ```bash
+   node ./datasets/batch_api_pipeline.js 
+   ```
+
+   The very last portion of `portal-chatbot/output/batch_api_output.log` will display the batch API results.
+
+---
 TODO:
 - Explain dataset structure and associated prompt/schema here
 - Explain batch API usage here (including OpenAI model used)

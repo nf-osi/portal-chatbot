@@ -2,4 +2,8 @@
 **/venv
 **/env
 **/__pycache__
-**/datasets
+**/*.pyc
+.env
+.qodo
+datasets/*
+!datasets/batch_api_pipeline.js
