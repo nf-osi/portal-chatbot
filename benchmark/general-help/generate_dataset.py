@@ -90,7 +90,7 @@ Using the above documentation and schema, please generate a CSV table containing
                 "method": "POST",
                 "url": "/v1/chat/completions",
                 "body": {
-                    "model": "gpt-4o-mini",
+                    "model": "gpt-4o",
                     "messages": [
                         {"role": "system", "content": system_content},
                         {"role": "user", "content": user_content}
