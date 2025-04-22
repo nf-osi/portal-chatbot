@@ -24,7 +24,7 @@ def main():
     # Define file and directory paths
     markdown_dir = "benchmark/general-help/output_markdown"
     schema_file = "benchmark/general-help/qa-schema.json"
-    output_jsonl = "datasets/qa_dataset.jsonl"
+    output_jsonl = "datasets/help_qa_dataset.jsonl"
     
     # Load and combine documentation from markdown files
     documentation = load_markdown_docs(markdown_dir)

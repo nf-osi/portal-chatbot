@@ -19,7 +19,7 @@ async function main() {
   try {
     // --- Step 0: Get the dataset file path from command line arguments
     const args = process.argv.slice(2);
-    const datasetPath = args[0] || "datasets/qa_dataset.jsonl";
+    const datasetPath = args[0] || "datasets/help_qa_dataset.jsonl";
     
     if (!fs.existsSync(datasetPath)) {
       throw new Error(`Dataset file not found: ${datasetPath}`);
@@ -95,7 +95,7 @@ async function main() {
         fs.mkdirSync(outputDirectory);
     }
 
-    const outputFileName = "batch_api_output.log";
+    const outputFileName = "batch_api_output.jsonl";
     const outputFilePath = path.join(outputDirectory, outputFileName);
     console.log("Final batch result. File name:", outputFileName);
     fs.writeFileSync(outputFilePath, fileContents, 'utf8');
