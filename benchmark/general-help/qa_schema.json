@@ -32,7 +32,7 @@
       },
       "persona": {
         "type": "string",
-        "enum": ["CONTRIBUUTOR", "REUSER", "FUNDER", "PATIENT", "X"]
+        "enum": ["CONTRIBUTOR", "REUSER", "FUNDER", "PATIENT", "X"]
       },
       "page_url": {
         "type": "string",
