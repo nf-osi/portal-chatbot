@@ -7,3 +7,4 @@
 .qodo
 datasets/*
 !datasets/batch_api_pipeline.js
+node_modules

@@ -1,0 +1,27 @@
+{
+  "name": "portal-chatbot",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Configuration files for NF Portal-flavored Synapse chatbot.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nf-osi/portal-chatbot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nf-osi/portal-chatbot/issues"
+  },
+  "homepage": "https://github.com/nf-osi/portal-chatbot#readme",
+  "dependencies": {
+    "openai": "^4.91.0"
+  }
+}

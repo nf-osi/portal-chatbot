@@ -4,7 +4,7 @@
   "type": "array",
   "items": {
     "type": "object",
-    "required": ["question", "mc1_targets"],
+    "required": ["question", "mc1_targets", "persona"],
     "properties": {
       "question": {
         "type": "string",
@@ -29,6 +29,18 @@
             "description": "A list of int32 labels where 0 indicates an incorrect answer and 1 indicates the correct answer. Exactly one label should be 1."
           }
         }
+      },
+      "persona": {
+        "type": "string",
+        "enum": ["CONTRIBUTOR", "REUSER", "FUNDER", "PATIENT", "X"]
+      },
+      "page_url": {
+        "type": "string",
+        "description": "URL of page that provides context for the question."
+      },
+      "context": {
+        "type": "string",
+        "description": "A snippet of text from the page that provides grounding for the correct anwer choice."
       }
     }
   }
