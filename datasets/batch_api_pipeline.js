@@ -15,11 +15,15 @@ function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// Takes a dataset file path to be uploaded for batch processing as first argument 
+// and saves result to `output/` with file path given as second argument.
 async function main() {
   try {
     // --- Step 0: Get the dataset file path from command line arguments
+    // or use datasets/help_qa_dataset.jsonl as default
     const args = process.argv.slice(2);
     const datasetPath = args[0] || "datasets/help_qa_dataset.jsonl";
+    const outputPath = args[1] || "output/batch_qa_benchmark.jsonl";
     
     if (!fs.existsSync(datasetPath)) {
       throw new Error(`Dataset file not found: ${datasetPath}`);
@@ -88,16 +92,7 @@ async function main() {
     const fileContents = await fileResponse.text();
     
     console.log("Final batch result file ID:", outputFileId);
-    // If you have a file name or need to derive it from some logic, you should include it here
-    // Define the directory where you want to save the output file.
-    const outputDirectory = "./output";  // Change this to your desired output directory
-    if (!fs.existsSync(outputDirectory)){
-        fs.mkdirSync(outputDirectory);
-    }
-
-    const outputFileName = "batch_api_output.jsonl";
-    const outputFilePath = path.join(outputDirectory, outputFileName);
-    console.log("Final batch result. File name:", outputFileName);
+    console.log("Final batch result is at:", outputPath);
     fs.writeFileSync(outputFilePath, fileContents, 'utf8');
 
     
