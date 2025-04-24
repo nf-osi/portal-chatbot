@@ -15,89 +15,110 @@ function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// Takes a dataset file path to be uploaded for batch processing as first argument 
-// and saves result to `output/` with file path given as second argument.
-async function main() {
+async function getDatasetPath(args) {
+  const datasetPath = args[0] || "datasets/help_qa_dataset.jsonl";
+  if (!fs.existsSync(datasetPath)) {
+    throw new Error(`Dataset file not found: ${datasetPath}`);
+  }
+  return datasetPath;
+}
+
+async function uploadFile(datasetPath) {
+  console.log("Uploading file...");
+  const uploadResponse = await openai.files.create({
+    file: fs.createReadStream(datasetPath),
+    purpose: "batch",
+  });
+  console.log("Upload response:", uploadResponse);
+
+  const inputFileId = uploadResponse.id;
+  console.log("Input file id:", inputFileId);
+  if (!inputFileId) {
+    throw new Error("Failed to get file id from upload response.");
+  }
+  return inputFileId;
+}
+
+async function createBatch(inputFileId) {
+  console.log("Creating batch...");
+  const batchResponse = await openai.batches.create({
+    input_file_id: inputFileId,
+    endpoint: "/v1/chat/completions",
+    completion_window: "24h"
+  });
+  console.log("Batch creation response:", batchResponse);
+  
+  const batchId = batchResponse.id;
+  console.log("Batch id:", batchId);
+  if (!batchId) {
+    throw new Error("Failed to get batch id from batch creation response.");
+  }
+  return batchId;
+}
+
+async function pollBatchStatus(batchId) {
+  let outputFileId = null;
+  let errorFileId = null;
+  let attempts = 0;
+  const maxAttempts = 144;
+  
+  while (!outputFileId && !errorFileId && attempts < maxAttempts) {
+    console.log(`Checking batch status (attempt ${attempts + 1})...`);
+    const statusResponse = await openai.batches.retrieve(batchId);
+    console.log("Batch status response:", statusResponse);
+    
+    outputFileId = statusResponse.output_file_id;
+    if (outputFileId) {
+      console.log("Success for batch. Output file available:", outputFileId);
+      break;
+    }
+
+    errorFileId = statusResponse.error_file_id;
+    if (errorFileId) {
+      console.log("Error for batch. Error file available:", errorFileId);
+      break;
+    }
+    
+    await delay(600000);
+    attempts++;
+  }
+  
+  if (!outputFileId && !errorFileId) {
+    throw new Error("Timed out waiting for output file id in batch status.");
+  }
+  return outputFileId || errorFileId;
+}
+
+async function retrieveBatchResultFile(outputFileId, outputPath) {
   try {
-    // --- Step 0: Get the dataset file path from command line arguments
-    // or use datasets/help_qa_dataset.jsonl as default
-    const args = process.argv.slice(2);
-    const datasetPath = args[0] || "datasets/help_qa_dataset.jsonl";
-    const outputPath = args[1] || "output/batch_qa_benchmark.jsonl";
-    
-    if (!fs.existsSync(datasetPath)) {
-      throw new Error(`Dataset file not found: ${datasetPath}`);
-    }
-    
-    console.log(`Using dataset file: ${datasetPath}`);
-
-    // --- Step 1: Upload file ---
-    console.log("Uploading file...");
-    const uploadResponse = await openai.files.create({
-      file: fs.createReadStream(datasetPath),
-      purpose: "batch",
-    });
-    console.log("Upload response:", uploadResponse);
-
-    // Get the file id from the upload response.
-    const inputFileId = uploadResponse.id;
-    console.log("Input file id:", inputFileId);
-    if (!inputFileId) {
-      throw new Error("Failed to get file id from upload response.");
-    }
-    
-    // --- Step 2: Create batch ---
-    console.log("Creating batch...");
-    const batchResponse = await openai.batches.create({
-      input_file_id: inputFileId,
-      endpoint: "/v1/chat/completions",
-      completion_window: "24h"
-    });
-    console.log("Batch creation response:", batchResponse);
-    
-    // Get the batch id from the batch creation response.
-    const batchId = batchResponse.id;
-    console.log("Batch id:", batchId);
-    if (!batchId) {
-      throw new Error("Failed to get batch id from batch creation response.");
-    }
-    
-    // --- Step 3: Poll for batch status until output_file_id is available ---
-    let outputFileId = null;
-    let attempts = 0;
-    const maxAttempts = 144; // 144 attempts = 24 hours (6 checks per hour * 24 hours)
-    while (!outputFileId && attempts < maxAttempts) {
-      console.log(`Checking batch status (attempt ${attempts + 1})...`);
-      const statusResponse = await openai.batches.retrieve(batchId);
-      console.log("Batch status response:", statusResponse);
-      
-      // Check directly for output_file_id.
-      outputFileId = statusResponse.output_file_id;
-      if (outputFileId) {
-        console.log("Output file id available:", outputFileId);
-        break;
-      }
-      
-      // Wait 10 minutes before checking again.
-      await delay(600000);
-      attempts++;
-    }
-    if (!outputFileId) {
-      throw new Error("Timed out waiting for output file id in batch status.");
-    }
-    
-    // --- Step 4: Retrieve batch result file contents ---
     console.log("Retrieving batch result file contents...");
     const fileResponse = await openai.files.content(outputFileId);
     const fileContents = await fileResponse.text();
-    
+
     console.log("Final batch result file ID:", outputFileId);
     console.log("Final batch result is at:", outputPath);
-    fs.writeFileSync(outputFilePath, fileContents, 'utf8');
-
-    
+    fs.writeFileSync(outputPath, fileContents, 'utf8');
   } catch (error) {
-    console.error("Error in pipeline:", error);
+    console.error("Error retrieving batch result file:", error);
+    throw error;
+  }
+}
+
+async function main() {
+  try {
+    const args = process.argv.slice(2);
+    const outputPath = args[1] || "output/batch_qa_benchmark.jsonl";
+    
+    const datasetPath = await getDatasetPath(args);
+    console.log(`Using dataset file: ${datasetPath}`);
+
+    const inputFileId = await uploadFile(datasetPath);
+    const batchId = await createBatch(inputFileId);
+    const outputFileId = await pollBatchStatus(batchId);
+    await retrieveBatchResultFile(outputFileId, outputPath);
+  } catch (error) {
+    console.error("Error in main pipeline:", error);
+    throw error;
   }
 }
 
