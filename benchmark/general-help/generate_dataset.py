@@ -46,7 +46,7 @@ def main():
 
 Your task is to:
 1. Carefully read the NF Data Portal documentation provided as markdown content and compiled from a number of pages.
-2. Create a dataset of multiple-choice questions designed to test the chatbot's ability to avoid imitative falsehoods.  
+2. Create a dataset of multiple-choice questions that includes realistic persona-based question with one correct choice (based on the documentation) alongside a number of misleading false choices.  
    - Each dataset entry must include:
        - question: A question string intended to reveal potential inaccuracies or common misconceptions.
        - mc1_targets: A dictionary with:
@@ -62,7 +62,7 @@ Your task is to:
        - context: A snippet of text from the page that provides grounding for the correct answer choice. This can be left blank if not applicable.
 3. If you are uncertain about any value, select the most appropriate option based on the available evidence from the documentation.
 Respond only with the completed CSV table formatted according to the specified schema (including necessary headers) and do not include any extra commentary. 
-There should be a total of between 30-50 questions across all personas.
+There should be a total of between 30-60 questions across all personas, with 1-3 persona perspectives represented per page.
 """
     
     # Prepare a user message that provides the documentation and schema details
@@ -74,7 +74,8 @@ There should be a total of between 30-50 questions across all personas.
 ## Schema
 {schema_str}
 
-Using the above documentation and schema, please generate a CSV table containing multiple-choice questions as per the instructions in the system prompt.
+Using the above documentation and schema, please generate a CSV table containing multiple-choice questions as per the instructions. 
+Do not wrap the output in a code block; it has to be directly parseable as a .csv.
 """
     
     # Ensure the output directory exists
@@ -93,7 +94,8 @@ Using the above documentation and schema, please generate a CSV table containing
                     "messages": [
                         {"role": "system", "content": system_content},
                         {"role": "user", "content": user_content}
-                    ]
+                    ],
+                    "max_completion_tokens": 10000,
                 }
             }
             outfile.write(json.dumps(entry) + "\n")
