@@ -94,10 +94,11 @@ The batch API pipeline automates a multi-step process using the OpenAI API:
    - **Poll for Batch Completion:** The script polls the batch status every 5 seconds until the API produces an output file ID (indicating the batch job is complete).
    - **Retrieve Results:** Finally, the output file is retrieved and its contents (i.e. the batch API results) are printed.
 
-   Run the pipeline with:
+   Assuming you have an OpenAI key, you can run the pipeline (from the root of repo) with:
 
    ```bash
-   node ./datasets/batch_api_pipeline.js 
+
+   OPENAI_API_KEY=$OPENAI_API_KEY node ./datasets/batch_api_pipeline.js 
    ```
 
    The very last portion of `portal-chatbot/output/batch_api_output.log` will display the batch API results.
