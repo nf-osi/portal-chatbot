@@ -12,7 +12,33 @@ This directory contains configurations for different versions of NF Portal chatb
 
 ## Compare and Contrast
 
+### Evolution of Capabilities
 
+| Feature | v0 (Legacy) | nf-portal-chatbot (Current) | nf-portal-pilot (Next) |
+|---------|-------------|----------------------------|------------------------|
+| **Primary Function** | Chat only | Portal help and navigation | Advanced search and discovery |
+| **Data Source** | Static instructions only | Help docs | Knowledge graph + publications |
+| **Query Capabilities** | None | Help docs | SPARQL + SPARQL+Text queries |
+| **Response Format** | Plain text | Structured XML with actions | Structured XML with actions |
+| **Navigation** | Text directions only | Direct redirects to portal pages | Direct redirects to portal pages |
+| **Discovery** | ❌ No | ⚠️ Limited | ✅ Better (datasets, studies, tools) |
+| **Publication Search** | ❌ No | ❌ No | ✅ Yes (indexed text search) |
+| **Guided Prompts** | ❌ No | ✅ Yes (interactive suggestions) | ✅ Yes (interactive suggestions) |
+| **Model** | Claude 3.5 Sonnet | Claude Sonnet 4 | Claude Sonnet 4 |
+
+### Key Differences
+
+**v0** was an initial test deployment of the Synapse Custom Agent framework with no customizations beyond the system instructions. 
+It had no ability to query data or access real-time information.
+
+**nf-portal-chatbot** represents the production version focused on helping users with portal documentation and navigation.
+- **Contextual Navigation**: Can redirect users directly to filtered views and detail pages
+- **Interactive Guidance**: Provides contextual follow-up suggestions throughout the conversation
+
+**nf-portal-pilot** is an experimental next-generation agent that adds:
+- **Knowledge Graph Integration**: Direct SPARQL queries to the NF-OSI knowledge graph
+- **Advanced Discovery**: Helps researchers discover linked datasets, publications, and tools more effectively
+- **Publication Search**: Searches indexed publication text with citation attribution
 
 ## Setup
 
