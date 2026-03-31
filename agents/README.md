@@ -6,7 +6,7 @@ This directory contains configurations for different versions of NF Portal chatb
 
 | Agent Name | Status | Agent ID | Registration ID | Registered By | Synapse Link | Configuration | Notes |
 |------------|--------|----------|-----------------|---------------|--------------|---------------|-------|
-| **nf-portal-chatbot** | Current | `2COISTBHRB` | `197` | `allaway` | [Chat](https://www.synapse.org/Chat:initialMessage=hello&agentRegistrationId=197) | `nf-portal-chatbot/` | Hackathon 2025/2026 version |
+| **nf-portal-chatbot** | Current | `2COISTBHRB` | `197` | `allaway` | [Chat](https://www.synapse.org/Chat:initialMessage=hello&agentRegistrationId=197) | [nf-portal-chatbot](https://github.com/Sage-Bionetworks/portal-agent-contexts/tree/main/nf-portal-chatbot) | Hackathon 2025/2026 version |
 | **nf-portal-pilot** | Next | `WU3QRWA0FQ` | - | `nf-service` | - | `nf-portal-pilot/` | Next-gen pilot version with graph RAG |
 | **v0** | Legacy | `JRQZHX4RCC` | `11` | `allaway` | - | `v0/nf-chatbot-cloudformation.yml` | Legacy version. Alias ID: `TSTALIASID`. Registered: 2024-11-18. |
 
