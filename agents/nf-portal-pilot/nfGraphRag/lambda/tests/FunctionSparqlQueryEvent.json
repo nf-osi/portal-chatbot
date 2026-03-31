@@ -1,0 +1,16 @@
+{
+  "messageVersion": "1.0",
+  "agent": {
+    "name": "nf-kg-agent",
+    "version": "test"
+  },
+  "actionGroup": "nfGraphRag",
+  "function": "sparqlQuery",
+  "parameters": [
+    {
+      "name": "query",
+      "type": "string",
+      "value": "SELECT ?type (COUNT(?s) AS ?count) WHERE { ?s a ?type } GROUP BY ?type ORDER BY DESC(?count) LIMIT 5"
+    }
+  ]
+}

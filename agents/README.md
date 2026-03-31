@@ -1,0 +1,19 @@
+# Agent Registrations
+
+This directory contains configurations for different versions of NF Portal chatbot agents registered on Synapse.
+
+## Current Registered Agents
+
+| Agent Name | Status | Agent ID | Registration ID | Registered By | Synapse Link | Configuration | Notes |
+|------------|--------|----------|-----------------|---------------|--------------|---------------|-------|
+| **nf-portal-chatbot** | Current | `2COISTBHRB` | `197` | `allaway` | [Chat](https://www.synapse.org/Chat:initialMessage=hello&agentRegistrationId=197) | `nf-portal-chatbot/` | Hackathon 2025/2026 version |
+| **nf-portal-pilot** | Next | `WU3QRWA0FQ` | - | `nf-service` | - | `nf-portal-pilot/` | Next-gen pilot version with graph RAG |
+| **v0** | Legacy | `JRQZHX4RCC` | `11` | `allaway` | - | `v0/nf-chatbot-cloudformation.yml` | Legacy version. Alias ID: `TSTALIASID`. Registered: 2024-11-18. |
+
+## Compare and Contrast
+
+
+
+## Setup
+
+To learn more about the Synapse Custom Agent framework, refer to [this internal Confluence doc](https://sagebionetworks.jira.com/wiki/spaces/PLFM/pages/3711303683/Adding+Custom+Agents+to+Synapse).

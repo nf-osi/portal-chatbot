@@ -1,0 +1,23 @@
+{
+  "messageVersion": "1.0",
+  "agent": {
+    "name": "nf-kg-agent",
+    "version": "test"
+  },
+  "actionGroup": "nfGraphRag",
+  "apiPath": "/sparql-query",
+  "httpMethod": "POST",
+  "requestBody": {
+    "content": {
+      "application/json": {
+        "properties": [
+          {
+            "name": "query",
+            "type": "string",
+            "value": "SELECT (COUNT(*) AS ?triples) WHERE { ?s ?p ?o }"
+          }
+        ]
+      }
+    }
+  }
+}
