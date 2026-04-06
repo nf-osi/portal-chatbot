@@ -1,0 +1,142 @@
+openapi: 3.0.0
+info:
+  title: NF RAG Function API
+  version: 1.0.0
+  description: >
+    This schema describes the four agent-facing functions for NF knowledgegraph
+    RAG. A Lambda adapter maps these operations to Bedrock action-group style
+    function calls via apiPath or function name.
+tags:
+  - name: sparql
+    description: SPARQL and schema helper operations for the NF-OSI knowledge graph
+paths:
+  /sparql-query:
+    post:
+      tags:
+        - sparql
+      operationId: sparqlQuery
+      summary: Execute an arbitrary SPARQL query
+      description: >
+        Runs a SPARQL query against the configured NF-OSI SPARQL endpoint and
+        returns TSV text. The implementation prepends the default NF ontology
+        prefixes automatically.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SparqlQueryRequest"
+            examples:
+              tripleCount:
+                value:
+                  query: SELECT (COUNT(*) AS ?triples) WHERE { ?s ?p ?o }
+      responses:
+        "200":
+          description: TSV query result or application-level error payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TsvResultResponse"
+  /schema:
+    post:
+      tags:
+        - sparql
+      operationId: getSchema
+      summary: List ontology classes and properties
+      description: >
+        Returns a TSV table containing ontology terms, their kinds, labels,
+        comments, domains, and ranges.
+      responses:
+        "200":
+          description: TSV schema result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TsvResultResponse"
+  /shape:
+    post:
+      tags:
+        - sparql
+      operationId: getShape
+      summary: Retrieve the SHACL shape for one NF class
+      description: >
+        Returns a TSV table describing the SHACL node shape and property
+        constraints for the requested class. The class name may be passed either
+        as a local name like CellLine or as a prefixed value like nf:CellLine.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetShapeRequest"
+            examples:
+              cellLine:
+                value:
+                  className: CellLine
+      responses:
+        "200":
+          description: Requested shape or application-level error payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetShapeResponse"
+  /count-by-type:
+    post:
+      tags:
+        - sparql
+      operationId: countByType
+      summary: Count instances grouped by rdf:type
+      description: >
+        Returns a TSV table containing per-type instance counts from the
+        knowledge graph.
+      responses:
+        "200":
+          description: TSV count result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TsvResultResponse"
+components:
+  schemas:
+    SparqlQueryRequest:
+      type: object
+      required:
+        - query
+      properties:
+        query:
+          type: string
+          description: >
+            SPARQL query text. The Lambda implementation prepends the default NF
+            ontology prefixes automatically.
+      additionalProperties: false
+    GetShapeRequest:
+      type: object
+      required:
+        - className
+      properties:
+        className:
+          type: string
+          description: >
+            Class local name such as CellLine or AnimalModel, or a prefixed name
+            like nf:CellLine.
+      additionalProperties: false
+    TsvResultResponse:
+      type: object
+      properties:
+        resultTsv:
+          type: string
+          description: Tab-separated query result returned by the underlying SPARQL endpoint.
+        error:
+          type: string
+          description: Application-level error text returned by the function.
+      additionalProperties: false
+    GetShapeResponse:
+      type: object
+      properties:
+        className:
+          type: string
+        resultTsv:
+          type: string
+        error:
+          type: string
+      additionalProperties: false

@@ -1,0 +1,23 @@
+{
+  "messageVersion": "1.0",
+  "agent": {
+    "name": "nf-kg-agent",
+    "version": "test"
+  },
+  "actionGroup": "nfGraphRag",
+  "apiPath": "/shape",
+  "httpMethod": "POST",
+  "requestBody": {
+    "content": {
+      "application/json": {
+        "properties": [
+          {
+            "name": "className",
+            "type": "string",
+            "value": "CellLine"
+          }
+        ]
+      }
+    }
+  }
+}
