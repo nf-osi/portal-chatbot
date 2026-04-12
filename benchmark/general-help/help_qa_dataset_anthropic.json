@@ -1059,29 +1059,6 @@
     "id": "fd640c50-0061-4274-8317-65fa6296e4da"
   },
   {
-    "question": "In ProjectLIVE, how can a funder find out if any new data files were uploaded to the portal in the last 30 days?",
-    "mc1_targets": {
-      "choices": [
-        "Go to the Snapshot module and filter by date in the Overview section",
-        "Go to the Participating Studies module and sort the table by upload date",
-        "Go to the New Submissions module and type 30 into the 'Display files uploaded within the last N days' field",
-        "Go to the Publications module and filter by the current year"
-      ],
-      "labels": [
-        0,
-        0,
-        1,
-        0
-      ]
-    },
-    "persona": "FUNDER",
-    "page_urls": [
-      "https://help.nf.synapse.org/nf-data-portal-documentation/for-the-funding-organizations/how-to-use-projectlive/projectlive-use-cases"
-    ],
-    "context": "Go to the New Submissions module. Type 30 Into the Display files uploaded within the last N days field. This will show you all new files uploaded within the last 30 days.",
-    "id": "346a780d-e0ee-43ff-8a50-3d4051f04ff1"
-  },
-  {
     "question": "According to the NF Data Portal documentation, which step-by-step resource is available to help a researcher export data to a compute platform like CAVATICA, and where can they also learn how to upload data to Synapse?",
     "mc1_targets": {
       "choices": [
