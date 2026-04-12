@@ -868,31 +868,6 @@
     "id": "9a3f383c-fc32-4d1e-8d70-25c89d407af3"
   },
   {
-    "question": "Which of the following tool types is NOT currently accepted for contribution to NF Research Tools Central?",
-    "mc1_targets": {
-      "choices": [
-        "Animal models",
-        "Cell lines",
-        "Clinical trial protocols",
-        "Genetic reagents",
-        "Biobanks"
-      ],
-      "labels": [
-        0,
-        0,
-        1,
-        0,
-        0
-      ]
-    },
-    "persona": "CONTRIBUTOR",
-    "page_urls": [
-      "https://help.nf.synapse.org/nf-data-portal-documentation/neurofibromatosis-research-tools-database"
-    ],
-    "context": "We accept the following types of tools: Cell lines, Animal models, Antibodies, Genetic reagents, Biobanks. The database currently supports contributions of information about any animal models, cell lines, antibodies, genetic reagents, and biobanks that are related to the study of neurofibromatosis type 1, neurofibromatosis type 2, or schwannomatosis.",
-    "id": "3c786528-e882-4cfd-865e-5076718a642c"
-  },
-  {
     "question": "When opening a new project on the NF Data Portal, at what step does the study become active and visible on the portal?",
     "mc1_targets": {
       "choices": [
