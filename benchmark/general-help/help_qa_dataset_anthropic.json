@@ -1108,31 +1108,6 @@
     "id": "181d8bb8-59a8-492e-8182-79a6d0f9b336"
   },
   {
-    "question": "A data contributor cannot find the controlled vocabulary term they need in a Synapse Curator drop-down field. What is the recommended first step?",
-    "mc1_targets": {
-      "choices": [
-        "Email the NF-OSI team to request the new term before submitting anything.",
-        "Leave the field blank and note the missing term in a separate document.",
-        "Ask the AI assistant, which may suggest an existing matching term; if nothing fits, submit a provisional new value directly.",
-        "Switch back to the Data Curator App, which has a more complete vocabulary.",
-        "Delete the file row and re-upload the file with a different name."
-      ],
-      "labels": [
-        0,
-        0,
-        1,
-        0,
-        0
-      ]
-    },
-    "persona": "CONTRIBUTOR",
-    "page_urls": [
-      "https://help.nf.synapse.org/nf-data-portal-documentation/contributing-data/synapse-curator-transition-guide"
-    ],
-    "context": "First, try asking the AI assistant; it may be able to suggest a term that already exists in our list that matches what you're looking for. If nothing fits, you can submit a provisional new value directly in the app. We'll follow up if any changes are needed on our end.",
-    "id": "86b74dda-b9f3-4fe1-88d2-eb24e0550f90"
-  },
-  {
     "question": "Which of the following correctly describes a key limitation of MySQL Full Text Search as used in the NF Research Tools Central?",
     "mc1_targets": {
       "choices": [
