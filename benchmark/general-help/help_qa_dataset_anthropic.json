@@ -916,29 +916,6 @@
     "id": "f14102ad-ac52-437e-8f14-bc9b2dd01d4a"
   },
   {
-    "question": "What does the 'News' tab on the NF Data Portal do when clicked?",
-    "mc1_targets": {
-      "choices": [
-        "It opens a new page within the portal showing the latest publications",
-        "It opens a new browser tab highlighting what's going on in the world of the NF Data Portal",
-        "It redirects to the NF Data Portal documentation (help) site",
-        "It displays a list of current grant opportunities within the portal's main window"
-      ],
-      "labels": [
-        0,
-        1,
-        0,
-        0
-      ]
-    },
-    "persona": "X",
-    "page_urls": [
-      "https://help.nf.synapse.org/nf-data-portal-documentation/navigating-the-portal"
-    ],
-    "context": "The News tab opens a new browser tab that highlights what's going on in the world of the NF Data Portal. Learn about the latest software releases, new grant opportunities, upcoming hackathons, and more.",
-    "id": "9b4e8a82-1ba6-4b61-b70a-81dd7fd1d07d"
-  },
-  {
     "question": "A contributor wants to submit unpublished, proprietary information about a newly developed cell line to NF Research Tools Central. What should they do before submitting?",
     "mc1_targets": {
       "choices": [
