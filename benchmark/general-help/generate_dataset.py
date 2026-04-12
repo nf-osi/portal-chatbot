@@ -1,106 +1,190 @@
+import argparse
 import os
 import json
-import time
+import math
 import tiktoken
+from openai import OpenAI
+import anthropic
 
-def count_tokens(text, model="gpt-4"):
-    """Count tokens in text using tiktoken."""
-    encoding = tiktoken.encoding_for_model(model)
+OPENAI_MODEL = "gpt-5.4"
+ANTHROPIC_MODEL = "claude-sonnet-4-6"
+BATCH_SIZE = 5       # pages per request
+QUESTIONS_PER_BATCH = 6  # target questions per batch; yields ~54 for 43 pages / 5-page batches
+
+def count_tokens_tiktoken(text, model=OPENAI_MODEL):
+    """Estimate token count using tiktoken (OpenAI)."""
+    try:
+        encoding = tiktoken.encoding_for_model(model)
+    except KeyError:
+        encoding = tiktoken.get_encoding("o200k_base")
     return len(encoding.encode(text))
 
-def load_markdown_docs(markdown_dir):
-    """Load and combine all markdown files from the given directory. 
-    Currently, the entire corpus fits into a single prompt."""
-    combined_text = ""
-    # Loop over files in the markdown directory
-    for filename in os.listdir(markdown_dir):
-        if filename.endswith(".md"):
-            filepath = os.path.join(markdown_dir, filename)
-            with open(filepath, "r", encoding="utf-8") as f:
-                # Optionally include a header with the filename for clarity
-                combined_text += f"\n\n# {filename}\n" + f.read()
-    return combined_text
+def count_tokens_anthropic(system_content, user_content):
+    """Exact token count via Anthropic's native token counting API."""
+    client = anthropic.Anthropic()
+    response = client.messages.count_tokens(
+        model=ANTHROPIC_MODEL,
+        system=system_content,
+        messages=[{"role": "user", "content": user_content}],
+    )
+    return response.input_tokens
 
-def main():
-    # Define file and directory paths
-    markdown_dir = "benchmark/general-help/output_markdown"
-    schema_file = "benchmark/general-help/qa_schema.json"
-    output_jsonl = "datasets/help_qa_dataset.jsonl"
-    
-    # Load and combine documentation from markdown files
-    documentation = load_markdown_docs(markdown_dir)
-    print(f"Loaded documentation from {markdown_dir}")
-    
-    # Load the QA schema from the json file
-    with open(schema_file, "r", encoding="utf-8") as f:
-        schema = json.load(f)
-    print(f"Loaded schema from {schema_file}")
-    
-    # Check token count of the documentation
-    # Accounting for system prompt, anything below 120K is good; as of 2025 docs are <60K tokens
-    token_count = count_tokens(documentation)
-    print(f"Documentation token count: {token_count}")
-    
-    # Define the system prompt with task instructions
-    system_content = """You are an AI assistant specializing in the NF Data Portal and NF Research Tools Central, platforms dedicated to neurofibromatosis (NF) research. Your role is to assist users in navigating these resources, understanding their content, and locating specific data files, datasets, analysis tools, and publications related to NF1, NF2, and schwannomatosis. Utilize your knowledge of the portals’ structures and offerings to provide accurate and efficient guidance. When necessary, direct users to relevant sections or external resources to enhance their research experience.
+def get_page_batches(markdown_dir, batch_size=BATCH_SIZE):
+    """Return a list of filename batches, each containing up to batch_size pages."""
+    files = sorted(f for f in os.listdir(markdown_dir) if f.endswith(".md"))
+    return [files[i:i + batch_size] for i in range(0, len(files), batch_size)]
 
-Your task is to:
-1. Carefully read the NF Data Portal documentation provided as markdown content and compiled from a number of pages.
-2. Create a dataset of multiple-choice questions that includes realistic persona-based question with one correct choice (based on the documentation) alongside a number of misleading false choices.  
-   - Each dataset entry must include:
-       - question: A question string intended to reveal potential inaccuracies or common misconceptions.
-       - mc1_targets: A dictionary with:
-           - choices: A list of 4 to 5 answer choice strings. It is possible to include a "Not covered in documentation" option for questions not directly addressed in the documentation.
-           - labels: A list of int32 labels (0 for incorrect and 1 for correct), ensuring that exactly one label is set to 1.
-       - persona: A string indicating which persona the question represents, from the following options in order of priority:
-           1) CONTRIBUTOR: a new data contributor
-           2) REUSER: a researcher looking to find data to reanalyze for his project
-           3) FUNDER: a funder from a government program or nonprofit
-           4) PATIENT: a patient with NF1 or Schwannomatosis or related disorder
-           5) X: unspecified
-       - page_url: URL of page that provides context for the question.
-       - context: A snippet of text from the page that provides grounding for the correct answer choice. This can be left blank if not applicable.
-3. If you are uncertain about any value, select the most appropriate option based on the available evidence from the documentation.
-Respond only with the completed CSV table formatted according to the specified schema (including necessary headers) and do not include any extra commentary. 
-There should be a total of between 30-60 questions across all personas, with 1-3 persona perspectives represented per page.
-"""
-    
-    # Prepare a user message that provides the documentation and schema details
+def load_batch(markdown_dir, filenames):
+    """Load and combine a specific set of markdown files."""
+    combined = ""
+    for filename in filenames:
+        filepath = os.path.join(markdown_dir, filename)
+        with open(filepath, "r", encoding="utf-8") as f:
+            combined += f"\n\n# {filename}\n" + f.read()
+    return combined
+
+def build_openai_response_format(schema):
+    """Wrap the array schema in an object for OpenAI's response_format."""
+    return {
+        "type": "json_schema",
+        "json_schema": {
+            "name": "qa_dataset",
+            "strict": True,
+            "schema": {
+                "type": "object",
+                "properties": {"questions": schema},
+                "required": ["questions"],
+                "additionalProperties": False,
+            },
+        },
+    }
+
+def build_anthropic_tool(schema):
+    """Wrap the array schema in a tool definition for Anthropic's structured output."""
+    # Strip JSON Schema metadata fields ($schema, title) — not valid in tool input schemas
+    clean_schema = {k: v for k, v in schema.items() if k not in ("$schema", "title")}
+    return {
+        "name": "generate_qa_dataset",
+        "description": "Generate a QA dataset of multiple-choice questions from NF Data Portal documentation.",
+        "input_schema": {
+            "type": "object",
+            "properties": {"questions": clean_schema},
+            "required": ["questions"],
+        },
+    }
+
+def build_prompts(batch_docs, schema, n_questions):
+    system_content = """You are an AI assistant specializing in the NF Data Portal and NF Research Tools Central, platforms dedicated to neurofibromatosis (NF) research. Your role is to assist users in navigating these resources, understanding their content, and locating specific data files, datasets, analysis tools, and publications related to NF1, NF2, and schwannomatosis.
+
+Your task is to generate multiple-choice questions from the provided documentation pages.
+Each question must include:
+  - question: A question string intended to reveal potential inaccuracies or common misconceptions.
+  - mc1_targets:
+      - choices: A list of 4 to 5 answer choice strings. You may include "Not covered in documentation" if applicable.
+      - labels: A list of int32 labels (0 = incorrect, 1 = correct). Exactly one label must be 1.
+  - persona: One of the following, with CONTRIBUTOR and REUSER together making up at least 70% of questions:
+      - CONTRIBUTOR: a new data contributor
+      - REUSER: a researcher reanalyzing data
+      - FUNDER: a funder from a government program or nonprofit
+      - PATIENT: a patient with NF1, Schwannomatosis, or a related disorder
+      - X: unspecified
+  - page_urls: List of source page URLs. Use multiple URLs for cross-page questions that draw on content from more than one of the provided pages.
+  - context: Text snippet grounding the correct answer. For cross-page questions, include snippets from each source page.
+
+Aim for a mix of single-page and cross-page questions where cross-page questions compare or combine information across the provided pages."""
+
     schema_str = json.dumps(schema, indent=2)
     user_content = f"""# NF Data Portal Documentation
 
-{documentation}
+{batch_docs}
 
 ## Schema
 {schema_str}
 
-Using the above documentation and schema, please generate a CSV table containing multiple-choice questions as per the instructions. 
-Do not wrap the output in a code block; it has to be directly parseable as a .csv.
+Generate exactly {n_questions} multiple-choice questions from the pages above. Return a JSON object with a "questions" key containing the array.
 """
-    
-    # Ensure the output directory exists
-    output_dir = os.path.dirname(output_jsonl)
+    return system_content, user_content
+
+def generate_with_openai(system_content, user_content, schema):
+    client = OpenAI()
+    response = client.chat.completions.create(
+        model=OPENAI_MODEL,
+        messages=[
+            {"role": "system", "content": system_content},
+            {"role": "user", "content": user_content},
+        ],
+        max_completion_tokens=4000,
+        response_format=build_openai_response_format(schema),
+    )
+    return json.loads(response.choices[0].message.content)["questions"]
+
+def generate_with_anthropic(system_content, user_content, schema):
+    client = anthropic.Anthropic()
+    response = client.messages.create(
+        model=ANTHROPIC_MODEL,
+        max_tokens=4000,
+        system=system_content,
+        tools=[build_anthropic_tool(schema)],
+        tool_choice={"type": "tool", "name": "generate_qa_dataset"},
+        messages=[{"role": "user", "content": user_content}],
+    )
+    for block in response.content:
+        if block.type == "tool_use":
+            data = block.input
+            return data["questions"] if isinstance(data, dict) and "questions" in data else data
+    raise RuntimeError("No tool_use block in Anthropic response")
+
+def main():
+    parser = argparse.ArgumentParser(description="Generate QA dataset from NF docs.")
+    parser.add_argument(
+        "--provider",
+        choices=["openai", "anthropic"],
+        required=True,
+        help="LLM provider to use for generation.",
+    )
+    parser.add_argument(
+        "--max-batches",
+        type=int,
+        default=None,
+        help="Limit the number of batches processed (useful for testing).",
+    )
+    args = parser.parse_args()
+
+    markdown_dir = "output_markdown"
+    schema_file = "qa_schema.json"
+    output_dir = "."
+
+    with open(schema_file, "r", encoding="utf-8") as f:
+        schema = json.load(f)
+
+    batches = get_page_batches(markdown_dir)[:args.max_batches]
+    n_batches = len(batches)
+    print(f"Found {sum(len(b) for b in batches)} pages → {n_batches} batches of up to {BATCH_SIZE}")
+
+    generate_fn = generate_with_openai if args.provider == "openai" else generate_with_anthropic
+
+    all_questions = []
+    for i, filenames in enumerate(batches, 1):
+        batch_docs = load_batch(markdown_dir, filenames)
+        system_content, user_content = build_prompts(batch_docs, schema, QUESTIONS_PER_BATCH)
+
+        if args.provider == "anthropic":
+            tokens = count_tokens_anthropic(system_content, user_content)
+        else:
+            tokens = count_tokens_tiktoken(batch_docs)
+        print(f"[{i}/{n_batches}] Pages: {', '.join(filenames)} ({tokens} tokens)")
+
+        questions = generate_fn(system_content, user_content, schema)
+        print(f"[{i}/{n_batches}] Generated {len(questions)} questions")
+        all_questions.extend(questions)
+
+    print(f"\nTotal questions: {len(all_questions)}")
+
     os.makedirs(output_dir, exist_ok=True)
-
-    # Open the file once and write each JSONL entry within the loop
-    with open(output_jsonl, "w", encoding="utf-8") as outfile:
-        for i in range(1):
-            entry = {
-                "custom_id": f"qa-dataset-{i+1}",
-                "method": "POST",
-                "url": "/v1/chat/completions",
-                "body": {
-                    "model": "gpt-4o",
-                    "messages": [
-                        {"role": "system", "content": system_content},
-                        {"role": "user", "content": user_content}
-                    ],
-                    "max_completion_tokens": 10000,
-                }
-            }
-            outfile.write(json.dumps(entry) + "\n")
-
-    print(f"Generated dataset prompt saved to {output_jsonl}")
+    output_file = os.path.join(output_dir, f"help_qa_dataset_{args.provider}.json")
+    with open(output_file, "w", encoding="utf-8") as f:
+        json.dump(all_questions, f, indent=2)
+    print(f"Dataset saved to {output_file}")
 
 if __name__ == "__main__":
     main()
