@@ -986,12 +986,12 @@
     "id": "6e7d635e-13f1-4435-8013-fbae2dc48ce9"
   },
   {
-    "question": "In the NF Data Portal's organizational structure, what is a 'Project' defined as?",
+    "question": "In the context of Hackathons, what does a Project mean?",
     "mc1_targets": {
       "choices": [
         "A funded research project that bundles multiple pieces of information together, including data files, publications, and tools",
         "A group of related grant-funded studies under a single initiative",
-        "A mini-research project not associated with a grant, describing the result of a hackathon or other collaborative science event",
+        "A hackathon project is a mini-research project not associated with a grant, describing the result of a hackathon or other collaborative science event",
         "A curated collection of datasets processed and harmonized for improved usefulness",
         "A set of biological and computational tools built to explore neurofibromatosis data"
       ],
