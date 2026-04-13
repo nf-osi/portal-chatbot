@@ -2,6 +2,7 @@ import argparse
 import os
 import json
 import math
+import uuid as uuid_lib
 import tiktoken
 from openai import OpenAI
 import anthropic
@@ -134,6 +135,43 @@ def generate_with_anthropic(system_content, user_content, schema):
             return data["questions"] if isinstance(data, dict) and "questions" in data else data
     raise RuntimeError("No tool_use block in Anthropic response")
 
+def assign_ids(questions):
+    """Add a unique 'id' field to each question that doesn't already have one."""
+    for q in questions:
+        if "id" not in q:
+            q["id"] = str(uuid_lib.uuid4())
+    return questions
+
+
+def find_page_file(markdown_dir, query):
+    """Find a markdown file matching a URL substring or filename substring.
+
+    Checks each file's first line for a 'source_page_url:' header, then
+    falls back to matching against the filename itself.
+    Returns the matching filename, or raises ValueError if none/multiple found.
+    """
+    files = sorted(f for f in os.listdir(markdown_dir) if f.endswith(".md"))
+    matches = []
+    for filename in files:
+        if query in filename:
+            matches.append(filename)
+            continue
+        filepath = os.path.join(markdown_dir, filename)
+        with open(filepath, "r", encoding="utf-8") as f:
+            first_line = f.readline().strip()
+        if first_line.startswith("source_page_url:") and query in first_line:
+            matches.append(filename)
+
+    if not matches:
+        raise ValueError(f"No markdown file found matching: {query!r}")
+    if len(matches) > 1:
+        raise ValueError(
+            f"Multiple files match {query!r}: {matches}. "
+            "Use a more specific query."
+        )
+    return matches[0]
+
+
 def main():
     parser = argparse.ArgumentParser(description="Generate QA dataset from NF docs.")
     parser.add_argument(
@@ -146,7 +184,17 @@ def main():
         "--max-batches",
         type=int,
         default=None,
-        help="Limit the number of batches processed (useful for testing).",
+        help="Limit the number of batches processed (useful for testing). Ignored when --page is set.",
+    )
+    parser.add_argument(
+        "--page",
+        type=str,
+        default=None,
+        metavar="QUERY",
+        help=(
+            "Generate questions for a single page matching QUERY (URL substring or filename "
+            "substring). New questions are appended to the existing dataset file if it exists."
+        ),
     )
     args = parser.parse_args()
 
@@ -157,11 +205,45 @@ def main():
     with open(schema_file, "r", encoding="utf-8") as f:
         schema = json.load(f)
 
+    generate_fn = generate_with_openai if args.provider == "openai" else generate_with_anthropic
+    output_file = os.path.join(output_dir, f"help_qa_dataset_{args.provider}.json")
+
+    if args.page:
+        # --- Focused single-page mode ---
+        filename = find_page_file(markdown_dir, args.page)
+        print(f"Generating questions for: {filename}")
+
+        batch_docs = load_batch(markdown_dir, [filename])
+        system_content, user_content = build_prompts(batch_docs, schema, QUESTIONS_PER_BATCH)
+
+        if args.provider == "anthropic":
+            tokens = count_tokens_anthropic(system_content, user_content)
+        else:
+            tokens = count_tokens_tiktoken(batch_docs)
+        print(f"Prompt size: {tokens} tokens")
+
+        new_questions = assign_ids(generate_fn(system_content, user_content, schema))
+        print(f"Generated {len(new_questions)} new questions")
+
+        # Load existing dataset if present and append
+        if os.path.exists(output_file):
+            with open(output_file, "r", encoding="utf-8") as f:
+                existing = json.load(f)
+            print(f"Appending to existing dataset ({len(existing)} questions)")
+            all_questions = existing + new_questions
+        else:
+            all_questions = new_questions
+
+        print(f"\nTotal questions: {len(all_questions)}")
+        with open(output_file, "w", encoding="utf-8") as f:
+            json.dump(all_questions, f, indent=2)
+        print(f"Dataset saved to {output_file}")
+        return
+
+    # --- Full batch mode ---
     batches = get_page_batches(markdown_dir)[:args.max_batches]
     n_batches = len(batches)
     print(f"Found {sum(len(b) for b in batches)} pages → {n_batches} batches of up to {BATCH_SIZE}")
-
-    generate_fn = generate_with_openai if args.provider == "openai" else generate_with_anthropic
 
     all_questions = []
     for i, filenames in enumerate(batches, 1):
@@ -174,14 +256,13 @@ def main():
             tokens = count_tokens_tiktoken(batch_docs)
         print(f"[{i}/{n_batches}] Pages: {', '.join(filenames)} ({tokens} tokens)")
 
-        questions = generate_fn(system_content, user_content, schema)
+        questions = assign_ids(generate_fn(system_content, user_content, schema))
         print(f"[{i}/{n_batches}] Generated {len(questions)} questions")
         all_questions.extend(questions)
 
     print(f"\nTotal questions: {len(all_questions)}")
 
     os.makedirs(output_dir, exist_ok=True)
-    output_file = os.path.join(output_dir, f"help_qa_dataset_{args.provider}.json")
     with open(output_file, "w", encoding="utf-8") as f:
         json.dump(all_questions, f, indent=2)
     print(f"Dataset saved to {output_file}")

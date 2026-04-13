@@ -1,0 +1,60 @@
+questions:
+  - id: 0acc64fa-6195-43de-81f2-dc54f127c365
+    reviewer: ANV
+    note: Technically correct, but the documentation and answer are too technical for the target audience.
+
+  - id: c0d1bcac-aa44-4ca3-b057-be6b7381c42c
+    reviewer: ANV
+    note: Doc and answer needs to be clearer about first steps for funded/sponsored contributor vs independent contributor.
+
+  - id: d255fc51-c03d-4172-b940-5a95cccedfcd
+    reviewer: ANV
+    note: Answer needs to be more specific — "Sage data manager" rather than just "Sage".
+
+  - id: f7f51606-6692-4ac6-907e-93b1047186d4
+    reviewer: ANV
+    review_after: "2026-05-31"
+    note: Needs to be updated after the OpenSearch update.
+
+  - id: 7aa68345-178a-442e-9845-df7e28b0e85f
+    reviewer: ANV
+    review_after: "2026-05-31"
+    note: Needs to be revised or removed after infrastructure and documentation changes.
+
+  - id: 8a23e8da-0245-405e-9739-aea4c7f6d6c2
+    reviewer: ANV
+    review_after: "2026-01-01"
+    note: Docs should mention the new tool types we will additionally be accepting beginning 2026.
+
+  - id: beb3f397-f263-4a5c-a824-5aea633a53c3
+    reviewer: ANV
+    note: Docs could better explain the reasoning behind this — not just what to do, but why.
+
+  - id: 61339ec9-756c-45d8-aad0-f549a7737b88
+    reviewer: ANV
+    review_after: "2026-05-31"
+    note: Will likely need to be updated after infrastructure and documentation changes.
+
+  - id: 5511341f-9b7d-4050-9d45-6ae747c6b9ee
+    reviewer: ANV
+    note: >
+      Suggests a coverage gap: add a question along the lines of "What do you need to do before
+      you can upload data?" This comes up frequently and should be explicitly covered in the
+      benchmark.
+
+  - id: 6222d106-6117-4bd7-88ae-5c84bac30613
+    reviewer: ANV
+    note: Do the docs need to mention that coverage has been extended to CTF? If so, the answer may be incomplete.
+
+  - id: 9e7475f5-afc2-4213-aaf0-ecd0f11af716
+    reviewer: ANV
+    note: >
+      Consider whether "How to Publish Data" should be its own contributor stage — e.g. packaging
+      data into a dataset, minting a DOI, how to include citation info in a manuscript. If so, the
+      question and answer choices should reflect that stage explicitly.
+
+  - id: 582773fe-9655-4f31-b574-eef8dd8ef590
+    reviewer: ANV
+    note: >
+      Doc uses "Project" to refer to what is effectively a hackathon project, which is ambiguous.
+      Doc should be updated to use clearer terminology (e.g. "Hackathon Project").

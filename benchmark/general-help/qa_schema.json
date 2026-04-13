@@ -34,13 +34,15 @@
         "type": "string",
         "enum": ["CONTRIBUTOR", "REUSER", "FUNDER", "PATIENT", "X"]
       },
-      "page_url": {
-        "type": "string",
-        "description": "URL of page that provides context for the question."
+      "page_urls": {
+        "type": "array",
+        "items": {"type": "string"},
+        "minItems": 1,
+        "description": "URLs of the pages that provide context for the question. Include multiple URLs for cross-page questions."
       },
       "context": {
         "type": "string",
-        "description": "A snippet of text from the page that provides grounding for the correct anwer choice."
+        "description": "A snippet of text that provides grounding for the correct answer choice. For cross-page questions, include relevant snippets from each source page."
       }
     }
   }
