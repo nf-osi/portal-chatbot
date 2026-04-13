@@ -7,4 +7,6 @@
 .qodo
 datasets/*
 !datasets/batch_api_pipeline.js
+benchmark/general-help/eval_results.json
+benchmark/general-help/eval_results.png
 node_modules
