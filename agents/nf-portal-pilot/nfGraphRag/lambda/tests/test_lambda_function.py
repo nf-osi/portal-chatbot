@@ -224,10 +224,10 @@ class TestHandlerErrorPaths:
     """Verify the handler always returns a well-formed response."""
 
     @patch("lambda_function.sparql_request", side_effect=TimeoutError("timed out"))
-    def test_timeout_returns_408(self, _mock):
+    def test_timeout_returns_200_with_error(self, _mock):
         event = _api_event("/schema")
         resp = lambda_handler(event, None)
-        assert resp["response"]["httpStatusCode"] == 408
+        assert resp["response"]["httpStatusCode"] == 200
         assert "timed out" in _body(resp)["error"]
 
     @patch("lambda_function.sparql_request", side_effect=RuntimeError("boom"))

@@ -89,7 +89,7 @@ def lambda_handler(event, context):
     except TimeoutError as e:
         print(f"Timeout: {e}")
         response = _make_response(
-            action_group, api_path, http_method, 408, {"error": str(e)}
+            action_group, api_path, http_method, 200, {"error": str(e)}
         )
     except Exception as e:
         print(f"Error processing request: {e}")
