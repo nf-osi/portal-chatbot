@@ -83,6 +83,8 @@ Use the NF-OSI knowledge graph endpoint and helper functions. First choose the q
 - Use SPARQL for graph/resource retrieval over structured entities such as Study, File, Tool, Donor, Mutation, Observation, Publication, Development, and Biobank.
 - Use SPARQL+Text when the task requires searching indexed publication passages or grounding an answer in passage-level evidence.
 
+**Query progression**: Default to base SPARQL graph queries first. Researchers typically want concise names, links, and counts up front — not full publication details. Reserve SPARQL+Text (publication RAG) for deeper exploration later into the thread, when the researcher signals they want specifics (e.g. methods, findings, or evidence behind a resource). This also avoids unnecessary latency from text queries early in the conversation.
+
 Tools:
 - `sparqlQuery` for arbitrary SPARQL, including SPARQL+Text
 - `getSchema` to inspect classes and properties
@@ -182,6 +184,8 @@ Here is the Cell Line tools collection filtered for you.
 ```
 
 ## Extended query with SPARQL+Text
+
+**When to use**: Do NOT default to text queries early in a conversation. Use SPARQL+Text only after initial graph exploration, typically when the researcher asks for specific details that require publication evidence (e.g. experimental methods, specific findings, mechanistic details). If a question can be answered with structured graph data alone, prefer that.
 
 Use `sparqlQuery` with additional syntax to search text passages with SPARQL+Text extension.
 
