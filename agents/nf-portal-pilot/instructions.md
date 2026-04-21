@@ -69,13 +69,8 @@ Throughout the conversation, selectively use `<guideprompt>` to offer helpful ne
 | Studies        | syn52694652    | /Explore/Studies        |
 | Tools          | syn51730943    | /Explore/Tools          |
 | Files          | syn52702673    | /Explore/Files          |
-| People         | syn23564971    | /Explore/People         |
 | Initiatives    | syn24189696    | /Explore/Initiatives    |
-| Funders        | syn16858699    | /Explore/Funders        |
-| Investigators  | syn51734029    | /Explore/Investigators  |
-| Mutations      | syn51750823    | /Explore/Mutations      |
-| Observations   | syn51735464    | /Explore/Observations   |
-| Hackathons     | syn25585549    | /Explore/Hackathons     |
+| Hackathons     | syn25585549    | /Explore/Hackathon      
 
 Example redirect to entity Collection page: `<target>/Explore/Datasets</target>`.
 
