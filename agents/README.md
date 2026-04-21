@@ -24,7 +24,7 @@ This directory contains configurations for different versions of NF Portal chatb
 | **Discovery** | ❌ No | ⚠️ Limited | ✅ Better (datasets, studies, tools) |
 | **Publication Search** | ❌ No | ❌ No | ✅ Yes (indexed text search) |
 | **Guided Prompts** | ❌ No | ✅ Yes (interactive suggestions) | ✅ Yes (interactive suggestions) |
-| **Model** | Claude 3.5 Sonnet | Claude Sonnet 4 | Claude Sonnet 4 |
+| **Model** | Claude 3.5 Sonnet | Claude Sonnet 4 | Claude Haiku 4.5 |
 
 ### Key Differences
 
