@@ -1,5 +1,7 @@
 import json
 import os
+import re
+import socket
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -7,6 +9,12 @@ from typing import Any, Dict
 
 
 SPARQL_ENDPOINT = os.environ.get("SPARQL_ENDPOINT", "http://localhost:7001")
+
+# LAMBDA_TIMEOUT should match the Lambda function's configured timeout (seconds).
+# SPARQL_TIMEOUT is kept shorter so the Lambda always has time to return a clean
+# error response before AWS forcibly kills the invocation (which causes a 424).
+_LAMBDA_TIMEOUT = int(os.environ.get("LAMBDA_TIMEOUT", "30"))
+SPARQL_TIMEOUT = int(os.environ.get("SPARQL_TIMEOUT", str(max(_LAMBDA_TIMEOUT - 5, 5))))
 
 DEFAULT_PREFIXES = """\
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -20,20 +28,46 @@ PREFIX prov: <http://www.w3.org/ns/prov#>
 """
 
 
+def _make_response(action_group, api_path, http_method, http_status, body):
+    """Build a Bedrock action-group response that is always JSON-serializable."""
+    try:
+        body_str = json.dumps(body)
+    except (TypeError, ValueError):
+        body_str = json.dumps({"error": "Response could not be serialized"})
+    return {
+        "messageVersion": "1.0",
+        "response": {
+            "actionGroup": action_group,
+            "apiPath": api_path,
+            "httpMethod": http_method,
+            "httpStatusCode": http_status,
+            "responseBody": {
+                "application/json": {"body": body_str}
+            },
+        },
+    }
+
+
 def lambda_handler(event, context):
     """
     Lambda handler for exposing the nf_rag SPARQL helper functions to an agent.
+
+    The entire body is wrapped in a top-level try/except so that a well-formed
+    response is *always* returned.  An unhandled exception would cause an AWS
+    invocation failure, which Bedrock surfaces as a 424 error.
     """
-    print(f"Received event: {json.dumps(event)}")
-
-    action_group = event.get("actionGroup")
-    api_path = event.get("apiPath", "")
-    function = map_api_path_to_function(api_path) or event.get("function")
-    params = extract_params(event)
-
-    print(f"API path: {api_path}, function: {function}, params: {params}")
-
+    action_group = api_path = http_method = None
     try:
+        print(f"Received event: {json.dumps(event)}")
+
+        action_group = event.get("actionGroup")
+        api_path = event.get("apiPath", "")
+        http_method = event.get("httpMethod", "POST")
+        function = map_api_path_to_function(api_path) or event.get("function")
+        params = extract_params(event)
+
+        print(f"API path: {api_path}, function: {function}, params: {params}")
+
         if function == "sparqlQuery":
             response_body = sparql_query(params)
         elif function == "getSchema":
@@ -48,24 +82,21 @@ def lambda_handler(event, context):
                 "apiPath": api_path,
                 "eventKeys": list(event.keys()),
             }
+
+        response = _make_response(
+            action_group, api_path, http_method, 200, response_body
+        )
+    except TimeoutError as e:
+        print(f"Timeout: {e}")
+        response = _make_response(
+            action_group, api_path, http_method, 200, {"error": str(e)}
+        )
     except Exception as e:
         print(f"Error processing request: {e}")
-        response_body = {"error": f"Failed to process request: {e}"}
-
-    response = {
-        "messageVersion": "1.0",
-        "response": {
-            "actionGroup": action_group,
-            "apiPath": api_path,
-            "httpMethod": event.get("httpMethod", "POST"),
-            "httpStatusCode": 200,
-            "responseBody": {
-                "application/json": {
-                    "body": json.dumps(response_body)
-                }
-            },
-        },
-    }
+        response = _make_response(
+            action_group, api_path, http_method, 200,
+            {"error": f"Failed to process request: {e}"},
+        )
 
     print(f"Returning response: {json.dumps(response)}")
     return response
@@ -110,12 +141,15 @@ def sparql_request(query: str, include_default_prefixes: bool = True) -> str:
         method="POST",
     )
     try:
-        with urllib.request.urlopen(req, timeout=30) as response:
+        with urllib.request.urlopen(req, timeout=SPARQL_TIMEOUT) as response:
             return response.read().decode("utf-8")
     except urllib.error.HTTPError as e:
         body = e.read().decode("utf-8", errors="replace")
         raise Exception(f"SPARQL error {e.code}: {body}")
-    except urllib.error.URLError as e:
+    except (urllib.error.URLError, socket.timeout) as e:
+        reason = getattr(e, "reason", e)
+        if isinstance(reason, (socket.timeout, TimeoutError)):
+            raise TimeoutError(f"SPARQL query timed out after {SPARQL_TIMEOUT}s")
         raise Exception(f"Request failed: {e}")
 
 
@@ -158,6 +192,9 @@ def get_shape(params: Dict[str, Any]) -> Dict[str, Any]:
 
     if ":" in class_name:
         class_name = class_name.split(":", 1)[1]
+
+    if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", class_name):
+        return {"error": f"Invalid className: {class_name!r}"}
 
     query = f"""\
 PREFIX sh: <http://www.w3.org/ns/shacl#>
