@@ -40,6 +40,8 @@ It had no ability to query data or access real-time information.
 - **Advanced Discovery**: Helps researchers discover linked datasets, publications, and tools more effectively
 - **Publication Search**: Searches indexed publication text with citation attribution
 
+Releases are named after famous pilots and explorers. Current release: **Amelia**. See [CHANGELOG](CHANGELOG.md) for history.
+
 ## Setup
 
 To learn more about the Synapse Custom Agent framework, refer to [this internal Confluence doc](https://sagebionetworks.jira.com/wiki/spaces/PLFM/pages/3711303683/Adding+Custom+Agents+to+Synapse).

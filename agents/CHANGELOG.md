@@ -2,7 +2,7 @@
 
 ## nf-portal-pilot
 
-### 2026-04-21
+### 2026-04-21 — Amelia
 
 - Update underlying model from Claude Sonnet 4 to Claude Haiku 4.5
 - More robust RAG lambda with improved error handling and tests (#29)
