@@ -103,11 +103,84 @@ Record notes, corrections, and flags in `reviewer_notes.yml` using the question 
 
 ## Step 4: Evaluation
 
-TODO: We plan to have `ipynb` that runs the benchmark against the deployed AWS Bedrock Agent and scores results with an LLM judge 
-(even though questions are currently multiple-choice, the format of evaluation will have the agent provide a free-text answer of merely picking an option).
+`evaluate_bedrock_agent.py` invokes the deployed Bedrock Agent with each benchmark question (one fresh session per question), then uses an LLM judge to score how well the agent's free-text response corresponds to the known correct answer. Although the dataset is multiple-choice, evaluation is done in free-response format to better reflect real-world agent interaction.
 
-Example references:
+### Requirements
 
-- [AWS Bedrock Agent Runtime](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/bedrock-agent-runtime/client/invoke_agent.html)
+```bash
+pip install boto3 pandas
+```
+
+You also need AWS credentials with access to the Bedrock Agent and Bedrock Runtime (for the judge model). The script creates a `boto3.Session` using the `--profile` flag, which resolves credentials in the standard boto3 order:
+
+1. **Named profile** (`--profile my-profile`) — reads from `~/.aws/credentials` and `~/.aws/config`.
+2. **Environment variables** — if using the default profile, you can set `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and optionally `AWS_SESSION_TOKEN` for temporary credentials (e.g. from `aws sso login` or `aws sts assume-role`).
+3. **Instance/container role** — if running on EC2, ECS, or Lambda, boto3 picks up the attached IAM role automatically.
+
+### Run
+
+```bash
+cd benchmark/general-help
+python evaluate_bedrock_agent.py
+```
+
+All options have sensible defaults. Override any of them as needed:
+
+```bash
+python evaluate_bedrock_agent.py \
+  --agent-id 2COISTBHRB \              # Bedrock Agent ID
+  --alias-id TSTALIASID \              # Bedrock Agent alias ID
+  --profile default \                  # AWS profile from ~/.aws/credentials
+  --region us-east-1 \                 # AWS region
+  --dataset help_qa_dataset_anthropic.json \  # benchmark dataset
+  --output eval_results.json           # base output path (datestamp appended)
+  # --judge-model can be used to override the LLM judge (defaults to Haiku 4.5)
+```
+
+| Flag | Default | Description |
+|---|---|---|
+| `--agent-id` | `2COISTBHRB` | Bedrock Agent ID |
+| `--alias-id` | `TSTALIASID` | Bedrock Agent alias ID |
+| `--profile` | `default` | AWS profile from `~/.aws/credentials` |
+| `--region` | `us-east-1` | AWS region |
+| `--dataset` | `help_qa_dataset_anthropic.json` | Path to benchmark dataset JSON |
+| `--judge-model` | `us.anthropic.claude-haiku-4-5-20251001-v1:0` | Bedrock model ID for the LLM judge |
+| `--output` | `eval_results.json` | Base output path (a UTC datestamp is appended automatically) |
+
+### Judge scoring
+
+The LLM judge receives the question, the correct answer, and the agent's response, then assigns a score:
+
+| Score | Meaning |
+|---|---|
+| 2 | Correct — clearly corresponds to the correct answer |
+| 1 | Partially correct or vague |
+| 0 | Incorrect or contradicts the correct answer |
+| -1 | Judge failed to return a valid score |
+
+### Output
+
+Results are saved as `eval_results_<timestamp>.json` (e.g. `eval_results_20260421T153012Z.json`) so that successive runs can be compared for trend tracking. Each file contains:
+
+- `timestamp` — UTC timestamp of the run
+- `config` — agent ID, alias, judge model, and dataset used
+- `results` — per-question scores, agent responses, cited URLs, and attribution hits
+- `errors` — any questions that failed during invocation
+
+### Metrics
+
+The script prints the following metrics to stdout:
+
+| Metric | Description |
+|---|---|
+| Overall accuracy | % of questions scored 2 (correct) by the judge |
+| Score distribution | Count of 0 / 1 / 2 / judge-failed responses |
+| Per-persona accuracy | Accuracy broken down by CONTRIBUTOR, REUSER, FUNDER, PATIENT, X |
+| Cross-page vs single-page accuracy | Accuracy for questions sourced from one page vs. multiple pages |
+| Source attribution rate | % of questions where the agent cited an expected source URL |
+
+### References
+
+- [AWS Bedrock Agent Runtime — `invoke_agent`](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/bedrock-agent-runtime/client/invoke_agent.html)
 - [boto3 Bedrock Agent Runtime client](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/bedrock-agent-runtime.html)
 - [LLM-as-a-Judge (Zheng et al., 2023)](https://arxiv.org/abs/2306.05685) — methodology for using an LLM to score free-text responses
