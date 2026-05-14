@@ -241,20 +241,20 @@
     "id": "66675639-277f-48bc-9017-ebf79b0ba914"
   },
   {
-    "question": "According to the Contributing Data overview, which of the following is NOT listed as one of the stages a data contributor must follow when submitting data to the NF Data Portal?",
+    "question": "According to the Contributing Data overview, what are the stages a data contributor must follow when submitting data to the NF Data Portal?",
     "mc1_targets": {
       "choices": [
-        "How to Format Data",
-        "How to Organize Data",
-        "How to Annotate Data",
-        "How to Publish Data",
-        "How to Upload Data"
+        "How to Format Data, How to Organize Data, How to Upload Data, How to Annotate Data, How to Publish Data",
+        "How to Share Data (Overview), How to Format Data, How to Organize Data, How to Annotate Data",
+        "How to Share Data (Overview), How to Format Data, How to Organize Data, How to Upload Data, How to Annotate Data",
+        "How to Format Data, How to Upload Data, How to Annotate Data",
+        "How to Share Data (Overview), How to Organize Data, How to Upload Data, How to Publish Data, How to Annotate Data"
       ],
       "labels": [
         0,
         0,
-        0,
         1,
+        0,
         0
       ]
     },
@@ -650,20 +650,18 @@
     "id": "beb3f397-f263-4a5c-a824-5aea633a53c3"
   },
   {
-    "question": "Which of the following types of research tools is NOT listed as currently accepted for submission to NF Research Tools Central?",
+    "question": "What types of research tools are currently accepted for submission to NF Research Tools Central?",
     "mc1_targets": {
       "choices": [
-        "Animal models",
-        "Cell lines",
-        "Antibodies",
-        "Clinical trial protocols",
-        "Genetic reagents"
+        "Animal models, cell lines, antibodies, genetic reagents, and clinical trial protocols",
+        "Animal models, cell lines, antibodies, genetic reagents, and biobanks",
+        "Cell lines, antibodies, genetic reagents, biobanks, and clinical trial protocols",
+        "Animal models, cell lines, and antibodies only"
       ],
       "labels": [
         0,
-        0,
-        0,
         1,
+        0,
         0
       ]
     },
