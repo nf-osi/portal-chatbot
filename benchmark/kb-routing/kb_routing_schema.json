@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "KB Routing Sessions Dataset",
+  "description": "Multi-turn sessions for evaluating KB source selection in a multi-source agent.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["session_id", "description", "n_turns", "turns"],
+    "additionalProperties": false,
+    "properties": {
+      "session_id": {
+        "type": "string",
+        "description": "Unique identifier for the session."
+      },
+      "description": {
+        "type": "string",
+        "description": "Human-readable description of the session's intent and expected routing pattern."
+      },
+      "n_turns": {
+        "type": "integer",
+        "minimum": 1,
+        "description": "Number of turns in this session. Must equal the length of the turns array."
+      },
+      "turns": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "object",
+          "required": ["id", "question", "expected_kb", "persona"],
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Unique turn identifier (UUID or slug)."
+            },
+            "question": {
+              "type": "string",
+              "description": "The user's question as it would appear in the chat."
+            },
+            "expected_kb": {
+              "type": "string",
+              "enum": ["DOCS", "GRAPH", "BOTH", "NONE"],
+              "description": "Which KB source(s) the agent should use. DOCS = documentation KB; GRAPH = KG action groups (SPARQL); BOTH = either is acceptable or both should be used; NONE = no KB lookup expected (agent should answer from general knowledge or decline)."
+            },
+            "persona": {
+              "type": "string",
+              "enum": ["CONTRIBUTOR", "REUSER", "FUNDER", "PATIENT", "X"],
+              "description": "User persona for the question."
+            },
+            "notes": {
+              "type": "string",
+              "description": "Optional reasoning for why this question maps to the expected KB source, or edge-case notes."
+            }
+          }
+        }
+      }
+    }
+  }
+}
