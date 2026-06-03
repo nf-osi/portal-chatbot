@@ -5,16 +5,21 @@
   "type": "array",
   "items": {
     "type": "object",
-    "required": ["session_id", "description", "n_turns", "turns"],
+    "required": ["session_id", "session_type", "description", "n_turns", "turns"],
     "additionalProperties": false,
     "properties": {
       "session_id": {
         "type": "string",
         "description": "Unique identifier for the session."
       },
+      "session_type": {
+        "type": "string",
+        "enum": ["DOCS", "GRAPH", "MIXED", "BOTH", "NONE"],
+        "description": "Routing pattern for the session. DOCS = all turns expect docs KB; GRAPH = all turns expect KG; MIXED = turns route to different sources; BOTH = all turns accept either/both sources; NONE = no KB lookup expected for any turn."
+      },
       "description": {
         "type": "string",
-        "description": "Human-readable description of the session's intent and expected routing pattern."
+        "description": "Human-readable description of the session's intent and content."
       },
       "n_turns": {
         "type": "integer",

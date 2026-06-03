@@ -24,6 +24,7 @@ This benchmark tests whether the agent routes queries to the right source — an
 ```json
 {
   "session_id": "s-mixed-01",
+  "session_type": "MIXED",
   "description": "Contributor asks about process, then pivots to data inventory",
   "n_turns": 2,
   "turns": [
@@ -54,25 +55,32 @@ This benchmark tests whether the agent routes queries to the right source — an
 | `BOTH` | Either source is acceptable, or both should be used for a compound question |
 | `NONE` | No KB lookup expected — agent should answer from general knowledge or decline |
 
-### Session types in the seed dataset
+### `session_type` values
 
-| Type | Sessions |
-|------|---------|
-| DOCS-only | 2 |
-| GRAPH-only | 2 |
-| Mixed (DOCS→GRAPH) | 1 |
-| Mixed (GRAPH→DOCS) | 1 |
-| Mixed (interleaved) | 1 |
-| BOTH (compound questions) | 1 |
-| Ambiguous edge cases | 1 |
-| NONE (off-topic / no KB needed) | 1 |
-| FUNDER overview (mixed) | 1 |
+| Value | Meaning |
+|-------|---------|
+| `DOCS` | All turns expect the documentation KB |
+| `GRAPH` | All turns expect the KG / SPARQL action groups |
+| `MIXED` | Turns route to different sources within the same session |
+| `BOTH` | All turns accept either or both sources (compound or ambiguous questions) |
+| `NONE` | No KB lookup expected for any turn |
+
+### Dataset composition
+
+| `session_type` | Sessions | Single-turn | Multi-turn | Turns |
+|----------------|----------|-------------|------------|-------|
+| DOCS | 5 | 3 | 2 | 8 |
+| GRAPH | 5 | 3 | 2 | 8 |
+| MIXED | 4 | — | 4 | 13 |
+| BOTH | 2 | 1 | 1 | 3 |
+| NONE | 3 | 2 | 1 | 4 |
+| **Total** | **19** | **9** | **10** | **36** |
 
 ---
 
 ## Step 1: Expand the dataset
 
-Add sessions directly to `kb_routing_dataset.json` following the schema in `kb_routing_schema.json`. Each session requires a unique `session_id`, a `description`, `n_turns` (must equal the length of `turns`), and one or more turns with `id`, `question`, `expected_kb`, and `persona`.
+Add sessions directly to `kb_routing_dataset.json` following the schema in `kb_routing_schema.json`. Each session requires `session_id`, `session_type`, `description`, `n_turns` (must equal the length of `turns`), and turns with `id`, `question`, `expected_kb`, and `persona`.
 
 ---
 
