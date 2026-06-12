@@ -69,12 +69,12 @@ The agent has two knowledge sources:
 
 | `session_type` | Sessions | Single-turn | Multi-turn | Turns |
 |----------------|----------|-------------|------------|-------|
-| DOCS | 5 | 3 | 2 | 8 |
+| DOCS | 4 | 2 | 2 | 6 |
 | GRAPH | 5 | 3 | 2 | 8 |
 | MIXED | 4 | — | 4 | 13 |
 | BOTH | 2 | 1 | 1 | 3 |
 | NONE | 3 | 2 | 1 | 4 |
-| **Total** | **19** | **9** | **10** | **36** |
+| **Total** | **18** | **8** | **10** | **34** |
 
 ---
 

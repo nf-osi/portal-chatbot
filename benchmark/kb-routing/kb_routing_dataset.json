@@ -47,15 +47,15 @@
   {
     "session_id": "s-graph-single-02",
     "session_type": "GRAPH",
-    "description": "Animal model tools for NF2",
+    "description": "Count of animal model tools",
     "n_turns": 1,
     "turns": [
       {
         "id": "s-graph-single-02-t1",
-        "question": "List the animal model tools available for NF2 research",
+        "question": "How many animal model tools are on the portal?",
         "expected_kb": "GRAPH",
         "persona": "REUSER",
-        "notes": "Listing specific resources requires a SPARQL query over the KG."
+        "notes": "Current count requires querying the KG."
       }
     ]
   },
@@ -128,8 +128,8 @@
   },
   {
     "session_id": "s-docs-02",
-    "session_type": "DOCS",
-    "description": "Data access and licensing questions from a reuser",
+    "session_type": "MIXED",
+    "description": "Licensing policy from docs, then actual license distribution from graph",
     "n_turns": 2,
     "turns": [
       {
@@ -141,10 +141,10 @@
       },
       {
         "id": "s-docs-02-t2",
-        "question": "How should I cite the NF Data Portal in a publication?",
-        "expected_kb": "DOCS",
+        "question": "What's the most common dataset license?",
+        "expected_kb": "GRAPH",
         "persona": "REUSER",
-        "notes": "Citation guidance is a documentation topic."
+        "notes": "Requires aggregating license values across dataset entities in the KG; docs only describe the default policy, not actual distribution."
       }
     ]
   },
