@@ -30,21 +30,6 @@
     ]
   },
   {
-    "session_id": "s-docs-single-03",
-    "session_type": "DOCS",
-    "description": "How to download data using the Synapse client",
-    "n_turns": 1,
-    "turns": [
-      {
-        "id": "s-docs-single-03-t1",
-        "question": "How do I download files from the NF portal using the Synapse Python client?",
-        "expected_kb": "DOCS",
-        "persona": "REUSER",
-        "notes": "Download instructions via the Synapse client are in the help docs."
-      }
-    ]
-  },
-  {
     "session_id": "s-graph-single-01",
     "session_type": "GRAPH",
     "description": "Count of biobanks on the portal",
@@ -145,24 +130,17 @@
     "session_id": "s-docs-02",
     "session_type": "DOCS",
     "description": "Data access and licensing questions from a reuser",
-    "n_turns": 3,
+    "n_turns": 2,
     "turns": [
       {
         "id": "s-docs-02-t1",
-        "question": "How do I get access to controlled access datasets on the NF portal?",
-        "expected_kb": "DOCS",
-        "persona": "REUSER",
-        "notes": "Access request process is described in documentation."
-      },
-      {
-        "id": "s-docs-02-t2",
         "question": "What is the default license applied to non-human data submitted to the portal?",
         "expected_kb": "DOCS",
         "persona": "REUSER",
         "notes": "License policy is in the docs; no need to query the graph."
       },
       {
-        "id": "s-docs-02-t3",
+        "id": "s-docs-02-t2",
         "question": "How should I cite the NF Data Portal in a publication?",
         "expected_kb": "DOCS",
         "persona": "REUSER",
@@ -316,10 +294,10 @@
     "turns": [
       {
         "id": "s-both-01-t1",
-        "question": "Please walk me through how to download the largest available dataset",
+        "question": "What's the largest available dataset? Is there an applicable guide that walks me through how to download it?",
         "expected_kb": "BOTH",
         "persona": "REUSER",
-        "notes": "Compound question: 'what data' needs GRAPH; 'how to access' needs DOCS."
+        "notes": "Two-part question: identifying the largest dataset requires GRAPH; the download guide is in DOCS."
       }
     ]
   },
@@ -338,10 +316,10 @@
       },
       {
         "id": "s-ambig-01-t2",
-        "question": "Can I programmatically access the portal data?",
+        "question": "Which clients are available for programmatic access?",
         "expected_kb": "DOCS",
         "persona": "REUSER",
-        "notes": "API access info is in docs."
+        "notes": "Available clients (e.g. Synapse Python/R clients) are described in the docs."
       }
     ]
   },
@@ -382,24 +360,24 @@
       },
       {
         "id": "s-funder-01-t2",
-        "question": "How is portal funding and governance described?",
-        "expected_kb": "DOCS",
+        "question": "I'm trying to get a complete picture of which funders have contributed datasets aside from the historical main funders",
+        "expected_kb": "BOTH",
         "persona": "FUNDER",
-        "notes": "Funding and governance model is described in documentation."
+        "notes": "Intentionally open-ended. A well-routing agent should consult the docs for named major funders/initiatives and the KG to enumerate all funder entities directly on dataset entities. Neither source alone gives the complete picture."
       },
       {
         "id": "s-funder-01-t3",
-        "question": "I want to confirm the number of NTAP initiatives listed on the portal",
+        "question": "Which funder has the most initiatives?",
         "expected_kb": "GRAPH",
         "persona": "FUNDER",
-        "notes": "Current initiative count from the KG."
+        "notes": "Ranking funders by initiative count requires aggregating over the KG."
       },
       {
         "id": "s-funder-01-t4",
-        "question": "What is the process for adding a new initiative?",
+        "question": "Who should I contact to provide potential support for the portal?",
         "expected_kb": "DOCS",
         "persona": "FUNDER",
-        "notes": "Onboarding process for new initiatives is in documentation."
+        "notes": "Contact information for portal support/partnerships is in the docs; no KG lookup needed."
       }
     ]
   }
