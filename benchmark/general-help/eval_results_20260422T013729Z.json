@@ -1,0 +1,827 @@
+{
+  "timestamp": "20260422T013729Z",
+  "config": {
+    "agent_id": "2COISTBHRB",
+    "agent_alias_id": "TSTALIASID",
+    "judge_model": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "dataset": "help_qa_dataset_anthropic.json"
+  },
+  "results": [
+    {
+      "question": "What is the default license applied to non-human data submitted to the NF Data Portal?",
+      "persona": "CONTRIBUTOR",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/contributing-data/about-data-licensing"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/about-data-licensing"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "CC0 (No Rights Reserved)",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "Based on the NF Data Portal documentation, the default license for non-human data is CC0 (Creative Commons Zero). CC0 is described as a \"no rights reserved\" license by Creative Commons, which essentially places the data in the public domain, making it truly open data available to anyone without restriction. This license is specifically recommended for non-human, raw experimental data, which should be the immediate output of an experiment without analysis or interpretation.\n\nThe CC0 license is chosen as the default because it enables maximum reuse of data, which aligns with the NF Data Portal's goals. It's a respected standard used by many other repositories and allows researchers to reanalyze and repurpose data to advance new discoveries. Additionally, this type of public domain release may be required by funding structures, as it's commonly required for publicly funded projects."
+    },
+    {
+      "question": "What is the maximum file download size supported through the Synapse web interface?",
+      "persona": "REUSER",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/accessing-data"
+      ],
+      "cited_urls": [],
+      "attribution_hit": false,
+      "correct_answer": "5 GB or 100 files",
+      "judge_score": 0,
+      "correct": false,
+      "agent_response": "I apologize, but I don't have specific information about the maximum file download size supported through the Synapse web interface in my knowledge base. The search didn't return relevant results about file size limitations.\n\nFor accurate information about Synapse file download limits, I recommend:\n\n1. Checking the official Synapse documentation at docs.synapse.org\n2. Contacting Synapse support directly\n3. Looking at the Synapse help center or FAQ section\n\nGenerally, web browsers and web applications may have practical limitations for very large file downloads, and alternative methods like the Synapse Python client or R client are often recommended for downloading large datasets. However, I cannot provide the specific size threshold without access to the current documentation."
+    },
+    {
+      "question": "Which of the following correctly describes the relationship between Synapse and the NF Data Portal?",
+      "persona": "REUSER",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/about"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/how-to-upload-data",
+        "https://help.nf.synapse.org/NFdocs/about"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "Synapse is the back-end platform where data is uploaded and stored, while the NF Data Portal is the front-end user interface for exploring that data.",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "The NF Data Portal and Synapse have a complementary backend-frontend relationship. Synapse serves as the data management software and backend platform where all data is actually stored, uploaded, and managed. The NF Data Portal functions as the public-facing frontend that makes this data searchable and accessible to users. When researchers upload data, it goes into Synapse first and then becomes available through the NF Data Portal interface. This architecture allows for collaborative data curation and analysis in Synapse while providing an intuitive exploration and discovery experience through the NF Data Portal."
+    },
+    {
+      "question": "According to the NF Data Portal documentation, what is the typical embargo period provided to data contributors after a grant ends before data must be released?",
+      "persona": "FUNDER",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/accessing-data"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/accessing-data",
+        "https://help.nf.synapse.org/NFdocs/frequently-asked-questions"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "12-18 months",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "According to the NF Data Portal documentation, after a grant ends, data contributors are typically provided an embargo period of 12-18 months to publish their results before data must be released. This embargo period varies by funder and is defined in the Data Sharing Plan and/or funder contract.\n\nDuring this embargo period, the data remains private and is only accessible to the research team, NF-OSI data curation/support staff at Sage Bionetworks, and project managers from the funding organization. While the data itself remains private during the embargo, the metadata is publicly visible, allowing portal users to see what type of data is being generated by the project without being able to download or use the actual data files."
+    },
+    {
+      "question": "A researcher wants to share their NF study data publicly. According to the data sharing steps outlined in the documentation, what is the very FIRST step they should take?",
+      "persona": "CONTRIBUTOR",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/about/about-data-sharing"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/about-data-sharing"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "Get involved with the NF-OSI community and be accepted as a contributor.",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "According to the NF Data Portal documentation, the very first step a researcher should take when wanting to share their NF study data publicly is to **get involved with the NF-OSI community** by making contact with them at nf-osi@sagebionetworks.org. The documentation specifically states that researchers need to be accepted as a contributor before moving onto the next steps in the data sharing process.\n\nThis initial contact step is crucial because it starts the conversation with the NF-OSI community and ensures that the researcher is properly onboarded as a contributor to the portal before proceeding with the technical aspects of data formatting, organization, upload, and annotation."
+    },
+    {
+      "question": "Why does the NF Data Portal documentation recommend using the CC0 license for non-human research data, and how does this connect to data reuse goals?",
+      "persona": "CONTRIBUTOR",
+      "cross_page": true,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/contributing-data/about-data-licensing",
+        "https://help.nf.synapse.org/nf-data-portal-documentation/about/about-data-sharing/10-reasons-to-share-your-data"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/about-data-licensing"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "CC0 places data in the public domain without restrictions, enabling reuse and reanalysis to advance new discoveries, which is the goal of the NF Data Portal-and sharing data publicly can also support new collaborations.",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "The NF Data Portal documentation recommends using the CC0 license for non-human research data because it serves as the equivalent of depositing data in the public domain, making it truly open data available to anyone without restriction. This \"no rights reserved\" license is specifically designed for raw experimental data, which should be the immediate output of an experiment without analysis or interpretation.\n\nThe CC0 recommendation directly supports the NF Data Portal's core data reuse goals in several ways. The documentation explicitly states that \"CC0 is a respected standard in use by many other repositories, it enables reuse, which is the goal of the NF Data Portal.\" The license removes legal barriers that could deter researchers from reanalyzing and repurposing data to advance new discoveries. In the United States specifically, copyright law complexity means that any restrictions, no matter how reasonable, can discourage reuse.\n\nAdditionally, the public domain release through CC0 may be required by funding structures, as this type of release is commonly mandated for publicly funded projects. By removing all copyright restrictions, CC0 allows future researchers to combine datasets, perform meta-analyses, and ask new questions of existing data - all of which align with the portal's mission to maximize the scientific value of neurofibromatosis research data."
+    },
+    {
+      "question": "Which file formats are available for downloading the NF-OSI Data Dictionary for integration into developer tools and workflows?",
+      "persona": "CONTRIBUTOR",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/annotation-dictionary-browser"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/frequently-asked-questions",
+        "https://help.nf.synapse.org/NFdocs/about"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "JSON-LD, JSON Schema, and LinkML (yaml format)",
+      "judge_score": 0,
+      "correct": false,
+      "agent_response": "The NF-OSI Data Dictionary is available in two file formats for download and integration into developer tools and workflows: CSV and JSON formats. These versioned releases of the core NF-OSI metadata dictionary are hosted on GitHub as an open-source repository.\n\nThe data dictionary includes:\n- The Attribute column listing all NF-OSI terms and concepts (like dataType) and their values (like geneExpression)\n- The Description column providing definitions for each Attribute\n- The Valid Values column listing all allowed terms for concepts in the Attribute column\n\nThis makes it easy for developers to programmatically access and integrate the standardized metadata schema into their applications and analysis workflows."
+    },
+    {
+      "question": "According to the Antibody Epitope Nomenclature guidelines, how should a phospho-specific epitope targeting NF1 at serine position 2515 be correctly formatted?",
+      "persona": "CONTRIBUTOR",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/neurofibromatosis-research-tools-database/antibody-epitope-nomenclature"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/antibody-epitope-nomenclature"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "phospho-NF1 (Ser2515)",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "According to the Antibody Epitope Nomenclature guidelines in the NF Data Portal documentation, a phospho-specific epitope targeting NF1 at serine position 2515 should be formatted as: **phospho-NF1 (Ser2515)**\n\nThe formatting follows this specific structure:\n- Start with the prefix \"phospho-\" for phospho-specific antibodies\n- Follow with the gene/protein symbol (NF1)  \n- Include the phospho-target in parentheses using the three-character amino acid abbreviation (Ser) followed by the location number (2515)\n\nThis example is actually provided directly in the documentation as one of the valid epitope formats."
+    },
+    {
+      "question": "During the project close-out process on Synapse, who is responsible for confirming that all data listed on the data sharing plan are uploaded?",
+      "persona": "FUNDER",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/for-the-funding-organizations/draft-checklist-to-close-a-project"
+      ],
+      "cited_urls": [],
+      "attribution_hit": false,
+      "correct_answer": "Sage Bionetworks",
+      "judge_score": 0,
+      "correct": false,
+      "agent_response": "I apologize, but I was unable to find specific information about the project close-out process and data sharing plan confirmation responsibilities in the available Synapse documentation. The search results did not return sufficient information to answer your question about who is responsible for confirming that all data listed on the data sharing plan are uploaded during the project close-out process.\n\nFor detailed information about Synapse project close-out procedures and data sharing plan requirements, I recommend:\n\n1. Checking the official Synapse documentation directly\n2. Contacting Synapse support for specific procedural questions\n3. Consulting with your institution's research administration or data management team\n4. Reviewing any project-specific agreements or guidelines you may have received\n\nIf you have access to Synapse documentation or project guidelines, those would be the most authoritative sources for this procedural information."
+    },
+    {
+      "question": "What are the three ways listed to contact the NF Data Portal support team for help?",
+      "persona": "X",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/contact-us"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/contact-us"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "Filing a support ticket, scheduling a Zoom appointment, and emailing nf-osi@sagebionetworks.org",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "Based on the NF Data Portal documentation, there are actually four ways to contact the NF Data Portal support team for help. However, if you're specifically looking for three ways, the main contact methods are:\n\n1. Visit their service portal and file a support ticket\n2. Schedule a Zoom appointment with their team\n3. Email them at nf-osi@sagebionetworks.org\n\nThere is also a fourth option: contact them via the \"Need more help?\" button on the lower right hand corner of the documentation pages."
+    },
+    {
+      "question": "According to the Contributing Data overview, which of the following is NOT listed as one of the stages a data contributor must follow when submitting data to the NF Data Portal?",
+      "persona": "CONTRIBUTOR",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/contributing-data"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/about-data-sharing"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "How to Publish Data",
+      "judge_score": 1,
+      "correct": false,
+      "agent_response": "According to the Contributing Data overview, there are 6 stages that a data contributor must follow when submitting data to the NF Data Portal:\n\n1. **Become a contributor** - You'll need to be accepted as a contributor before moving onto the next steps\n2. **Prepare data** - Before generating data, review the relevant documentation and ensure you've met the data sharing requirements  \n3. **Deposit data** - This includes uploading and annotating data, as well as providing supplementary information needed to understand and curate the data\n4. **Determine data access controls** - This encompasses data licensing and deciding how the data should be accessed and by whom\n5. **Share data** - After the above steps are complete, you're ready to share your data with others, often after a publication embargo period lifts\n6. **Access data** - Once your data is shared, it becomes accessible to others and meets FAIR data standards (findable, accessible, interoperable, and reusable)\n\nWithout seeing the specific answer choices you're referring to, I cannot identify which option is NOT listed as one of these stages. If you could provide the answer choices, I would be happy to help identify which one is not part of the official 6-stage process outlined in the Contributing Data overview."
+    },
+    {
+      "question": "When closing a project, what action must Sage take regarding a DOI for the project/dataset, and why is it important for contributors to include it in their manuscripts?",
+      "persona": "FUNDER",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/for-the-funding-organizations/draft-checklist-to-close-a-project"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/draft-checklist-to-close-a-project"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "Sage checks whether a DOI has been minted and, if not, asks the contributor to create one and include it in the manuscript's Data Availability Statement so readers can find the data.",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "When closing a project, Sage must check that a DOI (Digital Object Identifier) has been minted for the project/dataset. If no DOI has been created yet, Sage must ask the data contributor or coordinator to create one.\n\nIt's important for contributors to include the DOI in their manuscripts because it creates a direct link between the published research and the underlying dataset. Specifically, contributors should include the DOI in their manuscript's Data Availability Statement so that readers can easily find and access the data that supports the published findings. This ensures proper attribution of the dataset and enables reproducibility and further research by allowing others to locate the exact data used in the study."
+    },
+    {
+      "question": "During the Initial Award Phase, what is a consequence of NOT completing the Data Sharing Plan (DSP)?",
+      "persona": "CONTRIBUTOR",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/contributing-data/data-contributor-checklist"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/data-contributor-checklist"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "It can lead to delays in funding disbursements.",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "During the Initial Award Phase, not completing the Data Sharing Plan (DSP) can lead to delays in funding disbursements. The DSP is a critical requirement that must be completed in a timely manner as part of the initial award process. The funding agency and Sage Bionetworks work with researchers during this phase to complete the data sharing plan and set up the Synapse project workspace, and failure to complete this requirement can impact the release of funding."
+    },
+    {
+      "question": "Which of the following sequencing assays does NF-OSI support for Copy Number Variation (CNV) processing?",
+      "persona": "REUSER",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/data-processing/eligible-datatypes-and-workflows"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/eligible-datatypes-and-workflows"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "Whole Genome Sequencing (WGS) only",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "Based on the NF-OSI documentation, for Copy Number Variation (CNV) processing, NF-OSI supports:\n\n**Whole Genome Sequencing (WGS)** - CNV processing is available and supported for WGS data.\n\n**Whole Exome Sequencing (WES)** - CNV processing is technically available for WES data, but NF-OSI has decided not to provide this processing. This decision follows recommendations from scientists and engineers at Sage Bionetworks who have identified various problems in interpretation of processed CNV data from WES workflows during downstream analysis.\n\nSo to directly answer your question: NF-OSI supports CNV processing for **WGS only**, while WES is not supported for CNV processing due to analytical limitations."
+    },
+    {
+      "question": "How frequently is the data in the ProjectLIVE app updated to reflect changes in Synapse studies?",
+      "persona": "FUNDER",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/for-the-funding-organizations/how-to-use-projectlive/faqs"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/for-the-funding-organizations",
+        "https://help.nf.synapse.org/NFdocs/how-to-use-projectlive"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "Daily",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "Based on the documentation available, the ProjectLIVE app provides daily tracking of data file uploads and annotations from Synapse studies. The app includes daily tracking of the upload and annotation of data files generated in funded studies, which suggests that the data is updated on a daily basis to reflect changes in Synapse studies.\n\nHowever, the specific technical details about the exact refresh schedule or synchronization frequency are not explicitly detailed in the available documentation. The app's \"New Submissions\" module allows users to view files uploaded within customizable time windows (with a default of 60 days), indicating that the system is designed to capture and display recent changes promptly.\n\nFor more specific technical details about the exact update frequency or synchronization schedule, you may need to contact the Sage Bionetworks team directly through the NF Data Portal support channels."
+    },
+    {
+      "question": "In the NF Research Tools Central data model, where is the schema maintained in machine-readable format?",
+      "persona": "REUSER",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/neurofibromatosis-research-tools-database/data-model-schema"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/data-model-schema"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "As JSON-LD files on GitHub",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "In the NF Research Tools Central data model, the schema is maintained in machine-readable format as JSON-LD files. These files are available on GitHub at the nf-research-tools-schema repository (https://github.com/nf-osi/nf-research-tools-schema). Changes to the schema are tracked through release notes, ensuring transparency and version control for the data model updates."
+    },
+    {
+      "question": "According to the Data Contributor Checklist, who must give approval before data can be made public on the NF Data Portal?",
+      "persona": "CONTRIBUTOR",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/contributing-data/data-contributor-checklist"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/data-contributor-checklist"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "The principal investigator of the study",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "According to the Data Contributor Checklist, the Principal Investigator (PI) must give approval before data can be made public on the NF Data Portal. Specifically, during the Data Publication Prep Phase, the documentation states that \"We always require the approval of the principal investigator before making data public.\" The process involves the Sage team reaching out to the PI via email to request approval, and the PI must provide their approval by responding to that email from the Sage team before the data is made accessible to the public."
+    },
+    {
+      "question": "The NF-OSI data processing pilot initiative covers NTAP-funded projects from which time range, and what kind of data does it aim to uniformly process?",
+      "persona": "CONTRIBUTOR",
+      "cross_page": true,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/data-processing/eligible-datatypes-and-workflows",
+        "https://help.nf.synapse.org/nf-data-portal-documentation/data-processing"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/data-processing",
+        "https://help.nf.synapse.org/NFdocs/eligible-datatypes-and-workflows",
+        "https://help.nf.synapse.org/NFdocs/nextflow-data-processing-configuration"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "NTAP-funded projects from 2018-2024, focusing on genomic and transcriptomic data",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "The NF-OSI data processing pilot initiative covers NTAP-funded projects from the time range of 2018 to 2024. This initiative aims to uniformly process genomic and transcriptomic data using standardized data processing pipelines. The specific types of data it processes include:\n\n1. **Genomic data**: Whole Exome Sequencing (WES) and Whole Genome Sequencing (WGS) data, with processing for germline and somatic SNVs/INDELs, copy number variations, structural variants, and microsatellite instability.\n\n2. **Transcriptomic data**: Both bulk RNA sequencing and single-cell RNA sequencing data, processed to generate raw gene expression counts.\n\nThe goal is to ensure uniformity in data processing so that the processed data can be shared on the NF Data Portal and facilitate utilization in other data analysis and exploration platforms."
+    },
+    {
+      "question": "What is the primary purpose of the ProjectLIVE app for funding organizations?",
+      "persona": "FUNDER",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/for-the-funding-organizations"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/for-the-funding-organizations",
+        "https://help.nf.synapse.org/NFdocs/how-to-use-projectlive"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "To consolidate high-level information about individual studies and provide daily tracking of data file uploads and annotations",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "The primary purpose of the ProjectLIVE app for funding organizations is to provide comprehensive tracking and oversight of their funded research portfolio. The app serves as a centralized dashboard that consolidates high-level information about individual studies funded through various initiatives, allowing funding organizations to monitor the impact and progress of their investments in research.\n\nProjectLIVE helps funding organizations track their funding portfolio at various levels of granularity through four key modules: Snapshot (providing a bird's eye view of funding structure and activity year over year), Publications (longitudinal tracking of associated publications), Participating Studies (detailed information about individual studies including file annotation status and milestone tracking), and New Submissions (visualization of newly uploaded files within specified time windows).\n\nThe app enables funding organizations to see summary-level information about data generation, file uploads, annotation progress, and research outputs, making it an effective tool for understanding the tangible impact their organization has made in supporting neurofibromatosis research."
+    },
+    {
+      "question": "During a study's embargo period, which of the following parties can access the actual data files (not just metadata)?",
+      "persona": "CONTRIBUTOR",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/frequently-asked-questions"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/frequently-asked-questions"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "Only the research team, NF-OSI data curation and support staff at Sage Bionetworks, and designated project managers from the funding organization",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "During a study's embargo period, access to the actual data files (not just metadata) is restricted to a limited set of parties. Based on the NF Data Portal documentation, the following parties can access the actual data files during the embargo period:\n\n1. **The research team** - Members of the original research group conducting the study\n2. **NF-OSI data curation/support staff at Sage Bionetworks** - Technical staff responsible for data management and curation\n3. **Project manager(s) from the funder** - Representatives from the funding organization overseeing the project\n\nIt's important to note that during the embargo period, all data has publicly-visible metadata (so others can see what type of data is being generated), but the actual data files remain private and cannot be downloaded by the general public or other researchers outside these authorized parties."
+    },
+    {
+      "question": "What does a researcher need to do before they can download data from the NF Data Portal?",
+      "persona": "REUSER",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/getting-started"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/getting-started"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "Register for a Synapse account and agree to the Synapse Terms and Conditions of Use",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "Before downloading data from the NF Data Portal, researchers need to take the following steps:\n\n1. **Register for a Synapse Account**: All data downloads require registration for a Synapse account at synapse.org. During registration, you must agree to the Synapse Terms and Conditions of Use.\n\n2. **For Open Access Data**: Once you have a registered Synapse account, you can download publicly available data immediately.\n\n3. **For Controlled Access Data**: Some datasets require additional approval. You must request access by reading and electronically agreeing to data-specific terms and conditions for each controlled access dataset you want to download.\n\n4. **Acknowledge Data Use**: When using any downloaded data in publications (whether open or controlled access), you're required to include specific acknowledgement statements, which can be found on each study's details page.\n\nThe portal operates on open science principles, so anyone can browse and explore the content without any account setup. However, actual data downloading always requires at minimum a registered Synapse account."
+    },
+    {
+      "question": "According to the NF Data Portal Glossary, what distinguishes a 'Study' from a 'Dataset'?",
+      "persona": "REUSER",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/glossary"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/glossary"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "A study is the primary unit of data organization representing a research project, while a dataset bundles multiple similar data files into one large bulk file",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "According to the NF Data Portal Glossary, there is a clear distinction between a Study and a Dataset:\n\nA **Study** is defined as \"the primary unit of data organization in the portal\" that \"represents an individual research project with specific objectives and focus.\" Studies are comprehensive containers that bundle multiple pieces of project information together, including study title, summary, lead investigator, access requirements, acknowledgement statements, data files, datasets, metadata files, tools, publications, and related studies. Studies are typically associated with a grant and often represent data generated from a specific human cohort, experiments on a model system, cross-consortium data processing efforts, or data associated with a specific publication.\n\nA **Dataset**, on the other hand, is more focused on the data itself. Datasets \"bundle multiple similar data files together into one large bulk file that can be downloaded at once.\" They range in size from hundreds of files to just a few, and sometimes have been processed or harmonized to improve their usefulness.\n\nIn essence, a Study is the broader organizational unit encompassing an entire research project with all its components, while a Dataset is a specific collection of related data files within that study that can be downloaded as a unit."
+    },
+    {
+      "question": "Under the Controlled Access governance model on the NF Data Portal, how long does a data access approval last before it must be renewed?",
+      "persona": "CONTRIBUTOR",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/contributing-data/governance-models"
+      ],
+      "cited_urls": [],
+      "attribution_hit": false,
+      "correct_answer": "1 year",
+      "judge_score": 0,
+      "correct": false,
+      "agent_response": "Based on my search through the NF Data Portal documentation, I was unable to find specific information about the duration of controlled access data approvals or renewal requirements for the NF Data Portal's Controlled Access governance model.\n\nThe documentation confirms that some data on the NF Data Portal is classified as \"controlled access\" and requires users to request access by reading and electronically agreeing to data-specific terms. However, the available documentation does not specify:\n\n- How long a controlled access approval lasts\n- When renewals are required\n- The specific renewal process or timeline\n\nFor this specific information about controlled access approval duration and renewal requirements, I recommend contacting the NF Data Portal support team directly at nf-osi@sagebionetworks.org, as they would have the most current and detailed information about their data governance policies and access management procedures."
+    },
+    {
+      "question": "A researcher wants to cite data they used from the NF Data Portal in a publication. Which of the following does the documentation recommend including?",
+      "persona": "REUSER",
+      "cross_page": true,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/getting-started",
+        "https://help.nf.synapse.org/nf-data-portal-documentation/frequently-asked-questions"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/frequently-asked-questions"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "The acknowledgement statement from the Study Details page, the Synapse ID or DOI, and a standard NF Data Portal acknowledgement statement",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "According to the NF Data Portal documentation, when citing data used from the portal in a publication, researchers should include several key elements:\n\n1. **Citation/acknowledgement information from the Study page** - Use the specific citation information provided on the Study page for the data you are using, including any \"Acknowledgement Statements\" section.\n\n2. **Synapse ID or DOI** - Reference the persistent Synapse ID (e.g., syn2343195) or DOI when available (e.g., 10.7303/syn2343195) for the specific data or study. These are persistent accession numbers that help others locate the exact data used.\n\n3. **NF Data Portal acknowledgement statement** - Include the following standardized acknowledgement: \"The results published here are in whole or in part based on data obtained from the NF Data Portal (http://www.nf.synapse.org) and made available through the NF Open Science Initiative.\"\n\n4. **Portal location reference** - Mention that the data is available on the NF Data Portal at nf.synapse.org and on Synapse with the specific URL.\n\nThe documentation emphasizes that including the standardized acknowledgement statement helps the portal team track publications and measure the impact of the portal on the research community. Both DOIs and Synapse IDs can be found on the portal Study page and serve as reliable, persistent identifiers for referencing specific datasets."
+    },
+    {
+      "question": "When annotating data using the NF Data Curator App, what should you do if your manifest required custom terms not found in the existing dictionary?",
+      "persona": "CONTRIBUTOR",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/contributing-data/how-to-annotate-data"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/how-to-annotate-data",
+        "https://help.nf.synapse.org/NFdocs/about"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "Email the completed Google Sheet or Excel file to nf-osi@sagebionetworks.org so new terms can be added to the dictionary.",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "When annotating data using the NF Data Curator App, if your manifest requires custom terms that are not found in the existing NF-OSI dictionary, you should NOT submit the manifest directly through the app. Instead, you need to email the completed Google Sheet or Excel file to nf-osi@sagebionetworks.org so that the NF-OSI team can add your new terms to their dictionary. The team will work with you to get the annotations properly applied to your data once the custom terms have been incorporated into the dictionary.\n\nThis process ensures that the controlled vocabulary and data standards are maintained across the NF Data Portal, which is essential for enabling data discovery and ensuring consistency in terminology. The NF-OSI uses controlled vocabularies to allow users to find what they're looking for on the portal without having to search through multiple terms for the same concept."
+    },
+    {
+      "question": "According to the NF Data Portal's data formatting guidelines, which level of RNA-seq data is considered 'raw'?",
+      "persona": "CONTRIBUTOR",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/contributing-data/how-to-format-your-data"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/how-to-format-your-data"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "FASTQ or unaligned BAM/CRAM files",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "According to the NF Data Portal's data formatting guidelines, for RNA-seq data the \"raw\" level corresponds to FASTQ files, unaligned BAM files, or CRAM files. The guidelines specify that for bulk RNA sequencing, either \"raw OR semi-processed AND processed\" data is required, where raw data includes FASTQ, unaligned BAM, or CRAM formats, while semi-processed data would be aligned BAM files, and processed data would be counts matrices or quantification files (like quant.sf files generated by Salmon-based RNA-seq workflows).\n\nThe guidelines also reference that their level nomenclature can be cross-referenced with the TCGA data levels system, where 'raw' corresponds to Level 1 data."
+    },
+    {
+      "question": "What is the correct folder structure for raw data files in a Synapse project on the NF Data Portal?",
+      "persona": "CONTRIBUTOR",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/contributing-data/how-to-organize-data"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/how-to-organize-data"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "Files should be placed inside a dataset subfolder under 'Raw Data', not directly under 'Raw Data' itself.",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "Based on the NF Data Portal documentation, there is a specific folder structure required for organizing raw data files in a Synapse project. The top-level structure should include these main folders:\n\n**Main Project Structure:**\n- **Raw Data** or **Data** (the primary folder for all datasets)\n- **Milestone Reports** or **Reporting** (for summary reports and milestones)\n- **Data Sharing Plan** (for versioned copies of your data sharing plan)  \n- **Analysis** (for protocols, code, and derived results)\n\n**Raw Data Folder Organization:**\nWithin the Raw Data/Data folder, you must create subfolders organized by data type or dataset. Files should never be placed directly in the Raw Data folder - they must be in subfolders. Each dataset subfolder should contain:\n- The actual data files\n- A manifest.csv file for metadata\n\n**Example Structure:**\n```\nRaw Data\n\u251c\u2500\u2500 Imaging\n\u2502   \u251c\u2500\u2500 img1.tiff\n\u2502   \u251c\u2500\u2500 img2.tiff\n\u2502   \u2514\u2500\u2500 manifest.csv\n\u251c\u2500\u2500 Cognitive Assessments\n\u2502   \u251c\u2500\u2500 a_visit.xlsx\n\u2502   \u251c\u2500\u2500 b_visit.xlsx\n\u2502   \u2514\u2500\u2500 manifest.csv\n\u2514\u2500\u2500 RNA-seq\n    \u251c\u2500\u2500 abc.fq.gz\n    \u251c\u2500\u2500 def.fq.gz\n    \u2514\u2500\u2500 manifest.csv\n```\n\nDataset folders are automatically tagged with `contentType=dataset` when created properly. This structure is required for the data to be detected by the NF Data Portal's curation application and ensures proper data discovery and management."
+    },
+    {
+      "question": "Which of the following types of research tools is NOT listed as currently accepted for submission to NF Research Tools Central?",
+      "persona": "CONTRIBUTOR",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/neurofibromatosis-research-tools-database/how-to-contribute-a-tool"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/neurofibromatosis-research-tools-database",
+        "https://help.nf.synapse.org/NFdocs/how-to-contribute-a-tool"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "Clinical trial protocols",
+      "judge_score": 1,
+      "correct": false,
+      "agent_response": "Based on the NF Research Tools Central documentation, the currently accepted types of research tools for submission are:\n\n1. **Cell lines** - immortalized cell lines or primary cell cultures that exist in a large enough quantity to be shared\n2. **Animal models** - genetically modified models of any species as well as well-characterized and shareable xenograft models  \n3. **Antibodies** - any commercially available or self-distributed antibody for NF-relevant targets\n4. **Genetic reagents** - plasmids, guide RNAs, useful primers, or other genetic tools for studying NF\n5. **Biobanks** - tissue or other biospecimen repositories with NF tumors or other NF-relevant biospecimens\n\nHowever, I notice you're asking about which type is NOT accepted, but you haven't provided me with a list of options to choose from. Could you please provide the specific types you'd like me to evaluate against this accepted list?"
+    },
+    {
+      "question": "A researcher wants to reuse single-cell RNA sequencing data from the NF Data Portal. According to the data formatting guidelines, what processed file format is required for single-cell/single-nucleus RNA-seq data?",
+      "persona": "REUSER",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/contributing-data/how-to-format-your-data"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/how-to-format-your-data"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "TSV (processed expression matrix) and hda5/hdf5 format following the cellxgene required format",
+      "judge_score": 1,
+      "correct": false,
+      "agent_response": "According to the NF Data Portal's data formatting guidelines, for single-cell RNA sequencing data, researchers must provide data in both raw and processed formats. Specifically, the processed file format required is **hda5/hdf5 format following the cellxgene required format**.\n\nThe guidelines specify that single-cell RNA sequencing data requires:\n- **Raw data**: FASTQ files (which should be created from bcl files with a program like `cellranger mkfastq`)\n- **Processed data**: hda5/hdf5 format following cellxgene required format\n\nThe hda5 format is a type of hdf5 file, and the documentation notes that more information on formatting hda5 files can be found in their additional documentation resources."
+    },
+    {
+      "question": "Which types of observations are explicitly stated as NOT acceptable when contributing to the NF Research Tools Central observation database?",
+      "persona": "REUSER",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/neurofibromatosis-research-tools-database/how-to-contribute-an-observation"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/how-to-contribute-an-observation"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "Observations that are crude, derogatory, or disparaging",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "Based on the NF Data Portal documentation, observations that are explicitly NOT acceptable when contributing to the NF Research Tools Central observation database are those that are crude, derogatory, or disparaging. The documentation specifically states that while acceptable observations include general comments and reviews, usage instructions, depositor comments, issues, and scientific observations noted from use, \"Observations that are crude, derogatory, or disparaging will not be accepted.\""
+    },
+    {
+      "question": "What is the correct order of steps to begin sharing data on the NF Data Portal?",
+      "persona": "CONTRIBUTOR",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/contributing-data/how-to-share-data-an-overview"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/how-to-upload-data",
+        "https://help.nf.synapse.org/NFdocs/how-to-share-data-an-overview",
+        "https://help.nf.synapse.org/NFdocs/data-contributor-checklist",
+        "https://help.nf.synapse.org/NFdocs/contributing-data"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "Register on Synapse and get certified -> Complete a data sharing plan -> Upload data -> Annotate data",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "To begin sharing data on the NF Data Portal, you need to follow these steps in the correct order:\n\n1. **Become a Registered and Certified User**: Start by registering on Synapse.org and complete the certification quiz. Certification is required to upload data. You can also add your ORCID credentials to your profile during this step.\n\n2. **Complete your Data Sharing Plan (DSP)**: If you're funded by partners like NTAP, GFF, or CTF, you'll receive a pre-filled data sharing plan that you need to review and complete with details about your anticipated data types, sample numbers, upload dates, access requirements, and whether you're submitting human data.\n\n3. **Format your data**: Prepare your data according to the portal's formatting requirements.\n\n4. **Organize your data**: Structure your data appropriately for upload.\n\n5. **Upload your data**: Use Synapse tools to upload your data to the correct location.\n\n6. **Annotate your data**: Label your files with metadata so users can easily find and filter the data they need when exploring the portal.\n\n7. **Review your project**: Once your data is ready for public release, review everything to ensure you have proper permissions, correct annotations, and all associated details are accurate.\n\nThe NF Data Portal uses Synapse.org as the backend data management system, while the portal itself serves as the front-end interface for accessing the data."
+    },
+    {
+      "question": "What does the Synapse certification quiz consist of, and approximately how long does it take?",
+      "persona": "CONTRIBUTOR",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/contributing-data/how-to-share-data-an-overview"
+      ],
+      "cited_urls": [],
+      "attribution_hit": false,
+      "correct_answer": "15 questions covering the Synapse Commons Data Use Procedure, typically taking 15-20 minutes",
+      "judge_score": 0,
+      "correct": false,
+      "agent_response": "I searched for information about the Synapse certification quiz in the available documentation, but unfortunately I wasn't able to find specific details about what the quiz consists of or how long it takes to complete. The search results didn't contain sufficient information about the certification quiz structure, content, or duration.\n\nTo get accurate information about the Synapse certification quiz requirements, I'd recommend:\n- Checking the official Synapse documentation directly at docs.synapse.org\n- Looking for certification information in your Synapse account settings\n- Contacting Synapse support for specific details about the certification process\n\nI apologize that I couldn't provide the specific details you were looking for about the certification quiz content and timing."
+    },
+    {
+      "question": "When manually creating a folder in Synapse for data upload, what annotation must be added to make the folder appear in the Data Curator App?",
+      "persona": "CONTRIBUTOR",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/contributing-data/how-to-upload-data"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/how-to-upload-data"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "contentType = dataset",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "When manually creating a folder in Synapse for data upload, you must add the annotation `contentType = dataset` to make the folder appear in the Data Curator App. This annotation can be added manually by clicking the annotation folder icon and adding the Key \"contentType\" with the value \"dataset\". Folders created automatically by Sage will have this annotation applied by default, but manually created folders require you to add this annotation yourself."
+    },
+    {
+      "question": "Which ProjectLIVE module allows a funder to see a list of all newly uploaded files within a customizable recent time window?",
+      "persona": "FUNDER",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/for-the-funding-organizations/how-to-use-projectlive"
+      ],
+      "cited_urls": [],
+      "attribution_hit": false,
+      "correct_answer": "New Submissions",
+      "judge_score": 0,
+      "correct": false,
+      "agent_response": "Sorry I cannot answer"
+    },
+    {
+      "question": "As a researcher reusing NF Data Portal data, where would you find extensive individual-level clinical data such as patient demographics and phenotypes?",
+      "persona": "REUSER",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/accessing-data/metadata"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/about",
+        "https://help.nf.synapse.org/NFdocs/accessing-data",
+        "https://s3.amazonaws.com/static.synapse.org/governance/SageBionetworksSynapseTermsandConditionsofUse.pdf?v=5",
+        "https://help.nf.synapse.org/NFdocs/resource-hub"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "If available, as a .csv file or Synapse table in the project, though these are usually harder for contributors to share in full detail and often have more restrictions",
+      "judge_score": 1,
+      "correct": false,
+      "agent_response": "For extensive individual-level clinical data such as patient demographics and phenotypes, you would primarily find this information in **controlled access datasets** on the NF Data Portal. This type of sensitive clinical information is typically not available through open access due to privacy regulations and informed consent requirements.\n\nThe NF Data Portal operates on a tiered data access system where clinical data containing patient demographics, detailed phenotypic information, and other sensitive details are classified as \"Controlled Data.\" This data requires additional approvals and agreements to access because it carries some risk of re-identification and could potentially harm human participants if misused.\n\nTo access individual-level clinical data, researchers need to:\n1. Have a certified Synapse account\n2. Apply for controlled access permissions\n3. Agree to additional data-specific terms of use\n4. Sometimes undergo independent review by an ethics committee or Institutional Review Board\n\nThe portal provides step-by-step guides for downloading controlled access data, and you can explore available datasets by filtering for \"controlled access\" in the datasets section to identify which studies contain the clinical information you're looking for."
+    },
+    {
+      "question": "A contributor wants to update a tool they previously submitted to the NF Research Tools Central. They also want to upload a corrected dataset to Synapse. Which contact channel or mechanism is correct for each action?",
+      "persona": "CONTRIBUTOR",
+      "cross_page": true,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/contributing-data/how-to-upload-data",
+        "https://help.nf.synapse.org/nf-data-portal-documentation/neurofibromatosis-research-tools-database/how-to-update-a-contribution"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/how-to-update-a-contribution"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "Tool updates go through the Sage Bionetworks help portal (selecting 'NF Research Tools Central' -> 'Update a Research Tool or Observation'), while dataset uploads are done directly in Synapse",
+      "judge_score": 1,
+      "correct": false,
+      "agent_response": "For updating a tool in the NF Research Tools Central, there is a specific process through their help portal. Contributors should navigate to the NF Research Tools Central help portal, click \"NF Research Tools Central\", then click \"Update a Research Tool or Observation,\" and complete the prompts. They need to provide the name or Resource_id of the tool to be updated, a short description of the update requested, and the timeline. Alternatively, they can contact nf-osi@sagebionetworks.org directly for assistance.\n\nFor uploading a corrected dataset to Synapse, the search results from the Synapse documentation did not return specific information about the contact mechanism or process for updating existing datasets. Based on the available information, the best approach would be to contact the general Synapse support channels or the NF Data Portal team at nf-osi@sagebionetworks.org, as they handle NF-related data submissions and can provide guidance on the proper procedure for dataset corrections and uploads to Synapse."
+    },
+    {
+      "question": "When opening a new project on the NF Data Portal, at what step does the study become active and visible on the portal?",
+      "persona": "FUNDER",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/for-the-funding-organizations/opening-a-new-project"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/opening-a-new-project"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "When Sage adds the 'provision' tag to the DSP GitHub pull request, triggering the Synapse Study Creation process",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "Based on the NF Data Portal documentation, a study becomes active and visible on the portal at a specific point in the project setup process. When SAGE adds a \"provision\" tag to the Data Sharing Plan (DSP) GitHub pull request, this triggers the Synapse Study Creation process. At this exact moment, the study becomes active and visible on the NF Data Portal.\n\nThis occurs after the data sharing plan has been completed and reviewed, but before data upload begins. Once the study is provisioned and visible, SAGE sends an email to the Principal Investigator with links to the Synapse project space, the Study page in the NF Data Portal, the final DSP, and documentation resources."
+    },
+    {
+      "question": "A researcher wants to find processed and harmonized RNA-seq datasets aggregated from public repositories to compare with NF data. Which publicly available resource is best suited for this need?",
+      "persona": "REUSER",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/about/about-data-sharing/other-publicly-available-data-resources"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/how-to-format-your-data",
+        "https://help.nf.synapse.org/NFdocs/data-processing",
+        "https://help.nf.synapse.org/NFdocs/portal-structure"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "refine.bio",
+      "judge_score": 1,
+      "correct": false,
+      "agent_response": "Based on your need for processed and harmonized RNA-seq datasets from public repositories to compare with NF data, here are the best publicly available resources:\n\n**Top Recommendations:**\n\n1. **TCGA (The Cancer Genome Atlas) via GDC Data Portal** - Offers harmonized RNA-seq data processed through standardized pipelines, making it ideal for cross-study comparisons. The data has been reprocessed using consistent methods and reference genomes.\n\n2. **GTEx (Genotype-Tissue Expression)** - Provides processed RNA-seq data from normal tissues across the human body, excellent for comparing with NF tissue data to understand disease-specific expression patterns.\n\n3. **UCSC Xena** - Aggregates and harmonizes datasets from multiple sources including TCGA, GTEx, and other public repositories. It provides uniformly processed data that's ready for comparative analysis.\n\n4. **NCBI GEO (Gene Expression Omnibus)** - Contains vast amounts of RNA-seq data, though processing levels vary. Look for datasets that specify they've been processed through standardized pipelines.\n\nFor NF-specific comparisons, the NF Data Portal itself is developing standardized processing pipelines for genomic and transcriptomic data through the Neurofibromatosis Therapeutic Acceleration Program (NTAP). These processed datasets on the portal would be ideal for direct comparison since they use consistent methodologies.\n\nThe key advantage of these resources is that they provide data processed through standardized, well-documented pipelines, which is essential for meaningful cross-dataset comparisons with your NF data."
+    },
+    {
+      "question": "A contributor wants to submit unpublished, proprietary information about a newly developed cell line to NF Research Tools Central. What should they do before submitting?",
+      "persona": "CONTRIBUTOR",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/neurofibromatosis-research-tools-database"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/neurofibromatosis-research-tools-database",
+        "https://help.nf.synapse.org/NFdocs/how-to-contribute-a-tool"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "Speak with their institutional technology transfer office to confirm there are no restrictions on sharing the information publicly",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "Before submitting unpublished, proprietary information about a newly developed cell line to NF Research Tools Central, the contributor should speak with their institutional technology transfer office. This consultation is important to confirm any restrictions on how and when information related to the tool may be shared publicly, since all contributed information will be made publicly available in NF Research Tools Central.\n\nAdditionally, the documentation emphasizes that non-public information should not be submitted without permission from the tool developer. Contributors should also ensure their submissions abide by the Synapse Code of Conduct and adhere to the resource submission rubric. The database welcomes contributions at all stages of tool development, including unpublished tools, particularly if the contributor envisions sharing the tool publicly or is seeking collaborators to help validate and improve it.\n\nFor specific questions about the submission process, contributors can contact nf-osi@sagebionetworks.org or use the \"Need more help?\" button on the NF Data Portal."
+    },
+    {
+      "question": "When navigating the NF Data Portal, which section would a researcher use to browse and filter all studies associated with a particular funding initiative, and where would they find detailed filtering instructions?",
+      "persona": "REUSER",
+      "cross_page": true,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation",
+        "https://help.nf.synapse.org/nf-data-portal-documentation/navigating-the-portal"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/navigating-the-portal",
+        "https://help.nf.synapse.org/NFdocs/accessing-data"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "The 'Explore' tab's Initiatives or Studies pages; filtering instructions are in the 'Accessing and Reusing Data' section of the docs site",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "When navigating the NF Data Portal, researchers can browse and filter studies associated with a particular funding initiative using the **Explore** section, specifically through two main approaches:\n\n1. **Studies Page**: Under the Explore tab, researchers can access the Studies page which lists all studies. This page includes filtering tools that allow users to narrow down their search to find studies associated with specific funding initiatives.\n\n2. **Initiatives Page**: Alternatively, researchers can use the Initiatives page (also under Explore) which lists all funding initiatives. From here, they can select a specific initiative of interest to visit that program's specific page, which will display all of its associated projects and studies.\n\nFor detailed filtering instructions, researchers can find comprehensive guidance in the NF Data Portal documentation. The documentation specifically mentions that each of the Explore pages \"have helpful filtering tools in order to narrow down your search and find precisely the data you're looking for\" and directs users to find \"more information on the Explore tab and detailed instructions for using the filtering tools\" in the documentation site.\n\nThe filtering tools are typically located on the left side of each page, with visualization charts on top and data tables below. These tools allow researchers to apply various filters to narrow down their search results based on specific criteria related to funding initiatives and other study characteristics."
+    },
+    {
+      "question": "Which of the following organizations is listed as a Funding Organization on the NF Data Portal?",
+      "persona": "FUNDER",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/about/portal-structure"
+      ],
+      "cited_urls": [],
+      "attribution_hit": false,
+      "correct_answer": "Children's Tumor Foundation (CTF)",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "<chat>\nI can see the funding organizations listed in the NF Data Portal. The portal tracks several funding agencies including CDMRP, CTF, GFF, NFRI, NIH-NCI, and NTAP. However, I notice you mentioned \"which of the following organizations\" but didn't provide me with the specific organizations you'd like me to check. Could you please provide the list of organizations you'd like me to verify against the portal's funding organization database?\n</chat>\n<actions>\n  <redirect>\n    <target>/Explore/Funders</target>\n    <query><![CDATA[\n{\n  \"sql\": \"SELECT * FROM syn16858699\",\n  \"additionalFilters\": [],\n  \"selectedFacets\": [],\n  \"includeEntityEtag\": false,\n  \"isConsistent\": true\n}\n    ]]></query>\n  </redirect>\n</actions>"
+    },
+    {
+      "question": "In the context of Hackathons, what does a Project mean?",
+      "persona": "REUSER",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/about/portal-structure"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/portal-structure"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "A hackathon project is a mini-research project not associated with a grant, describing the result of a hackathon or other collaborative science event",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "In the context of Hackathons on the NF Data Portal, a \"Project\" is defined as a mini-research project that is not associated with a traditional grant. Instead, it describes the result of a hackathon or other collaborative science event. These projects emerge from events like the 2021 Hack for Rare, where community members use existing data, software, and other resources to develop research projects over the course of a weekend or a few weeks."
+    },
+    {
+      "question": "When submitting Whole Exome Sequencing (WES) data for genomic processing on the NF Data Portal, what additional file is required beyond the standard annotation terms?",
+      "persona": "CONTRIBUTOR",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/data-processing/genomic-data-processing-data-eligibility-criteria-"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/genomic-data-processing-data-eligibility-criteria-"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "A BED file associated with the library preparation method",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "When submitting Whole Exome Sequencing (WES) data for genomic processing on the NF Data Portal, a BED file is required as an additional file beyond the standard annotation terms. The BED file must be associated with the library preparation method used for each WES dataset and needs to be uploaded and made available to the NF-OSI Sage Team for the dataset to be eligible for processing. Without this BED file, WES files are not eligible for variant calling. The BED file contains information about the target regions that were sequenced during the exome capture process, which is essential for proper genomic analysis and variant calling."
+    },
+    {
+      "question": "For Bulk RNA Sequencing data submitted to the NF Data Portal, which annotation terms are listed as optional but recommended?",
+      "persona": "CONTRIBUTOR",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/data-processing/genomic-data-processing-data-eligibility-criteria-"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/genomic-data-processing-data-eligibility-criteria-"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "isStranded and readPairOrientation",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "For Bulk RNA Sequencing data submitted to the NF Data Portal, the annotation terms that are listed as optional but recommended are:\n\n1. **isStranded** - This should be either \"yes\" or \"no\"\n2. **readPairOrientation** - Indicates the read pair orientation, such as forward or reverse\n\nThese terms are marked with an asterisk (*) in the annotation requirements table and explicitly noted as \"optional but recommended\" in the documentation."
+    },
+    {
+      "question": "According to the NF Data Portal documentation, which step-by-step resource is available to help a researcher export data to a compute platform like CAVATICA, and where can they also learn how to upload data to Synapse?",
+      "persona": "REUSER",
+      "cross_page": true,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/about/portal-structure",
+        "https://help.nf.synapse.org/nf-data-portal-documentation/resource-hub"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/downloading-data-from-the-nf-data-portal",
+        "https://help.nf.synapse.org/NFdocs/resource-hub",
+        "https://help.nf.synapse.org/NFdocs/how-to-upload-data"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "A video tutorial is available for exporting data to CAVATICA, and a separate video tutorial is available for uploading data to Synapse - both found in the Step-by-step guides and videos resource hub",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "According to the NF Data Portal documentation, there is a video tutorial available that provides step-by-step instructions for exporting data from the NF Data Portal to a compute platform like CAVATICA. This tutorial specifically \"outlines the steps to export data from NF Data Portal to an AWS based compute platform called CAVATICA.\"\n\nFor learning how to upload data to Synapse, researchers can access a comprehensive video tutorial called \"Uploading Data via the Synapse UI\" which covers steps 3-4 of the data upload process. This is part of a series of three videos on sharing data, with the first video being \"Introduction to Sharing Data\" that covers steps 1-2. The documentation also provides detailed written step-by-step instructions for uploading data, including account certification, locating your Synapse project, creating folders, and the actual upload process using various methods (web UI, Python client, command-line client, or R client)."
+    },
+    {
+      "question": "In Synapse Curator, what happens to your intermediate changes while you are filling out a metadata grid?",
+      "persona": "CONTRIBUTOR",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/contributing-data/synapse-curator-transition-guide"
+      ],
+      "cited_urls": [],
+      "attribution_hit": false,
+      "correct_answer": "Each action is automatically saved, so you can use Undo and Redo.",
+      "judge_score": 0,
+      "correct": false,
+      "agent_response": "I apologize, but I don't have specific information about what happens to intermediate changes while filling out a metadata grid in Synapse Curator. The search results didn't return relevant documentation about this particular aspect of the Curator tool.\n\nFor detailed information about Synapse Curator's behavior regarding intermediate changes, auto-saving, or session management while working with metadata grids, I'd recommend:\n\n1. Checking the official Synapse documentation at docs.synapse.org\n2. Contacting Synapse support directly through their help desk\n3. Consulting the Synapse community forums where other users may have experience with this specific workflow\n\nThis would ensure you get accurate, up-to-date information about how the Curator handles your work-in-progress changes."
+    },
+    {
+      "question": "Which of the following correctly describes a key limitation of MySQL Full Text Search as used in the NF Research Tools Central?",
+      "persona": "REUSER",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/neurofibromatosis-research-tools-database/tips-for-search"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/tips-for-search"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "It does not perform stemming, so searching 'plexiform neurofibromas' may yield worse results than searching 'plexiform neurofibroma'.",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "Based on the search results, there are several key limitations of MySQL Full Text Search as used in the NF Research Tools Central:\n\n1. **No spelling error tolerance** - The system doesn't understand spelling mistakes well, so users must ensure correct spelling for effective searches.\n\n2. **No stemming capability** - MySQL Full Text Search does not perform \"stemming\" to identify the root of words, meaning it won't recognize different forms of the same word. Users get better results by avoiding pluralization or suffixes (like -ing), and should search for \"plexiform neurofibroma\" instead of \"plexiform neurofibromas.\"\n\n3. **Short term limitations** - The search ignores short terms that are not exact matches (4 or fewer characters), so while \"NF1\" will produce results, short terms embedded within longer words (like \"grow\" inside \"growing\") will not be found.\n\n4. **Requirement for exact matching** - Users need to search for exact matches rather than relying on the system to interpret variations or related terms.\n\nThe documentation emphasizes that users should check for spelling errors, avoid pluralization or suffixes, and utilize precise terms that exactly match their intended search criteria for optimal results."
+    },
+    {
+      "question": "A researcher wants to perform collaborative genomic analyses on NF data from the portal without manually downloading and re-uploading files. Which platform currently has an active Synapse DRS integration that enables this workflow?",
+      "persona": "REUSER",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/accessing-data/tools-and-environments-for-data-processing-and-ana"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/downloading-data-from-the-nf-data-portal",
+        "https://help.nf.synapse.org/NFdocs/resource-hub"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "Cavatica (Seven Bridges)",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "Based on the NF Data Portal documentation, the platform that currently has an active Synapse DRS integration enabling collaborative genomic analyses without manual file downloads is CAVATICA. The documentation specifically mentions that you can export data from the NF Data Portal to CAVATICA, which is described as \"an AWS based compute platform.\" This integration allows researchers to perform computational analyses on NF data directly within CAVATICA's cloud environment without needing to download and re-upload files manually.\n\nThe NF Portal documentation includes video tutorials that demonstrate how to export data from the NF Data Portal to CAVATICA for analysis, and there are step-by-step guides available for creating a CAVATICA account and connecting it to the NF Data Portal."
+    },
+    {
+      "question": "What is the key difference between using a DRS-connected platform versus a self-managed compute environment (e.g., institutional HPC) for accessing NF portal data?",
+      "persona": "REUSER",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/accessing-data/tools-and-environments-for-data-processing-and-ana"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/resource-hub",
+        "https://help.nf.synapse.org/NFdocs/downloading-data-from-the-nf-data-portal"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "DRS-connected platforms allow direct data access from Synapse without manual download/upload, while self-managed compute requires manual data transfer.",
+      "judge_score": 2,
+      "correct": true,
+      "agent_response": "Based on the NF Data Portal documentation, there are key differences between using a DRS-connected platform (like CAVATICA) versus a self-managed compute environment for accessing NF portal data:\n\n**DRS-Connected Platforms (e.g., CAVATICA):**\n- Provide direct integration with the NF Data Portal through AWS-based cloud computing\n- Allow you to export data directly from the portal to the compute platform without manual downloads\n- Offer streamlined workflows where data can be accessed and analyzed in the cloud environment\n- Handle the technical infrastructure and connectivity automatically\n- Provide video tutorials and step-by-step guides specifically for connecting to the NF Data Portal\n\n**Self-Managed Compute Environments (e.g., Institutional HPC):**\n- Require you to manually download data to your local computer or institutional systems first\n- Need you to manage the data transfer process using tools like the Synapse R Client\n- Require setting up your own computational infrastructure and managing storage\n- Give you full control over your computing environment but require more technical setup\n- May involve additional steps for data security and access control compliance\n\nThe main advantage of DRS-connected platforms is the seamless integration and reduced manual data handling, while self-managed environments offer more control but require additional setup and data transfer steps."
+    },
+    {
+      "question": "A contributor has been using the Data Curator App (DCA) to annotate a dataset and now wants to view and update that metadata using Synapse Curator. Is this supported, and under what condition?",
+      "persona": "CONTRIBUTOR",
+      "cross_page": false,
+      "expected_urls": [
+        "https://help.nf.synapse.org/nf-data-portal-documentation/contributing-data/synapse-curator-transition-guide"
+      ],
+      "cited_urls": [
+        "https://help.nf.synapse.org/NFdocs/how-to-annotate-data"
+      ],
+      "attribution_hit": false,
+      "correct_answer": "Yes - as long as a curation task has been set up for that dataset in Synapse Curator, DCA-annotated metadata can be viewed and updated there.",
+      "judge_score": 0,
+      "correct": false,
+      "agent_response": "Based on the available documentation, the Data Curator App (DCA) is the primary tool used for annotating datasets in the NF Data Portal ecosystem. The DCA workflow involves generating metadata templates, filling them out (typically in Google Sheets), validating the metadata, and then submitting annotations to Synapse. However, the documentation does not specifically mention \"Synapse Curator\" as a separate tool or provide information about compatibility between the DCA and a tool called \"Synapse Curator\" for viewing and updating metadata that was originally created through the DCA.\n\nThe available documentation focuses on the Data Curator App as the standard workflow for metadata annotation, which includes steps for generating templates, filling in metadata, validating submissions, and applying annotations to files in Synapse. If you need to view or update metadata that was created using the DCA, I would recommend contacting the NF-OSI support team at nf-osi@sagebionetworks.org for specific guidance about compatibility with other curation tools and workflows for updating existing metadata."
+    }
+  ],
+  "errors": []
+}
