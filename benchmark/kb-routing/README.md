@@ -11,7 +11,7 @@ The agent has two knowledge sources:
 | NF Help Docs KB | `DOCS` | Bedrock KB built from help.nf.synapse.org | `KNOWLEDGE_BASE` trace event or `WEB` citation |
 | NF-OSI Knowledge Graph | `GRAPH` | Structured RDF graph via SPARQL action groups | `ACTION_GROUP` trace event |
 
-This benchmark tests whether the agent routes queries to the right source — an issue the general-help eval cannot measure because it runs each question in isolation against a single-source agent.
+**This benchmark measures source routing, not answer correctness.** The primary metric is whether the agent consulted the right knowledge source — determined from Bedrock trace events — not whether the response text matches a gold answer. This is distinct from the general-help eval, which scores answer quality against known correct answers for a single-source agent. Answer quality is recorded here as a secondary metric only.
 
 ---
 
@@ -96,7 +96,18 @@ Add sessions directly to `kb_routing_dataset.json` following the schema in `kb_r
 
 ## Step 3: Evaluate
 
-`evaluate_kb_routing.py` invokes the agent, captures Bedrock trace events to detect which sources were used, and scores KB source selection accuracy alongside answer quality.
+`evaluate_kb_routing.py` invokes the agent and captures Bedrock trace events to determine which knowledge source was actually used. The primary output is KB source selection accuracy — whether the agent routed to the expected source — not whether the answer text is correct. Answer quality is scored as a secondary signal by an LLM judge.
+
+### Execution flow
+
+For each session the script:
+
+1. Creates a fresh Bedrock `sessionId` (UUID)
+2. Sends `turns` to the agent **in order**, reusing the same `sessionId` — so each turn arrives with the prior conversation in context
+3. After each turn, inspects trace events and response citations to detect which KB source was used (`DOCS`, `GRAPH`, both, or neither), then scores it against `expected_kb`
+4. Moves to the next turn in the same session before starting a new `sessionId` for the next session
+
+Single-turn sessions run this loop once. The `n_turns` field exists so sessions can be pre-filtered by turn count before running the eval (e.g. to isolate the effect of prior context on routing decisions).
 
 ### Requirements
 
@@ -146,14 +157,18 @@ The script enables `enableTrace=True` on agent invocations and inspects orchestr
 
 ### KB selection scoring
 
-| Score | Meaning |
-|-------|---------|
-| 2 | Correct — all expected sources used (extras acceptable); or `NONE` and no sources used |
-| 1 | Partial — some but not all expected sources used |
-| 0 | Wrong — used wrong/no source when one was expected; or used any source when `NONE` expected |
-| -1 | No trace detected (excluded from accuracy) |
+| Score | Meaning | `kb_correct` |
+|-------|---------|:---:|
+| 2 | Correct and efficient — used exactly the expected source(s); or `NONE` and no sources used | ✓ |
+| 1 | Correct but over-queried — used the right source plus unnecessary extras (`DOCS`/`GRAPH` turns only); or expected `BOTH` but only one source used | ✓ |
+| 0 | Wrong — used no source or wrong source when one was expected; or used any source when `NONE` expected | ✗ |
+| -1 | No trace detected (excluded from accuracy reporting) | — |
 
-### Answer quality scoring (LLM judge)
+`kb_correct` (`score >= 1`) captures whether the agent reached the right source at all. `score == 2` additionally captures routing efficiency — useful for identifying unnecessary KB calls on single-source questions.
+
+### Answer quality scoring (LLM judge, secondary)
+
+Unlike the general-help eval, there is no gold answer to compare against. The judge scores whether the response is coherent and on-topic given what type of source should have been used — not whether it matches a known correct answer.
 
 | Score | Meaning |
 |-------|---------|
@@ -175,9 +190,11 @@ Results are saved as `routing_eval_results_<timestamp>.json`. Each file contains
 
 | Metric | Description |
 |--------|-------------|
-| KB selection accuracy | % turns where correct source(s) used (score ≥ 2) |
-| Per-source accuracy | Accuracy broken down by DOCS / GRAPH / BOTH |
-| Actual usage distribution | What sources the agent actually used |
-| Answer quality | % turns scored 2 by the judge |
-| Per-persona KB accuracy | Accuracy by CONTRIBUTOR, REUSER, FUNDER, etc. |
-| Turn-1 vs turn-2+ accuracy | Whether prior session context affects routing |
+| KB routing accuracy | % turns with `kb_correct` (score ≥ 1) — agent reached the right source |
+| KB routing efficiency | % turns with score = 2 — right source used with no unnecessary extras |
+| Over-query rate | % `DOCS`/`GRAPH` turns with score = 1 — right source used but extras consulted |
+| Per-source breakdown | Above metrics broken down by `expected_kb` (DOCS / GRAPH / BOTH / NONE) |
+| Actual usage distribution | What source combinations the agent actually used |
+| Answer quality | % turns scored 2 by the LLM judge |
+| Per-persona KB accuracy | Routing accuracy by CONTRIBUTOR, REUSER, FUNDER, etc. |
+| Turn-1 vs turn-2+ accuracy | Whether prior session context affects routing decisions |

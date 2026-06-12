@@ -98,13 +98,16 @@ def invoke_agent(
 # ---------------------------------------------------------------------------
 
 def score_kb_selection(expected_kb: str, kb_sources_used: set[str]) -> dict:
-    """Score whether the agent used the expected KB source(s).
+    """Score whether the agent used the expected KB source(s) efficiently.
 
     Scoring:
-      2 — correct: all expected sources used (extras acceptable); or NONE and no sources used
-      1 — partial: expected BOTH but only one source used
-      0 — wrong: used a source when NONE expected, or used wrong/no source when one was expected
+      2 — correct and efficient: used exactly the expected source(s); or NONE and no sources used
+      1 — correct but over-queried: used the expected source plus unnecessary extras
+          (only applies to DOCS/GRAPH turns; BOTH turns are never penalised for extra sources)
+      0 — wrong: used wrong/no source when one was expected; or used any source when NONE expected
      -1 — no trace detected (excluded from accuracy reporting)
+
+    kb_correct is True for score >= 1 (agent reached the right source regardless of efficiency).
 
     Returns dict with kb_used, kb_score, kb_correct.
     """
@@ -128,23 +131,24 @@ def score_kb_selection(expected_kb: str, kb_sources_used: set[str]) -> dict:
 
     correct_used = expected & kb_sources_used
 
-    if expected.issubset(kb_sources_used):
-        # All expected sources present (may have used extras)
+    if kb_sources_used == expected:
+        # Exactly the right source(s) — correct and efficient
         kb_score = 2
-        kb_correct = True
+    elif expected.issubset(kb_sources_used):
+        # Right source used but unnecessary extras consulted
+        # BOTH already expects any/both, so extras are only penalised for DOCS/GRAPH
+        kb_score = 1 if expected_kb in ("DOCS", "GRAPH") else 2
     elif correct_used:
-        # Partial: some expected sources used
+        # Some expected sources used but not all (only reachable for BOTH)
         kb_score = 1
-        kb_correct = False
     else:
         # None of the expected sources used
         kb_score = 0
-        kb_correct = False
 
     return {
         "kb_used": sorted(kb_sources_used),
         "kb_score": kb_score,
-        "kb_correct": kb_correct,
+        "kb_correct": kb_score >= 1,
     }
 
 
@@ -254,31 +258,38 @@ def print_metrics(results: list[dict]) -> None:
     print(f"KB ROUTING EVALUATION RESULTS  ({n} turns across {df['session_id'].nunique()} sessions)")
     print(f"{'='*60}")
 
-    # --- KB source selection accuracy ---
-    # Exclude turns where kb_score is None (no expected_kb set) or -1 (no trace)
+    # --- KB routing accuracy and efficiency ---
+    # Exclude turns with no trace (-1); those are uninformative
     kb_df = df[df["kb_score"].notna() & (df["kb_score"] != -1)]
+    no_trace = (df["kb_score"] == -1).sum()
     if len(kb_df) > 0:
-        kb_acc = kb_df["kb_correct"].mean()
-        kb_full = (kb_df["kb_score"] == 2).mean()
-        kb_partial = (kb_df["kb_score"] == 1).mean()
-        kb_wrong = (kb_df["kb_score"] == 0).mean()
-        no_trace = (df["kb_score"] == -1).sum()
-        print(f"\nKB source selection accuracy: {kb_acc:.1%}  ({kb_df['kb_correct'].sum():.0f} / {len(kb_df)})")
-        print(f"  Full credit (score=2): {kb_full:.1%}")
-        print(f"  Partial    (score=1): {kb_partial:.1%}")
-        print(f"  Wrong      (score=0): {kb_wrong:.1%}")
-        if no_trace > 0:
-            print(f"  No trace detected:    {no_trace} turns (excluded from accuracy)")
-    else:
-        print("\nKB source selection: no scorable turns")
+        n_kb = len(kb_df)
+        routing_acc = kb_df["kb_correct"].mean()           # score >= 1: right source reached
+        efficiency  = (kb_df["kb_score"] == 2).mean()     # score == 2: right source, no extras
+        over_query_df = kb_df[kb_df["expected_kb"].isin(["DOCS", "GRAPH"])]
+        over_query = (over_query_df["kb_score"] == 1).mean() if len(over_query_df) else float("nan")
+        wrong = (kb_df["kb_score"] == 0).mean()
 
-    # --- Per expected_kb accuracy ---
-    print("\nKB selection accuracy by expected source:")
-    for kb_type in ["DOCS", "GRAPH", "BOTH"]:
-        sub = kb_df[kb_df["expected_kb"] == kb_type]
-        if len(sub) > 0:
+        print(f"\nKB routing accuracy  (score ≥ 1): {routing_acc:.1%}  ({kb_df['kb_correct'].sum():.0f} / {n_kb})")
+        print(f"KB routing efficiency (score = 2): {efficiency:.1%}  — right source, no unnecessary extras")
+        print(f"Over-query rate       (score = 1): {over_query:.1%}  — right source + extras  (DOCS/GRAPH turns only, n={len(over_query_df)})")
+        print(f"Wrong source          (score = 0): {wrong:.1%}")
+        if no_trace > 0:
+            print(f"No trace detected:                 {no_trace} turns (excluded)")
+    else:
+        print("\nKB routing: no scorable turns")
+
+    # --- Per expected_kb breakdown ---
+    if len(kb_df) > 0:
+        print("\nPer-source breakdown:")
+        print(f"  {'Source':<6}  {'Accuracy':>8}  {'Efficiency':>10}  {'n':>4}")
+        for kb_type in ["DOCS", "GRAPH", "BOTH", "NONE"]:
+            sub = kb_df[kb_df["expected_kb"] == kb_type]
+            if len(sub) == 0:
+                continue
             acc = sub["kb_correct"].mean()
-            print(f"  {kb_type:<6} {acc:.1%}  ({sub['kb_correct'].sum():.0f} / {len(sub)})")
+            eff = (sub["kb_score"] == 2).mean()
+            print(f"  {kb_type:<6}  {acc:>8.1%}  {eff:>10.1%}  {len(sub):>4}")
 
     # --- What source was actually used vs expected ---
     print("\nActual KB usage distribution:")
@@ -296,9 +307,9 @@ def print_metrics(results: list[dict]) -> None:
         score_dist.index = score_dist.index.map(score_map)
         print(f"  Distribution:\n{score_dist.to_string()}")
 
-    # --- Per-persona KB accuracy ---
+    # --- Per-persona routing accuracy ---
     if len(kb_df) > 0:
-        print("\nKB selection accuracy by persona:")
+        print("\nRouting accuracy by persona:")
         persona_acc = (
             kb_df.groupby("persona")["kb_correct"]
             .agg(accuracy="mean", n="count")
@@ -308,14 +319,14 @@ def print_metrics(results: list[dict]) -> None:
         persona_acc["accuracy"] = persona_acc["accuracy"].map("{:.1%}".format)
         print(persona_acc.to_string(index=False))
 
-    # --- Single-turn vs multi-turn accuracy ---
+    # --- Single-turn vs multi-turn routing accuracy ---
     if len(kb_df) > 0:
         single = kb_df[kb_df["turn_number"] == 1]["kb_correct"].mean()
         multi = kb_df[kb_df["turn_number"] > 1]["kb_correct"].mean()
         n_single = (kb_df["turn_number"] == 1).sum()
         n_multi = (kb_df["turn_number"] > 1).sum()
-        print(f"\nKB accuracy — turn 1 (no prior context): {single:.1%}  (n={n_single})")
-        print(f"KB accuracy — turn 2+ (with prior context): {multi:.1%}  (n={n_multi})")
+        print(f"\nRouting accuracy — turn 1 (no prior context): {single:.1%}  (n={n_single})")
+        print(f"Routing accuracy — turn 2+ (with prior context): {multi:.1%}  (n={n_multi})")
 
     print(f"\n{'='*60}")
 
