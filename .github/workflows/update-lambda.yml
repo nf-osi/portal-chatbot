@@ -1,0 +1,28 @@
+name: Update Lambda package
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - agents/nf-portal-copilot/lambda/nfGraphRag/lambda_function.py
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Package and upload
+        run: |
+          cd agents/nf-portal-copilot/nfGraphRag/lambda
+          zip /tmp/nfGraphRag.zip lambda_function.py
+          aws s3 cp /tmp/nfGraphRag.zip s3://nf-portal-chatbot/lambda/nfGraphRag.zip
