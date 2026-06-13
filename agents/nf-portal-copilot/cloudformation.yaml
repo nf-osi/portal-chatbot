@@ -102,10 +102,10 @@ Parameters:
 
   FoundationModelId:
     Type: String
-    Default: anthropic.claude-haiku-4-5-20251001-v1:0
+    Default: us.anthropic.claude-haiku-4-5-20251001-v1:0
     Description: >
-      Foundation model ID. Used to construct both the inference-profile
-      and foundation-model ARNs.
+      Cross-region inference profile or foundation model ID.
+      The template creates an inference-profile ARN from this value.
 
   IdleSessionTTL:
     Type: Number
@@ -229,7 +229,7 @@ Resources:
                   - bedrock:GetInferenceProfile
                   - bedrock:GetFoundationModel
                 Resource:
-                  - !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/us.${FoundationModelId}"
+                  - !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/${FoundationModelId}"
                   - !Sub "arn:aws:bedrock:*::foundation-model/${FoundationModelId}"
         - PolicyName: InvokeLambda
           PolicyDocument:
@@ -256,10 +256,10 @@ Resources:
       AgentResourceRoleArn: !GetAtt BedrockAgentRole.Arn
       AutoPrepare: true
       Description: !Ref AgentDescription
-      FoundationModel: !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/us.${FoundationModelId}"
+      FoundationModel: !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/${FoundationModelId}"
       IdleSessionTTLInSeconds: !Ref IdleSessionTTL
       Instruction: |
-        Release name: Harriet
+        Release: Amelia
 
         ## Role
 
