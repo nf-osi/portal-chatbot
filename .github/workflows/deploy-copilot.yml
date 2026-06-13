@@ -1,7 +1,10 @@
 name: Deploy Copilot stack
 
 on:
-  workflow_dispatch:  # manually trigger dev deploys from any branch
+  pull_request:
+    branches: [main]
+    paths:
+      - agents/nf-portal-copilot/**
   push:
     branches: [main]
     paths:
