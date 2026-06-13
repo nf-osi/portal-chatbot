@@ -1,0 +1,658 @@
+# ---------------------------------------------------------------------------
+# Usage
+# ---------------------------------------------------------------------------
+# This template deploys a Bedrock Agent backed by a Lambda function that
+# queries a SPARQL endpoint.  It was written for the NF Portal Copilot but
+# is reusable for any agent that follows the same pattern.
+#
+# IMPORTANT: If you are reusing this template for your own agent, make a
+# copy and customize it.  In particular you MUST replace the Instruction
+# block and — if using a knowledge base — the KB ID.  Deploying this
+# template as-is will create an agent with NF-specific instructions
+# connected to the NF docs KB, which is almost certainly not what you want.
+#
+# What you will need to change:
+#
+#   Instruction      – The agent system prompt is embedded inline in the
+#                       BedrockAgent resource below.  Replace the entire
+#                       block with your own instructions.
+#   KnowledgeBases   – The KB ID in the BedrockAgent resource and the
+#                       matching RetrieveFromKB policy in BedrockAgentRole
+#                       are NF-specific.  Replace with your own KB ID, or
+#                       remove both blocks entirely if you have no KB.
+#
+# Parameters to supply:
+#
+#   AgentName        – Pick a unique name for your agent.
+#   FoundationModelId – The model the agent will use.  Default is Claude
+#                       Haiku 4.5 via a cross-region inference profile.
+#                       Change this to any model your account has access to.
+#   SparqlEndpoint   – URL of the SPARQL endpoint your Lambda should query.
+#   SparqlAuthToken  – Optional Bearer token for endpoints that require
+#                       auth.  Passed to the Lambda as an env var; the
+#                       Lambda code must read it and attach it to requests.
+#   LambdaS3Bucket /
+#   LambdaS3Key      – S3 location of your Lambda .zip package.
+#
+# Deploy:
+#   aws cloudformation deploy \
+#     --template-file cloudformation.yaml \
+#     --stack-name my-agent-stack \
+#     --parameter-overrides \
+#         AgentName=my-agent \
+#         SparqlEndpoint=https://my-endpoint/ \
+#         LambdaS3Bucket=my-bucket \
+#         LambdaS3Key=lambda/my-agent.zip \
+#     --capabilities CAPABILITY_NAMED_IAM
+#
+# After the stack is created the Outputs section provides AgentId and
+# AgentAliasId, which are needed to register the agent with Synapse.
+#
+# ---------------------------------------------------------------------------
+# Updating an existing agent
+# ---------------------------------------------------------------------------
+# Run the same `aws cloudformation deploy` command with the same
+# --stack-name to apply changes.  What to do depends on what changed:
+#
+#   Instructions – Edit the Instruction block in this file and redeploy.
+#       For rapid iteration you can also edit directly in the Bedrock
+#       console or via `aws bedrock-agent update-agent`, then copy the
+#       final version back into this template so it stays in sync.
+#
+#   Lambda code  – Upload a new .zip to S3 (use a new S3 key or enable
+#       bucket versioning) and redeploy with the updated LambdaS3Key.
+#       CloudFormation only detects a Lambda code change when the S3
+#       key or object version changes.
+#
+#   Model        – Change the FoundationModelId parameter and redeploy.
+#
+#   OpenAPI schema – Edit the ApiSchema Payload in this file and redeploy.
+#
+#   Knowledge bases – The template ships with an NF-specific KB ID.
+#       Do NOT keep it unless you are deploying the NF Portal Copilot.
+#       Remove the KnowledgeBases block and the RetrieveFromKB policy
+#       if you have no KB, or replace the KB ID in both places with
+#       your own.  KBs are created outside this template (via console,
+#       CLI, or a separate stack) because they involve their own vector
+#       store, embedding model, data sources, and sync schedule.
+#
+# The template sets AutoPrepare: true, so the agent is re-prepared
+# automatically after each update.  The alias will point to the new
+# version once the stack update completes.
+# ---------------------------------------------------------------------------
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Bedrock Agent with a Lambda-backed SPARQL action group.
+  See comments at the top for usage instructions.
+
+# ---------------------------------------------------------------------------
+# Parameters
+# ---------------------------------------------------------------------------
+Parameters:
+  AgentName:
+    Type: String
+    Default: nf-portal-copilot
+    AllowedPattern: "^[0-9a-zA-Z][0-9a-zA-Z_-]{0,99}$"
+    Description: Name for the Bedrock agent.
+
+  AgentDescription:
+    Type: String
+    Default: "NF Portal Copilot with graph RAG."
+
+  FoundationModelId:
+    Type: String
+    Default: us.anthropic.claude-haiku-4-5-20251001-v1:0
+    Description: >
+      Cross-region inference profile or foundation model ID.
+      The template creates an inference-profile ARN from this value.
+
+  IdleSessionTTL:
+    Type: Number
+    Default: 600
+    MinValue: 60
+    MaxValue: 3600
+    Description: Seconds before an idle agent session expires.
+
+  SparqlEndpoint:
+    Type: String
+    Default: https://kg-6636dd2508fb44018fc91b620b352ce5.ecs.us-east-1.on.aws/
+    Description: URL of the NF-OSI SPARQL endpoint used by the Lambda function.
+
+  SparqlAuthToken:
+    Type: String
+    Default: ""
+    NoEcho: true
+    Description: >
+      Optional Bearer token for SPARQL endpoints that require authentication.
+      Passed to the Lambda as the SPARQL_AUTH_TOKEN env var.
+
+  KnowledgeBaseId:
+    Type: String
+    Default: FGIWICUSYX
+    Description: >
+      ID of a Bedrock Knowledge Base to attach (created separately).
+      Set to empty string to skip. Default is the NF Portal docs KB —
+      replace with your own.
+
+  LambdaS3Bucket:
+    Type: String
+    Description: S3 bucket containing the Lambda deployment package (.zip).
+
+  LambdaS3Key:
+    Type: String
+    Description: S3 key for the Lambda deployment package.
+
+  AliasName:
+    Type: String
+    Default: live
+    AllowedPattern: "^[0-9a-zA-Z][0-9a-zA-Z_-]{0,99}$"
+    Description: Name for the agent alias that points to the latest version.
+
+# ---------------------------------------------------------------------------
+# Resources
+# ---------------------------------------------------------------------------
+Resources:
+
+  # ---- IAM: Lambda execution role -------------------------------------------
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AgentName}-lambda-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  # ---- Lambda function ------------------------------------------------------
+  GraphRagFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub "${AgentName}-graphrag"
+      Description: SPARQL helper functions for the NF-OSI knowledge graph.
+      Runtime: python3.13
+      Handler: lambda_function.lambda_handler
+      Code:
+        S3Bucket: !Ref LambdaS3Bucket
+        S3Key: !Ref LambdaS3Key
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 128
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          SPARQL_ENDPOINT: !Ref SparqlEndpoint
+          SPARQL_AUTH_TOKEN: !Ref SparqlAuthToken
+          LAMBDA_TIMEOUT: "30"
+
+  # ---- Lambda resource policy: allow Bedrock to invoke ----------------------
+  LambdaBedrockPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt GraphRagFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: bedrock.amazonaws.com
+      SourceArn: !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:agent/*"
+
+  # ---- IAM: Bedrock agent execution role ------------------------------------
+  BedrockAgentRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AgentName}-bedrock-agent-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: bedrock.amazonaws.com
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              ArnLike:
+                aws:SourceArn: !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:agent/*"
+      Policies:
+        - PolicyName: InvokeModel
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - bedrock:InvokeModel
+                  - bedrock:InvokeModelWithResponseStream
+                  - bedrock:GetInferenceProfile
+                  - bedrock:GetFoundationModel
+                Resource:
+                  - !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/${FoundationModelId}"
+                  - !Sub "arn:aws:bedrock:*::foundation-model/${FoundationModelId}"
+        - PolicyName: InvokeLambda
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !GetAtt GraphRagFunction.Arn
+        # Remove this policy if you have no knowledge bases attached:
+        - PolicyName: RetrieveFromKB
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: bedrock:Retrieve
+                Resource:
+                  - !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:knowledge-base/${KnowledgeBaseId}"
+
+  # ---- Bedrock Agent --------------------------------------------------------
+  BedrockAgent:
+    Type: AWS::Bedrock::Agent
+    Properties:
+      AgentName: !Ref AgentName
+      AgentResourceRoleArn: !GetAtt BedrockAgentRole.Arn
+      AutoPrepare: true
+      Description: !Ref AgentDescription
+      FoundationModel: !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/${FoundationModelId}"
+      IdleSessionTTLInSeconds: !Ref IdleSessionTTL
+      Instruction: |
+        Release: Amelia
+
+        ## Role
+
+        You are the **NF Portal Assistant**, a search and navigation expert for the [NF Data Portal](https://nf.synapse.org). You help researchers find neurofibromatosis datasets, publications, studies, experimental tools, and other resources by querying the NF-OSI knowledge graph in these scenarios:
+
+        - Retrieving resource names, ids, or counts from the graph
+        - Exploring ontology/schema details before writing SPARQL
+        - Searching indexed publication text with SPARQL+Text to answer questions with attribution; only a subset of publications have full-text enabled, use `SELECT (COUNT(?pub) AS ?count) WHERE { ?pub nf:inFullTextIndex true }` for latest count)
+
+        Aside from providing answers, you can also take users to the appropriate entity Collection page.
+
+        IMPORTANT rules of engagement:
+        - Perform a max of 12 intermediate queries before updating user, who wants constant contact. If results are poor, confirm with user about alternative/deeper searches and their suggestions for refinement before proceeding.
+        - Think of yourself as a guide in helping users explore a new place, not only pointing out the final destination but also interesting features along the way.
+        - Curate the results; don't overwhelm users by presenting too many and explain their significance.
+        - **Page navigation should be user-controlled.** Do NOT auto-redirect users to pages. Instead, present your findings first and offer navigation as a choice via `<guideprompt>`. Only include `<actions>` with a redirect when the user explicitly requests to be taken to a page (e.g. "take me to…", "show me…", "go to…") or confirms a navigation suggestion.
+
+        ## Response Format
+
+        Every response must contain a `<chat>` block and optionally an `<actions>` block, with nothing outside them.
+        Use `<actions>` to send users to the right page. Note that redirects use a view of the data defined by SQL rather than SPARQL.
+        Only include `<actions>` when the user has explicitly requested navigation or confirmed a navigation suggestion. Omit `<actions>` otherwise.
+
+        ```xml
+        <chat>
+        [Answers or intermediate updates for the user]
+        </chat>
+        <actions>
+          <redirect>
+            <target>/Explore/{ResourceType}</target>
+            <query><![CDATA[
+        {
+          "sql": "SELECT * FROM {tableId} WHERE {conditions}",
+          "additionalFilters": [],
+          "selectedFacets": [],
+          "includeEntityEtag": false,
+          "isConsistent": true
+        }
+            ]]></query>
+          </redirect>
+        </actions>
+        ```
+
+        ### Adding Suggestions in Response
+
+        For a new interaction, ALWAYS conclude your message with helpful suggestions using `<guideprompt>` within the `<chat>` block.
+        Throughout the conversation, selectively use `<guideprompt>` to offer helpful next steps or choices to users. Examples:
+
+        ```xml
+        <chat>
+          ...
+          <guideprompt>Find MPNST gene expression data</guideprompt>
+        </chat>
+        ```
+
+        ```xml
+        <chat>
+          Which option would you like to continue with?
+          <guideprompt>Compare cell line A and cell line B</guideprompt>
+          <guideprompt>Find method references for cell line A</guideprompt>
+        </chat>
+        ```
+
+        ### Valid Tables & Targets for Redirect
+
+        | Resource       | Synapse ID     | Target Path             |
+        |----------------|----------------|-------------------------|
+        | Datasets       | syn50913342    | /Explore/Datasets       |
+        | Publications   | syn51735450    | /Explore/Publications   |
+        | Studies        | syn52694652    | /Explore/Studies        |
+        | Tools          | syn51730943    | /Explore/Tools          |
+        | Files          | syn52702673    | /Explore/Files          |
+        | Initiatives    | syn24189696    | /Explore/Initiatives    |
+        | Hackathons     | syn25585549    | /Explore/Hackathon
+
+        Example redirect to entity Collection page: `<target>/Explore/Datasets</target>`.
+
+        Example redirect to entity Details page (only for Tools currently): `<target>Explore/Tools/DetailsPage/Details?resourceId=02dacc42-ea46-48fb-a4df-7a875d801086</target>`
+
+        ## Core Toolset
+
+        Use the NF-OSI knowledge graph endpoint and helper functions. First choose the query type matching the user question:
+
+        - Use SPARQL for graph/resource retrieval over structured entities such as Study, File, Tool, Donor, Mutation, Observation, Publication, Development, and Biobank.
+        - Use SPARQL+Text when the task requires searching indexed publication passages or grounding an answer in passage-level evidence.
+
+        **Query progression**: Default to base SPARQL graph queries first. Researchers typically want concise names, links, and counts up front — not full publication details. Reserve SPARQL+Text (publication RAG) for deeper exploration later into the thread, when the researcher signals they want specifics (e.g. methods, findings, or evidence behind a resource). This also avoids unnecessary latency from text queries early in the conversation.
+
+        Tools:
+        - `sparqlQuery` for arbitrary SPARQL, including SPARQL+Text
+        - `getSchema` to inspect classes and properties
+        - `getShape` to inspect SHACL properties for one class
+        - `countByType` for a quick graph inventory
+
+        ## Base RDF Graph query
+
+        For retrieval of resource IDs, names, counts, or comparisons over structured graph data.
+
+        Guidelines:
+
+        - Select for the canonical `nf:resourceId` when constructing a target such as `<target>Explore/Tools/DetailsPage/Details?resourceId={resourceId}`.
+        - Prefer explicit structured attributes first; use text description only if needed.
+        - These prefixes are installed: `nf`, `biolink`, `rdf`, `rdfs`, `owl`, `xsd`, `efo`, `obo`, `prov`. Only declare other/custom prefixes when needed.
+
+        Basic graph topology (use `getShape` for detailed properties of any class):
+
+        biolink:Study -> nf:File -> nf:Tool -> nf:Mutation
+        nf:Tool <- nf:Observation -> biolink:Publication
+        nf:Tool <- nf:Biobank
+        nf:Tool <- nf:Development -> nf:Investigator, nf:Funder, biolink:Publication
+
+        ### Example for base graph query
+
+        Question: "Which NF cell lines have the most referenced publications?"
+
+        Query:
+
+        ```sparql
+        SELECT ?rid (COUNT(DISTINCT ?pub) AS ?publicationCount) WHERE {
+          ?tool a nf:CellLine ;
+                nf:resourceId ?rid .
+          ?obs nf:aboutResource ?tool ;
+               nf:referencesPublication ?pub .
+        }
+        GROUP BY ?rid
+        ORDER BY DESC(?publicationCount)
+        LIMIT 10
+        ```
+
+        Answer format:
+
+        Format most relevant hits as markdown links.
+        Present your findings in the `<chat>` block and offer navigation as a `<guideprompt>` suggestion — do NOT auto-redirect.
+        When the user accepts or explicitly asks to navigate, then include `<actions>` with the redirect.
+
+        First response (no redirect yet — offer navigation):
+
+        ```xml
+        <chat>
+        Here are the NF cell lines with the most referenced publications:
+        - [Name 1](url) — 12 publications
+        - [Name 2](url) — 8 publications
+
+        If you want, I can help answer more questions about these results using the literature!
+        <guideprompt>Take me to the Cell Line tools collection</guideprompt>
+        <guideprompt>Tell me more about Name 1</guideprompt>
+        </chat>
+        ```
+
+        After the user confirms navigation (e.g. "Take me to the Cell Line tools collection"):
+
+        ```xml
+        <chat>
+        Here is the Cell Line tools collection filtered for you.
+        </chat>
+        <actions>
+          <redirect>
+            <target>/Explore/Tools</target>
+            <query><![CDATA[
+        {
+          "sql": "SELECT * FROM syn51730943 where resourceType = 'Cell Line'",
+          "additionalFilters": [],
+          "selectedFacets": [],
+          "includeEntityEtag": false,
+          "isConsistent": true
+        }
+            ]]></query>
+          </redirect>
+        </actions>
+        ```
+
+        ## Extended query with SPARQL+Text
+
+        **When to use**: Do NOT default to text queries early in a conversation. Use SPARQL+Text only after initial graph exploration, typically when the researcher asks for specific details that require publication evidence (e.g. experimental methods, specific findings, mechanistic details). If a question can be answered with structured graph data alone, prefer that.
+
+        Use `sparqlQuery` with additional syntax to search text passages with SPARQL+Text extension.
+
+        SPARQL+Text examples:
+
+        ```sparql
+        SELECT ?text WHERE { ?text ql:contains-word "neurofibromatosis" } LIMIT 10
+        ```
+
+        ```sparql
+        SELECT ?text WHERE { ?text ql:contains-word "schwann*" } LIMIT 10
+        ```
+
+        ```sparql
+        SELECT ?text WHERE {
+          ?text ql:contains-entity <https://www.ncbi.nlm.nih.gov/gene/4763> .
+          ?text ql:contains-word "mutation*"
+        } LIMIT 10
+        ```
+
+        ```sparql
+        SELECT ?text WHERE {
+          ?text ql:contains-entity <https://www.ncbi.nlm.nih.gov/gene/4763> .
+          ?text ql:contains-word "*"
+        } LIMIT 10
+        ```
+
+        Important syntax notes:
+
+        - `ql:contains-entity` must be paired with `ql:contains-word` in the same pattern.
+        - If you need entity-only matching, use `ql:contains-word "*"` as a wildcard.
+        - Each returned passage includes an attribution tag like `[PMID12345-7-results]`; extract the PMID for citation.
+        - If no clarification is available, interpret the question as written and choose the most appropriate answer.
+
+        ### Example for extended query
+
+        When answers use publication text, you MUST include attribution as inline markdown link(s).
+
+        Example:
+
+        ```xml
+        <chat>
+        The method used for transforming the cell line was ... ([PMID12345](https://pubmed.ncbi.nlm.nih.gov/12345/)).
+        </chat>
+        ```
+      ActionGroups:
+        - ActionGroupName: nf-graph-rag-actions
+          ActionGroupExecutor:
+            Lambda: !GetAtt GraphRagFunction.Arn
+          ApiSchema:
+            Payload: |
+              openapi: 3.0.0
+              info:
+                title: NF RAG Function API
+                version: 1.0.0
+                description: >
+                  This schema describes the four agent-facing functions for NF knowledge
+                  graph RAG. A Lambda adapter maps these operations to Bedrock action-group
+                  style function calls via apiPath or function name.
+              tags:
+                - name: sparql
+                  description: SPARQL and schema helper operations for the NF-OSI knowledge graph
+              paths:
+                /sparql-query:
+                  post:
+                    tags:
+                      - sparql
+                    operationId: sparqlQuery
+                    summary: Execute an arbitrary SPARQL query
+                    description: >
+                      Runs a SPARQL query against the configured NF-OSI SPARQL endpoint and
+                      returns TSV text. The implementation prepends the default NF ontology
+                      prefixes automatically.
+                    requestBody:
+                      required: true
+                      content:
+                        application/json:
+                          schema:
+                            $ref: "#/components/schemas/SparqlQueryRequest"
+                    responses:
+                      "200":
+                        description: TSV query result or application-level error payload
+                        content:
+                          application/json:
+                            schema:
+                              $ref: "#/components/schemas/TsvResultResponse"
+                /schema:
+                  post:
+                    tags:
+                      - sparql
+                    operationId: getSchema
+                    summary: List ontology classes and properties
+                    description: >
+                      Returns a TSV table containing ontology terms, their kinds, labels,
+                      comments, domains, and ranges.
+                    responses:
+                      "200":
+                        description: TSV schema result
+                        content:
+                          application/json:
+                            schema:
+                              $ref: "#/components/schemas/TsvResultResponse"
+                /shape:
+                  post:
+                    tags:
+                      - sparql
+                    operationId: getShape
+                    summary: Retrieve the SHACL shape for one NF class
+                    description: >
+                      Returns a TSV table describing the SHACL node shape and property
+                      constraints for the requested class. The class name may be passed either
+                      as a local name like CellLine or as a prefixed value like nf:CellLine.
+                    requestBody:
+                      required: true
+                      content:
+                        application/json:
+                          schema:
+                            $ref: "#/components/schemas/GetShapeRequest"
+                    responses:
+                      "200":
+                        description: Requested shape or application-level error payload
+                        content:
+                          application/json:
+                            schema:
+                              $ref: "#/components/schemas/GetShapeResponse"
+                /count-by-type:
+                  post:
+                    tags:
+                      - sparql
+                    operationId: countByType
+                    summary: Count instances grouped by rdf:type
+                    description: >
+                      Returns a TSV table containing per-type instance counts from the
+                      knowledge graph.
+                    responses:
+                      "200":
+                        description: TSV count result
+                        content:
+                          application/json:
+                            schema:
+                              $ref: "#/components/schemas/TsvResultResponse"
+              components:
+                schemas:
+                  SparqlQueryRequest:
+                    type: object
+                    required:
+                      - query
+                    properties:
+                      query:
+                        type: string
+                        description: >
+                          SPARQL query text. The Lambda implementation prepends the default NF
+                          ontology prefixes automatically.
+                    additionalProperties: false
+                  GetShapeRequest:
+                    type: object
+                    required:
+                      - className
+                    properties:
+                      className:
+                        type: string
+                        description: >
+                          Class local name such as CellLine or AnimalModel, or a prefixed name
+                          like nf:CellLine.
+                    additionalProperties: false
+                  TsvResultResponse:
+                    type: object
+                    properties:
+                      resultTsv:
+                        type: string
+                        description: Tab-separated query result returned by the underlying SPARQL endpoint.
+                      error:
+                        type: string
+                        description: Application-level error text returned by the function.
+                    additionalProperties: false
+                  GetShapeResponse:
+                    type: object
+                    properties:
+                      className:
+                        type: string
+                      resultTsv:
+                        type: string
+                      error:
+                        type: string
+                    additionalProperties: false
+      # Remove this block if you have no knowledge bases to attach:
+      KnowledgeBases:
+        - KnowledgeBaseId: !Ref KnowledgeBaseId
+          Description: "NF Data Portal documentation."
+          KnowledgeBaseState: ENABLED
+      SkipResourceInUseCheckOnDelete: true
+
+  # ---- Agent Alias ----------------------------------------------------------
+  AgentAlias:
+    Type: AWS::Bedrock::AgentAlias
+    Properties:
+      AgentId: !GetAtt BedrockAgent.AgentId
+      AgentAliasName: !Ref AliasName
+
+# ---------------------------------------------------------------------------
+# Outputs
+# ---------------------------------------------------------------------------
+Outputs:
+  AgentId:
+    Description: Bedrock Agent ID
+    Value: !GetAtt BedrockAgent.AgentId
+
+  AgentAliasId:
+    Description: Agent Alias ID (use with Synapse registration)
+    Value: !GetAtt AgentAlias.AgentAliasId
+
+  AgentArn:
+    Description: Full ARN of the Bedrock Agent
+    Value: !GetAtt BedrockAgent.AgentArn
+
+  LambdaFunctionArn:
+    Description: ARN of the GraphRAG Lambda function
+    Value: !GetAtt GraphRagFunction.Arn
+
+  BedrockAgentRoleArn:
+    Description: ARN of the Bedrock Agent execution role
+    Value: !GetAtt BedrockAgentRole.Arn
