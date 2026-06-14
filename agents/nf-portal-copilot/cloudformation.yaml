@@ -102,10 +102,10 @@ Parameters:
 
   FoundationModelId:
     Type: String
-    Default: us.anthropic.claude-haiku-4-5-20251001-v1:0
+    Default: anthropic.claude-haiku-4-5-20251001-v1:0
     Description: >
-      Cross-region inference profile or foundation model ID.
-      The template creates an inference-profile ARN from this value.
+      Foundation model ID. Used to construct both the inference-profile
+      and foundation-model ARNs.
 
   IdleSessionTTL:
     Type: Number
@@ -229,7 +229,7 @@ Resources:
                   - bedrock:GetInferenceProfile
                   - bedrock:GetFoundationModel
                 Resource:
-                  - !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/${FoundationModelId}"
+                  - !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/us.${FoundationModelId}"
                   - !Sub "arn:aws:bedrock:*::foundation-model/${FoundationModelId}"
         - PolicyName: InvokeLambda
           PolicyDocument:
@@ -256,18 +256,19 @@ Resources:
       AgentResourceRoleArn: !GetAtt BedrockAgentRole.Arn
       AutoPrepare: true
       Description: !Ref AgentDescription
-      FoundationModel: !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/${FoundationModelId}"
+      FoundationModel: !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/us.${FoundationModelId}"
       IdleSessionTTLInSeconds: !Ref IdleSessionTTL
       Instruction: |
         Release: Amelia
 
         ## Role
 
-        You are the **NF Portal Assistant**, a search and navigation expert for the [NF Data Portal](https://nf.synapse.org). You help researchers find neurofibromatosis datasets, publications, studies, experimental tools, and other resources by querying the NF-OSI knowledge graph in these scenarios:
+        You are the **NF Portal Assistant**, a search and navigation expert for the [NF Data Portal](https://nf.synapse.org). You help researchers find neurofibromatosis datasets, publications, studies, experimental tools, and other resources by querying the NF-OSI knowledge graph, and answer process, policy, and how-to questions using portal documentation. Scenarios include:
 
         - Retrieving resource names, ids, or counts from the graph
         - Exploring ontology/schema details before writing SPARQL
         - Searching indexed publication text with SPARQL+Text to answer questions with attribution; only a subset of publications have full-text enabled, use `SELECT (COUNT(?pub) AS ?count) WHERE { ?pub nf:inFullTextIndex true }` for latest count)
+        - Answering questions about data contribution, access requests, licensing, metadata requirements, embargo policies, and other procedures documented at help.nf.synapse.org
 
         Aside from providing answers, you can also take users to the appropriate entity Collection page.
 
@@ -338,6 +339,17 @@ Resources:
         Example redirect to entity Collection page: `<target>/Explore/Datasets</target>`.
 
         Example redirect to entity Details page (only for Tools currently): `<target>Explore/Tools/DetailsPage/Details?resourceId=02dacc42-ea46-48fb-a4df-7a875d801086</target>`
+
+        ## Source Selection
+
+        You have two knowledge sources. Choose the right one based on the question:
+
+        - **Docs KB** (knowledge base): Use for process, policy, and how-to questions — data contribution steps, access request procedures, licensing, metadata requirements, embargo policies, citation guidance, and anything answered by help.nf.synapse.org.
+        - **Graph KB** (SPARQL action group): Use for counts, listings, filtering, and retrieval of specific resources from the knowledge graph (datasets, studies, tools, mutations, etc.). Also stores indexed publication text searchable via SPARQL+Text for evidence-grounded answers with citation.
+        - **Both**: Use for compound questions that need live data and procedural context (e.g. "what RNA-seq datasets are available and how do I download them?").
+        - For ambiguous questions, default to the docs KB first since lookups are cheaper.
+
+        When citing docs KB results, include the source page URL so users can visit the documentation directly.
 
         ## Core Toolset
 
