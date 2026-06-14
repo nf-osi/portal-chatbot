@@ -17,7 +17,7 @@ The agent has two knowledge sources:
 
 ## Dataset
 
-`kb_routing_dataset.json` — a curated set of multi-turn sessions, each labeled with the expected KB source per turn.
+`kb_routing_dataset.json` — a curated set of multi-turn sessions, each labeled with the expected source per turn.
 
 ### Session structure
 
@@ -31,14 +31,14 @@ The agent has two knowledge sources:
     {
       "id": "s-mixed-01-t1",
       "question": "What is the data embargo policy?",
-      "expected_kb": "DOCS",
+      "expected": "DOCS",
       "persona": "CONTRIBUTOR",
       "notes": "Policy question answered by documentation."
     },
     {
       "id": "s-mixed-01-t2",
       "question": "Show me all publicly available datasets",
-      "expected_kb": "GRAPH",
+      "expected": "GRAPH",
       "persona": "REUSER",
       "notes": "Data inventory requires querying the KG."
     }
@@ -46,13 +46,14 @@ The agent has two knowledge sources:
 }
 ```
 
-### `expected_kb` values
+### `expected` values
 
 | Value | Meaning |
 |-------|---------|
 | `DOCS` | Agent should use the documentation KB (process, policy, how-tos) |
 | `GRAPH` | Agent should use SPARQL action groups (counts, lists, specific records) |
 | `BOTH` | Either source is acceptable, or both should be used for a compound question |
+| `REDIRECT` | Agent should navigate the user via a redirect action (no KB lookup needed) |
 | `NONE` | No KB lookup expected — agent should answer from general knowledge or decline |
 
 ### `session_type` values
@@ -80,15 +81,15 @@ The agent has two knowledge sources:
 
 ## Step 1: Expand the dataset
 
-Add sessions directly to `kb_routing_dataset.json` following the schema in `kb_routing_schema.json`. Each session requires `session_id`, `session_type`, `description`, `n_turns` (must equal the length of `turns`), and turns with `id`, `question`, `expected_kb`, and `persona`.
+Add sessions directly to `kb_routing_dataset.json` following the schema in `kb_routing_schema.json`. Each session requires `session_id`, `session_type`, `description`, `n_turns` (must equal the length of `turns`), and turns with `id`, `question`, `expected`, and `persona`.
 
 ---
 
 ## Step 2: Human validation
 
-- Verify each `expected_kb` label is accurate for the question.
+- Verify each `expected` label is accurate for the question.
 - Check that multi-turn sessions flow naturally (follow-up turns are coherent).
-- Flag questions where either source gives a valid answer (change `expected_kb` to `BOTH`); this includes both compound questions and genuinely ambiguous queries.
+- Flag questions where either source gives a valid answer (change `expected` to `BOTH`); this includes both compound questions and genuinely ambiguous queries.
 - Ensure GRAPH questions can't be answered from docs alone.
 - Ensure DOCS questions don't require live KG data.
 
@@ -96,7 +97,7 @@ Add sessions directly to `kb_routing_dataset.json` following the schema in `kb_r
 
 ## Step 3: Evaluate
 
-`evaluate_kb_routing.py` invokes the agent and captures Bedrock trace events to determine which knowledge source was actually used. The primary output is KB source selection accuracy — whether the agent routed to the expected source — not whether the answer text is correct. Answer quality is scored as a secondary signal by an LLM judge.
+`evaluate_kb_routing.py` invokes the agent and captures Bedrock trace events to determine which source was actually used. The primary output is source selection accuracy — whether the agent routed to the expected source — not whether the answer text is correct. Answer quality is scored as a secondary signal by an LLM judge.
 
 ### Execution flow
 
@@ -104,7 +105,7 @@ For each session the script:
 
 1. Creates a fresh Bedrock `sessionId` (UUID)
 2. Sends `turns` to the agent **in order**, reusing the same `sessionId` — so each turn arrives with the prior conversation in context
-3. After each turn, inspects trace events and response citations to detect which KB source was used (`DOCS`, `GRAPH`, both, or neither), then scores it against `expected_kb`
+3. After each turn, inspects trace events and response citations to detect which source was used (`DOCS`, `GRAPH`, `REDIRECT`, or none), then scores it against `expected`
 4. Moves to the next turn in the same session before starting a new `sessionId` for the next session
 
 Single-turn sessions run this loop once. The `n_turns` field exists so sessions can be pre-filtered by turn count before running the eval (e.g. to isolate the effect of prior context on routing decisions).
@@ -121,30 +122,24 @@ AWS credentials with access to the Bedrock Agent and Bedrock Runtime.
 
 ```bash
 cd benchmark/kb-routing
-python evaluate_kb_routing.py
+python evaluate_kb_routing.py                          # routing only (~8 min for 34 turns)
+python evaluate_kb_routing.py --judge                  # also run LLM judge for answer quality
+python evaluate_kb_routing.py -n 3                     # quick test: first 3 sessions only
+python evaluate_kb_routing.py --agent-id ERAAPKTD4Q    # test a different agent
 ```
 
-Override defaults as needed:
-
-```bash
-python evaluate_kb_routing.py \
-  --agent-id WU3QRWA0FQ \
-  --alias-id TSTALIASID \
-  --profile default \
-  --region us-east-1 \
-  --dataset kb_routing_dataset.json \
-  --output routing_eval_results.json
-  # --judge-model to override LLM judge (defaults to Haiku 4.5)
-```
+The default alias `TSTALIASID` always points to the DRAFT version. If you've updated the agent (instructions, model, action groups) without preparing it, run `aws bedrock-agent prepare-agent --agent-id <ID>` first — otherwise the eval will test the previous prepared version, not your latest changes.
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--agent-id` | `WU3QRWA0FQ` | Bedrock Agent ID |
-| `--alias-id` | `TSTALIASID` | Bedrock Agent alias ID |
-| `--profile` | `default` | AWS profile |
+| `--agent-id` | `ERAAPKTD4Q` | Bedrock Agent ID (dev) |
+| `--alias-id` | `TSTALIASID` | Bedrock Agent alias ID (DRAFT) |
+| `-n` | all | Only run the first N sessions |
+| `--judge` | off | Enable LLM judge for answer quality scoring |
+| `--judge-model` | `us.anthropic.claude-haiku-4-5-20251001-v1:0` | Model for the LLM judge |
+| `--profile` | env credentials | AWS profile |
 | `--region` | `us-east-1` | AWS region |
 | `--dataset` | `kb_routing_dataset.json` | Sessions dataset |
-| `--judge-model` | `us.anthropic.claude-haiku-4-5-20251001-v1:0` | Answer quality judge |
 | `--output` | `routing_eval_results.json` | Base output path (datestamp appended) |
 
 ### Detection method
@@ -154,8 +149,9 @@ The script enables `enableTrace=True` on agent invocations and inspects orchestr
 - `invocationType: "KNOWLEDGE_BASE"` or `type: "KNOWLEDGE_BASE"` → `DOCS` used
 - `invocationType: "ACTION_GROUP"` or `type: "ACTION_GROUP"` → `GRAPH` used
 - `WEB`-type citation in response chunk → also marks `DOCS`
+- `<actions><redirect>` tag in response text → `REDIRECT` used
 
-### KB selection scoring
+### Source selection scoring
 
 | Score | Meaning | `kb_correct` |
 |-------|---------|:---:|
@@ -193,7 +189,7 @@ Results are saved as `routing_eval_results_<timestamp>.json`. Each file contains
 | KB routing accuracy | % turns with `kb_correct` (score ≥ 1) — agent reached the right source |
 | KB routing efficiency | % turns with score = 2 — right source used with no unnecessary extras |
 | Over-query rate | % `DOCS`/`GRAPH` turns with score = 1 — right source used but extras consulted |
-| Per-source breakdown | Above metrics broken down by `expected_kb` (DOCS / GRAPH / BOTH / NONE) |
+| Per-source breakdown | Above metrics broken down by `expected` (DOCS / GRAPH / BOTH / REDIRECT / NONE) |
 | Actual usage distribution | What source combinations the agent actually used |
 | Answer quality | % turns scored 2 by the LLM judge |
 | Per-persona KB accuracy | Routing accuracy by CONTRIBUTOR, REUSER, FUNDER, etc. |

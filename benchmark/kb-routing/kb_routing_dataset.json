@@ -8,7 +8,7 @@
       {
         "id": "s-docs-single-01-t1",
         "question": "How long is the standard data embargo period on the NF portal?",
-        "expected_kb": "DOCS",
+        "expected": "DOCS",
         "persona": "CONTRIBUTOR",
         "notes": "Embargo policy is defined in documentation."
       }
@@ -23,7 +23,7 @@
       {
         "id": "s-docs-single-02-t1",
         "question": "What consent and IRB documentation is required when submitting human data?",
-        "expected_kb": "DOCS",
+        "expected": "DOCS",
         "persona": "CONTRIBUTOR",
         "notes": "Regulatory submission requirements are covered in the help docs."
       }
@@ -38,7 +38,7 @@
       {
         "id": "s-graph-single-01-t1",
         "question": "How many biobanks are listed on the NF portal?",
-        "expected_kb": "GRAPH",
+        "expected": "GRAPH",
         "persona": "REUSER",
         "notes": "Current count requires querying the KG; docs won't have live numbers."
       }
@@ -53,7 +53,7 @@
       {
         "id": "s-graph-single-02-t1",
         "question": "How many animal model tools are on the portal?",
-        "expected_kb": "GRAPH",
+        "expected": "GRAPH",
         "persona": "REUSER",
         "notes": "Current count requires querying the KG."
       }
@@ -68,7 +68,7 @@
       {
         "id": "s-graph-single-03-t1",
         "question": "Which study on the portal has the most associated data files?",
-        "expected_kb": "GRAPH",
+        "expected": "GRAPH",
         "persona": "FUNDER",
         "notes": "Ranking studies by file count requires aggregating over the KG."
       }
@@ -83,7 +83,7 @@
       {
         "id": "s-none-single-01-t1",
         "question": "Help me write a Python script to reverse a string",
-        "expected_kb": "NONE",
+        "expected": "NONE",
         "persona": "X",
         "notes": "General coding question; no portal KB needed. Assistant should ideally decline this question."
       }
@@ -98,7 +98,7 @@
       {
         "id": "s-none-single-02-t1",
         "question": "hi, is neurofibromatosis a cancer or autoimmune disease?",
-        "expected_kb": "NONE",
+        "expected": "NONE",
         "persona": "X",
         "notes": "General medical background answerable from model knowledge; no portal KB needed."
       }
@@ -113,14 +113,14 @@
       {
         "id": "s-docs-01-t1",
         "question": "What are the steps to contribute data to the NF Data Portal?",
-        "expected_kb": "DOCS",
+        "expected": "DOCS",
         "persona": "CONTRIBUTOR",
         "notes": "High-level contribution workflow; answer is entirely in help docs."
       },
       {
         "id": "s-docs-01-t2",
         "question": "What metadata fields are required when submitting files?",
-        "expected_kb": "DOCS",
+        "expected": "DOCS",
         "persona": "CONTRIBUTOR",
         "notes": "Metadata requirements are documented; cannot be answered by querying the graph."
       }
@@ -135,14 +135,14 @@
       {
         "id": "s-docs-02-t1",
         "question": "What is the default license applied to non-human data submitted to the portal?",
-        "expected_kb": "DOCS",
+        "expected": "DOCS",
         "persona": "REUSER",
         "notes": "License policy is in the docs; no need to query the graph."
       },
       {
         "id": "s-docs-02-t2",
         "question": "What's the most common dataset license?",
-        "expected_kb": "GRAPH",
+        "expected": "GRAPH",
         "persona": "REUSER",
         "notes": "Requires aggregating license values across dataset entities in the KG; docs only describe the default policy, not actual distribution."
       }
@@ -157,21 +157,21 @@
       {
         "id": "s-graph-01-t1",
         "question": "How many NF1 cell line tools are available in the portal?",
-        "expected_kb": "GRAPH",
+        "expected": "GRAPH",
         "persona": "REUSER",
         "notes": "Requires counting instances in the knowledge graph; docs won't have current counts."
       },
       {
         "id": "s-graph-01-t2",
         "question": "Show me NF1 cell lines derived from human donors",
-        "expected_kb": "GRAPH",
+        "expected": "GRAPH",
         "persona": "REUSER",
         "notes": "Filtering by donor type requires a SPARQL query over the KG."
       },
       {
         "id": "s-graph-01-t3",
         "question": "Which of those cell lines have loss-of-function NF1 mutations?",
-        "expected_kb": "GRAPH",
+        "expected": "GRAPH",
         "persona": "REUSER",
         "notes": "Follow-up filtering on mutation type; still a graph query. Uses conversation context."
       }
@@ -186,14 +186,14 @@
       {
         "id": "s-graph-02-t1",
         "question": "How many studies on the portal are focused on schwannomatosis?",
-        "expected_kb": "GRAPH",
+        "expected": "GRAPH",
         "persona": "FUNDER",
         "notes": "Requires querying the graph for disease-specific study counts."
       },
       {
         "id": "s-graph-02-t2",
         "question": "What RNA-seq datasets are available for NF2 research?",
-        "expected_kb": "GRAPH",
+        "expected": "GRAPH",
         "persona": "REUSER",
         "notes": "Dataset listing by data type and disease; requires SPARQL over KG."
       }
@@ -208,16 +208,16 @@
       {
         "id": "s-mixed-01-t1",
         "question": "What is the data embargo policy for newly submitted datasets?",
-        "expected_kb": "DOCS",
+        "expected": "DOCS",
         "persona": "CONTRIBUTOR",
         "notes": "Policy/process question; clearly a documentation lookup."
       },
       {
         "id": "s-mixed-01-t2",
         "question": "Now show me all the datasets that are currently publicly available",
-        "expected_kb": "GRAPH",
+        "expected": "REDIRECT",
         "persona": "REUSER",
-        "notes": "Pivot to actual data inventory; requires querying the KG."
+        "notes": "Navigation request; agent can redirect to filtered Datasets page directly without querying any KB."
       }
     ]
   },
@@ -230,21 +230,21 @@
       {
         "id": "s-mixed-02-t1",
         "question": "How many datasets on the portal involve pediatric patients?",
-        "expected_kb": "GRAPH",
+        "expected": "GRAPH",
         "persona": "FUNDER",
         "notes": "Requires querying the KG for patient age-related attributes."
       },
       {
         "id": "s-mixed-02-t2",
         "question": "I'd like to add my pediatric NF1 study data to the portal. What do I need to prepare?",
-        "expected_kb": "DOCS",
+        "expected": "DOCS",
         "persona": "CONTRIBUTOR",
         "notes": "Pivot to contribution guidance; clearly a documentation topic despite prior graph context."
       },
       {
         "id": "s-mixed-02-t3",
         "question": "What is the maximum file size for a single upload?",
-        "expected_kb": "DOCS",
+        "expected": "DOCS",
         "persona": "CONTRIBUTOR",
         "notes": "Technical upload constraint is in documentation."
       }
@@ -259,28 +259,28 @@
       {
         "id": "s-mixed-03-t1",
         "question": "What types of NF model systems are supported by the portal?",
-        "expected_kb": "BOTH",
+        "expected": "BOTH",
         "persona": "REUSER",
         "notes": "Docs describe supported resource categories; graph can enumerate actual types present. Either source gives a valid answer."
       },
       {
         "id": "s-mixed-03-t2",
         "question": "How many mouse models are currently listed?",
-        "expected_kb": "GRAPH",
+        "expected": "GRAPH",
         "persona": "REUSER",
         "notes": "Current count requires querying the KG."
       },
       {
         "id": "s-mixed-03-t3",
         "question": "How is info for these mouse models collected?",
-        "expected_kb": "DOCS",
+        "expected": "DOCS",
         "persona": "REUSER",
         "notes": "Should be in documentation."
       },
       {
         "id": "s-mixed-03-t4",
         "question": "Find animal models with both NF1 and TP53 mutations",
-        "expected_kb": "GRAPH",
+        "expected": "GRAPH",
         "persona": "REUSER",
         "notes": "Filtering by co-occurring mutations requires SPARQL."
       }
@@ -295,7 +295,7 @@
       {
         "id": "s-both-01-t1",
         "question": "What's the largest available dataset? Is there an applicable guide that walks me through how to download it?",
-        "expected_kb": "BOTH",
+        "expected": "BOTH",
         "persona": "REUSER",
         "notes": "Two-part question: identifying the largest dataset requires GRAPH; the download guide is in DOCS."
       }
@@ -310,14 +310,14 @@
       {
         "id": "s-ambig-01-t1",
         "question": "Tell me about NF1 research on the portal",
-        "expected_kb": "BOTH",
+        "expected": "BOTH",
         "persona": "X",
         "notes": "Vague overview question; agent might use docs for context or graph for data inventory. BOTH is acceptable."
       },
       {
         "id": "s-ambig-01-t2",
         "question": "Which clients are available for programmatic access?",
-        "expected_kb": "DOCS",
+        "expected": "DOCS",
         "persona": "REUSER",
         "notes": "Available clients (e.g. Synapse Python/R clients) are described in the docs."
       }
@@ -332,14 +332,14 @@
       {
         "id": "s-none-01-t1",
         "question": "Help me write a Python script to reverse a string",
-        "expected_kb": "NONE",
+        "expected": "NONE",
         "persona": "X",
         "notes": "General programming question unrelated to the NF portal; no KB lookup needed."
       },
       {
         "id": "s-none-01-t2",
         "question": "OK, can you submit a support ticket on my behalf?",
-        "expected_kb": "NONE",
+        "expected": "NONE",
         "persona": "X",
         "notes": "Requesting action assistant doesn't have"
       }
@@ -354,28 +354,28 @@
       {
         "id": "s-funder-01-t1",
         "question": "How many NTAP-funded datasets are currently on the NF Data Portal?",
-        "expected_kb": "GRAPH",
+        "expected": "GRAPH",
         "persona": "FUNDER",
         "notes": "Current inventory counts require querying the KG."
       },
       {
         "id": "s-funder-01-t2",
         "question": "I'm trying to get a complete picture of which funders have contributed datasets aside from the historical main funders",
-        "expected_kb": "BOTH",
+        "expected": "BOTH",
         "persona": "FUNDER",
         "notes": "Intentionally open-ended. A well-routing agent should consult the docs for named major funders/initiatives and the KG to enumerate all funder entities directly on dataset entities. Neither source alone gives the complete picture."
       },
       {
         "id": "s-funder-01-t3",
         "question": "Which funder has the most initiatives?",
-        "expected_kb": "GRAPH",
+        "expected": "GRAPH",
         "persona": "FUNDER",
         "notes": "Ranking funders by initiative count requires aggregating over the KG."
       },
       {
         "id": "s-funder-01-t4",
         "question": "Who should I contact to provide potential support for the portal?",
-        "expected_kb": "DOCS",
+        "expected": "DOCS",
         "persona": "FUNDER",
         "notes": "Contact information for portal support/partnerships is in the docs; no KG lookup needed."
       }

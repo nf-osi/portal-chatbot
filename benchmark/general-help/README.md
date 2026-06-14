@@ -137,9 +137,11 @@ python evaluate_bedrock_agent.py \
   # --judge-model can be used to override the LLM judge (defaults to Haiku 4.5)
 ```
 
+The default alias `TSTALIASID` always points to the DRAFT version. If you've updated the agent (instructions, model, action groups) without preparing it, run `aws bedrock-agent prepare-agent --agent-id <ID>` first — otherwise the eval will test the previous prepared version, not your latest changes.
+
 | Flag | Default | Description |
 |---|---|---|
-| `--agent-id` | `2COISTBHRB` | Bedrock Agent ID |
+| `--agent-id` | `ERAAPKTD4Q` | Bedrock Agent ID (dev) |
 | `--alias-id` | `TSTALIASID` | Bedrock Agent alias ID |
 | `--profile` | `default` | AWS profile from `~/.aws/credentials` |
 | `--region` | `us-east-1` | AWS region |

@@ -281,7 +281,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument(
         "--agent-id",
-        default="2COISTBHRB",
+        default="ERAAPKTD4Q",
         help="Bedrock Agent ID (default: %(default)s)",
     )
     parser.add_argument(

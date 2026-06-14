@@ -7,13 +7,21 @@ turns), captures Bedrock trace events to detect which KB source was used
 accuracy alongside answer quality metrics.
 
 Usage:
-    python evaluate_kb_routing.py
-    python evaluate_kb_routing.py --agent-id WU3QRWA0FQ --alias-id TSTALIASID
-    python evaluate_kb_routing.py --dataset kb_routing_dataset.json --profile my-profile
+    python evaluate_kb_routing.py                          # routing only (~8 min for 34 turns)
+    python evaluate_kb_routing.py --judge                  # also run LLM judge for answer quality
+    python evaluate_kb_routing.py -n 3                     # quick test: first 3 sessions only
+    python evaluate_kb_routing.py --agent-id ERAAPKTD4Q   # test a different agent
+    python evaluate_kb_routing.py --profile my-profile
+
+The default alias TSTALIASID always points to the DRAFT version. If you've
+updated the agent (instructions, model, action groups) without preparing it,
+run `aws bedrock-agent prepare-agent --agent-id <ID>` first — otherwise the
+eval will test the previous prepared version, not your latest changes.
 
 Detection logic:
-    DOCS:  KNOWLEDGE_BASE invocation in trace (or WEB-type citation in response chunk)
-    GRAPH: ACTION_GROUP invocation in trace (SPARQL Lambda calls)
+    DOCS:     KNOWLEDGE_BASE invocation in trace (or WEB-type citation in response chunk)
+    GRAPH:    ACTION_GROUP invocation in trace (SPARQL Lambda calls)
+    REDIRECT: <actions><redirect> tag detected in response text
 """
 
 import argparse
@@ -38,10 +46,10 @@ def invoke_agent(
     question: str,
     session_id: str,
 ) -> tuple[str, list[str], set[str]]:
-    """Invoke agent and return (response_text, cited_urls, kb_sources_used).
+    """Invoke agent and return (response_text, cited_urls, sources_used).
 
-    kb_sources_used is a set of "DOCS" and/or "GRAPH" detected from trace events
-    and response chunk citations.
+    sources_used is a set of "DOCS", "GRAPH", and/or "REDIRECT" detected from
+    trace events, response chunk citations, and response text patterns.
     """
     response = agent_client.invoke_agent(
         agentId=agent_id,
@@ -53,7 +61,7 @@ def invoke_agent(
 
     completion = ""
     cited_urls: list[str] = []
-    kb_sources_used: set[str] = set()
+    sources_used: set[str] = set()
 
     for event in response["completion"]:
         # Response text and WEB citations
@@ -67,7 +75,7 @@ def invoke_agent(
                         url = location.get("webLocation", {}).get("url")
                         if url and url not in cited_urls:
                             cited_urls.append(url)
-                        kb_sources_used.add("DOCS")
+                        sources_used.add("DOCS")
 
         # Trace events for orchestration steps
         if "trace" in event:
@@ -78,27 +86,32 @@ def invoke_agent(
             inv_input = orch.get("invocationInput", {})
             inv_type = inv_input.get("invocationType", "")
             if inv_type == "ACTION_GROUP":
-                kb_sources_used.add("GRAPH")
+                sources_used.add("GRAPH")
             elif inv_type == "KNOWLEDGE_BASE":
-                kb_sources_used.add("DOCS")
+                sources_used.add("DOCS")
 
             # Detect via observation (post-call confirmation)
             obs = orch.get("observation", {})
             obs_type = obs.get("type", "")
             if obs_type == "ACTION_GROUP":
-                kb_sources_used.add("GRAPH")
+                sources_used.add("GRAPH")
             elif obs_type == "KNOWLEDGE_BASE":
-                kb_sources_used.add("DOCS")
+                sources_used.add("DOCS")
 
-    return completion.strip(), cited_urls, kb_sources_used
+    # Detect redirect action in response text
+    completion_stripped = completion.strip()
+    if "<actions><redirect>" in completion_stripped:
+        sources_used.add("REDIRECT")
+
+    return completion_stripped, cited_urls, sources_used
 
 
 # ---------------------------------------------------------------------------
-# KB source selection scoring
+# Source selection scoring
 # ---------------------------------------------------------------------------
 
-def score_kb_selection(expected_kb: str, kb_sources_used: set[str]) -> dict:
-    """Score whether the agent used the expected KB source(s) efficiently.
+def score_source_selection(expected: str, sources_used: set[str]) -> dict:
+    """Score whether the agent used the expected source(s) efficiently.
 
     Scoring:
       2 — correct and efficient: used exactly the expected source(s); or NONE and no sources used
@@ -111,33 +124,38 @@ def score_kb_selection(expected_kb: str, kb_sources_used: set[str]) -> dict:
 
     Returns dict with kb_used, kb_score, kb_correct.
     """
-    if expected_kb == "DOCS":
-        expected = {"DOCS"}
-    elif expected_kb == "GRAPH":
-        expected = {"GRAPH"}
-    elif expected_kb == "BOTH":
-        expected = {"DOCS", "GRAPH"}
-    elif expected_kb == "NONE":
-        expected = set()
-        if not kb_sources_used:
+    if expected == "DOCS":
+        expected_set = {"DOCS"}
+    elif expected == "GRAPH":
+        expected_set = {"GRAPH"}
+    elif expected == "BOTH":
+        expected_set = {"DOCS", "GRAPH"}
+    elif expected == "REDIRECT":
+        if "REDIRECT" in sources_used:
+            return {"kb_used": sorted(sources_used), "kb_score": 2, "kb_correct": True}
+        else:
+            return {"kb_used": sorted(sources_used), "kb_score": 0, "kb_correct": False}
+    elif expected == "NONE":
+        expected_set = set()
+        if not sources_used:
             return {"kb_used": [], "kb_score": 2, "kb_correct": True}
         else:
-            return {"kb_used": sorted(kb_sources_used), "kb_score": 0, "kb_correct": False}
+            return {"kb_used": sorted(sources_used), "kb_score": 0, "kb_correct": False}
     else:
-        expected = set()
+        expected_set = set()
 
-    if not kb_sources_used:
+    if not sources_used:
         return {"kb_used": [], "kb_score": -1, "kb_correct": False}
 
-    correct_used = expected & kb_sources_used
+    correct_used = expected_set & sources_used
 
-    if kb_sources_used == expected:
+    if sources_used == expected_set:
         # Exactly the right source(s) — correct and efficient
         kb_score = 2
-    elif expected.issubset(kb_sources_used):
+    elif expected_set.issubset(sources_used):
         # Right source used but unnecessary extras consulted
         # BOTH already expects any/both, so extras are only penalised for DOCS/GRAPH
-        kb_score = 1 if expected_kb in ("DOCS", "GRAPH") else 2
+        kb_score = 1 if expected in ("DOCS", "GRAPH") else 2
     elif correct_used:
         # Some expected sources used but not all (only reachable for BOTH)
         kb_score = 1
@@ -146,7 +164,7 @@ def score_kb_selection(expected_kb: str, kb_sources_used: set[str]) -> dict:
         kb_score = 0
 
     return {
-        "kb_used": sorted(kb_sources_used),
+        "kb_used": sorted(sources_used),
         "kb_score": kb_score,
         "kb_correct": kb_score >= 1,
     }
@@ -161,7 +179,7 @@ def judge_answer(
     judge_model_id: str,
     question: str,
     agent_response: str,
-    expected_kb: str,
+    expected: str,
 ) -> int:
     """Score answer quality without a gold answer.
 
@@ -178,7 +196,8 @@ def judge_answer(
         "DOCS": "documentation/process/policy information",
         "GRAPH": "specific data counts, lists, or records from the NF portal knowledge graph",
         "BOTH": "a combination of documentation guidance and specific portal data",
-    }.get(expected_kb, "relevant information")
+        "REDIRECT": "a redirect action navigating the user to the appropriate portal page",
+    }.get(expected, "relevant information")
 
     prompt = (
         "You are evaluating an AI assistant's response for the NF Data Portal.\n\n"
@@ -215,18 +234,19 @@ def evaluate_turn(
     session_id: str,
     turn: dict,
     turn_number: int,
+    no_judge: bool = False,
 ) -> dict:
     """Evaluate a single turn within a session."""
     question = turn["question"]
-    expected_kb = turn["expected_kb"]
+    expected = turn["expected"]
     persona = turn["persona"]
 
-    agent_response, cited_urls, kb_sources_used = invoke_agent(
+    agent_response, cited_urls, sources_used = invoke_agent(
         agent_client, agent_id, agent_alias_id, question, session_id
     )
 
-    kb_result = score_kb_selection(expected_kb, kb_sources_used)
-    answer_score = judge_answer(bedrock_client, judge_model_id, question, agent_response, expected_kb)
+    kb_result = score_source_selection(expected, sources_used)
+    answer_score = -1 if no_judge else judge_answer(bedrock_client, judge_model_id, question, agent_response, expected)
 
     return {
         "session_id": session_id,
@@ -234,7 +254,7 @@ def evaluate_turn(
         "turn_number": turn_number,
         "question": question,
         "persona": persona,
-        "expected_kb": expected_kb,
+        "expected": expected,
         "kb_used": kb_result["kb_used"],
         "kb_score": kb_result["kb_score"],
         "kb_correct": kb_result["kb_correct"],
@@ -266,7 +286,7 @@ def print_metrics(results: list[dict]) -> None:
         n_kb = len(kb_df)
         routing_acc = kb_df["kb_correct"].mean()           # score >= 1: right source reached
         efficiency  = (kb_df["kb_score"] == 2).mean()     # score == 2: right source, no extras
-        over_query_df = kb_df[kb_df["expected_kb"].isin(["DOCS", "GRAPH"])]
+        over_query_df = kb_df[kb_df["expected"].isin(["DOCS", "GRAPH"])]
         over_query = (over_query_df["kb_score"] == 1).mean() if len(over_query_df) else float("nan")
         wrong = (kb_df["kb_score"] == 0).mean()
 
@@ -279,12 +299,12 @@ def print_metrics(results: list[dict]) -> None:
     else:
         print("\nKB routing: no scorable turns")
 
-    # --- Per expected_kb breakdown ---
+    # --- Per expected source breakdown ---
     if len(kb_df) > 0:
         print("\nPer-source breakdown:")
         print(f"  {'Source':<6}  {'Accuracy':>8}  {'Efficiency':>10}  {'n':>4}")
-        for kb_type in ["DOCS", "GRAPH", "BOTH", "NONE"]:
-            sub = kb_df[kb_df["expected_kb"] == kb_type]
+        for kb_type in ["DOCS", "GRAPH", "BOTH", "REDIRECT", "NONE"]:
+            sub = kb_df[kb_df["expected"] == kb_type]
             if len(sub) == 0:
                 continue
             acc = sub["kb_correct"].mean()
@@ -350,6 +370,8 @@ def run_evaluation(args: argparse.Namespace) -> None:
     with open(dataset_path) as f:
         dataset = json.load(f)
 
+    if args.n is not None:
+        dataset = dataset[:args.n]
     total_turns = sum(len(s["turns"]) for s in dataset)
     print(f"Loaded {len(dataset)} sessions ({total_turns} turns) from {dataset_path.name}")
 
@@ -363,7 +385,7 @@ def run_evaluation(args: argparse.Namespace) -> None:
         print(f"\n[Session {si}/{len(dataset)}] {session_data['description']!r}  ({n_turns} turns)")
 
         for ti, turn in enumerate(session_data["turns"], 1):
-            label = f"  Turn {ti}/{n_turns}: [{turn['expected_kb']}] {turn['question'][:65]}..."
+            label = f"  Turn {ti}/{n_turns}: [{turn['expected']}] {turn['question'][:65]}..."
             print(label, flush=True)
             try:
                 result = evaluate_turn(
@@ -375,10 +397,14 @@ def run_evaluation(args: argparse.Namespace) -> None:
                     bedrock_session_id,
                     turn,
                     ti,
+                    no_judge=not args.judge,
                 )
                 results.append(result)
                 kb_status = "OK" if result["kb_correct"] else f"WRONG (used {result['kb_used']})"
-                print(f"    KB: {kb_status}  |  Answer score: {result['answer_score']}")
+                line = f"    KB: {kb_status}"
+                if args.judge:
+                    line += f"  |  Judge score: {result['answer_score']}"
+                print(line)
             except Exception as e:
                 errors.append({
                     "session_id": session_data["session_id"],
@@ -426,7 +452,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument(
         "--agent-id",
-        default="WU3QRWA0FQ",
+        default="ERAAPKTD4Q",
         help="Bedrock Agent ID (default: %(default)s)",
     )
     parser.add_argument(
@@ -436,8 +462,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument(
         "--profile",
-        default="default",
-        help="AWS profile name (default: %(default)s)",
+        default=None,
+        help="AWS profile name (default: env credentials)",
     )
     parser.add_argument(
         "--region",
@@ -458,6 +484,17 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--judge-model",
         default="us.anthropic.claude-haiku-4-5-20251001-v1:0",
         help="Bedrock model ID for the LLM judge (default: %(default)s)",
+    )
+    parser.add_argument(
+        "-n",
+        type=int,
+        default=None,
+        help="Only run the first N sessions (for quick test runs)",
+    )
+    parser.add_argument(
+        "--judge",
+        action="store_true",
+        help="Enable LLM judge scoring for answer quality (off by default)",
     )
     return parser.parse_args(argv)
 
