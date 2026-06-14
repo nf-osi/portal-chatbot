@@ -1,24 +1,31 @@
 [
   {
     "session_id": "embargo-period",
-    "session_type": "DOCS",
-    "description": "How long is the standard data embargo period",
-    "n_turns": 1,
+    "session_type": "MIXED",
+    "description": "Embargo policy, then count of studies that have released data",
+    "n_turns": 2,
     "turns": [
       {
         "id": "embargo-period-t1",
-        "question": "How long is the standard data embargo period on the NF portal?",
+        "question": "How long is the standard data embargo period on the portal?",
         "expected": "DOCS",
         "persona": "CONTRIBUTOR",
         "notes": "Embargo policy is defined in documentation."
+      },
+      {
+        "id": "embargo-period-t2",
+        "question": "How many studies have released data?",
+        "expected": "GRAPH",
+        "persona": "CONTRIBUTOR",
+        "notes": "Live count of studies with released data requires querying the KG."
       }
     ]
   },
   {
     "session_id": "human-data-irb",
-    "session_type": "DOCS",
-    "description": "Requirements for submitting human data",
-    "n_turns": 1,
+    "session_type": "MIXED",
+    "description": "IRB requirements for human data, then access controls, then a real example",
+    "n_turns": 3,
     "turns": [
       {
         "id": "human-data-irb-t1",
@@ -26,66 +33,86 @@
         "expected": "DOCS",
         "persona": "CONTRIBUTOR",
         "notes": "Regulatory submission requirements are covered in the help docs."
+      },
+      {
+        "id": "human-data-irb-t2",
+        "question": "How do I control access to sensitive human data?",
+        "expected": "DOCS",
+        "persona": "CONTRIBUTOR",
+        "notes": "Access tier configuration and controlled-access process is documented in the help docs."
+      },
+      {
+        "id": "human-data-irb-t3",
+        "question": "Can you give an example of a controlled access dataset on the portal?",
+        "expected": "GRAPH",
+        "persona": "CONTRIBUTOR",
+        "notes": "Retrieving a real example requires querying the KG for a controlled-access dataset."
       }
     ]
   },
   {
     "session_id": "biobank-count",
-    "session_type": "GRAPH",
-    "description": "Count of biobanks on the portal",
-    "n_turns": 1,
+    "session_type": "MIXED",
+    "description": "Count of biobanks, then whether NF-OSI helps with sample requests",
+    "n_turns": 2,
     "turns": [
       {
         "id": "biobank-count-t1",
-        "question": "How many biobanks are listed on the NF portal?",
+        "question": "How many biobanks are listed on the portal?",
         "expected": "GRAPH",
         "persona": "REUSER",
         "notes": "Current count requires querying the KG; docs won't have live numbers."
-      }
-    ]
-  },
-  {
-    "session_id": "animal-model-count",
-    "session_type": "GRAPH",
-    "description": "Count of animal model tools",
-    "n_turns": 1,
-    "turns": [
+      },
       {
-        "id": "animal-model-count-t1",
-        "question": "How many animal model tools are on the portal?",
-        "expected": "GRAPH",
+        "id": "biobank-count-t2",
+        "question": "Does NF-OSI help with requesting samples from a biobank?",
+        "expected": "DOCS",
         "persona": "REUSER",
-        "notes": "Current count requires querying the KG."
+        "notes": "Should sound like a doc question."
       }
     ]
   },
   {
-    "session_id": "study-file-ranking",
-    "session_type": "GRAPH",
-    "description": "Study with the most associated files",
-    "n_turns": 1,
+    "session_id": "study-data-types",
+    "session_type": "MIXED",
+    "description": "Accepted data types from docs, then which study has the most data types",
+    "n_turns": 2,
     "turns": [
       {
-        "id": "study-file-ranking-t1",
-        "question": "Which study on the portal has the most associated data files?",
+        "id": "study-data-types-t1",
+        "question": "What data types are accepted by the portal?",
+        "expected": "DOCS",
+        "persona": "CONTRIBUTOR",
+        "notes": "Accepted data types are defined in the documentation."
+      },
+      {
+        "id": "study-data-types-t2",
+        "question": "Which study has the most data types?",
         "expected": "GRAPH",
-        "persona": "FUNDER",
-        "notes": "Ranking studies by file count requires aggregating over the KG."
+        "persona": "CONTRIBUTOR",
+        "notes": "Ranking studies by number of distinct data types requires aggregating over the KG."
       }
     ]
   },
   {
-    "session_id": "offtopic-python",
-    "session_type": "NONE",
-    "description": "General programming question unrelated to the portal",
-    "n_turns": 1,
+    "session_id": "analysis-platforms",
+    "session_type": "MIXED",
+    "description": "Out-of-scope analysis request pivots to docs on supported analysis platforms",
+    "n_turns": 2,
     "turns": [
       {
-        "id": "offtopic-python-t1",
-        "question": "Help me write a Python script to reverse a string",
+        "id": "analysis-platforms-t1",
+        "question": "Can you help me write a script to analyze a portal dataset?",
         "expected": "NONE",
-        "persona": "X",
-        "notes": "General coding question; no portal KB needed. Assistant should ideally decline this question."
+        "persona": "REUSER",
+        "notes": "Direct analysis is out of scope; agent should decline and point to supported platforms."
+      },
+      {
+        "id": "analysis-platforms-t2",
+        "question": "OK, what's the difference between cavatica, pluto.bio, cbioportal?",
+        "expected": "DOCS",
+        "persona": "REUSER",
+        "notes": "Comparison of supported analysis platforms is covered in the help docs."
       }
     ]
   },
@@ -214,7 +241,7 @@
       },
       {
         "id": "embargo-to-browse-t2",
-        "question": "Now show me all the datasets that are currently publicly available",
+        "question": "Take me to all the datasets that are currently publicly available",
         "expected": "REDIRECT",
         "persona": "REUSER",
         "notes": "Navigation request; agent can redirect to filtered Datasets page directly without querying any KB."
@@ -254,7 +281,7 @@
     "session_id": "nf-model-systems",
     "session_type": "MIXED",
     "description": "Alternating docs and graph turns about NF model systems",
-    "n_turns": 4,
+    "n_turns": 3,
     "turns": [
       {
         "id": "nf-model-systems-t1",
@@ -265,7 +292,7 @@
       },
       {
         "id": "nf-model-systems-t2",
-        "question": "How many mouse models are currently listed?",
+        "question": "How many mouse models are there rn?",
         "expected": "GRAPH",
         "persona": "REUSER",
         "notes": "Current count requires querying the KG."
@@ -276,13 +303,6 @@
         "expected": "DOCS",
         "persona": "REUSER",
         "notes": "Should be in documentation."
-      },
-      {
-        "id": "nf-model-systems-t4",
-        "question": "Find animal models with both NF1 and TP53 mutations",
-        "expected": "GRAPH",
-        "persona": "REUSER",
-        "notes": "Filtering by co-occurring mutations requires SPARQL."
       }
     ]
   },
