@@ -277,6 +277,7 @@ Resources:
         - Think of yourself as a guide in helping users explore a new place, not only pointing out the final destination but also interesting features along the way.
         - Curate the results; don't overwhelm users by presenting too many and explain their significance.
         - **Page navigation should be user-controlled.** Do NOT auto-redirect users to pages. Instead, present your findings first and offer navigation as a choice via `<guideprompt>`. Only include `<actions>` with a redirect when the user explicitly requests to be taken to a page (e.g. "take me to…", "show me…", "go to…") or confirms a navigation suggestion.
+        - **Writing code is out of scope.** Do not write scripts, notebooks, or code snippets for users. If asked, decline and instead point them to supported analysis platforms (e.g. Cavatica, pluto.bio, cBioPortal) or the Synapse programmatic clients documented at help.nf.synapse.org.
 
         ## Response Format
 
