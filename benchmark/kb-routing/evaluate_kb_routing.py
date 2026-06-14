@@ -10,6 +10,7 @@ Usage:
     python evaluate_kb_routing.py                          # routing only (~8 min for 34 turns)
     python evaluate_kb_routing.py --judge                  # also run LLM judge for answer quality
     python evaluate_kb_routing.py -n 3                     # quick test: first 3 sessions only
+    python evaluate_kb_routing.py --session s-docs-single-01  # run one specific session
     python evaluate_kb_routing.py --agent-id ERAAPKTD4Q   # test a different agent
     python evaluate_kb_routing.py --profile my-profile
 
@@ -19,13 +20,14 @@ run `aws bedrock-agent prepare-agent --agent-id <ID>` first — otherwise the
 eval will test the previous prepared version, not your latest changes.
 
 Detection logic:
-    DOCS:     KNOWLEDGE_BASE invocation in trace (or WEB-type citation in response chunk)
+    DOCS:     KNOWLEDGE_BASE invocation in trace
     GRAPH:    ACTION_GROUP invocation in trace (SPARQL Lambda calls)
     REDIRECT: <actions><redirect> tag detected in response text
 """
 
 import argparse
 import json
+import re
 import sys
 import uuid
 from datetime import datetime, timezone
@@ -49,7 +51,8 @@ def invoke_agent(
     """Invoke agent and return (response_text, cited_urls, sources_used).
 
     sources_used is a set of "DOCS", "GRAPH", and/or "REDIRECT" detected from
-    trace events, response chunk citations, and response text patterns.
+    trace events and response text patterns.
+    cited_urls are extracted from Markdown links in the response text.
     """
     response = agent_client.invoke_agent(
         agentId=agent_id,
@@ -64,18 +67,10 @@ def invoke_agent(
     sources_used: set[str] = set()
 
     for event in response["completion"]:
-        # Response text and WEB citations
+        # Response text
         if "chunk" in event:
             chunk = event["chunk"]
             completion += chunk["bytes"].decode("utf-8")
-            for citation in chunk.get("attribution", {}).get("citations", []):
-                for ref in citation.get("retrievedReferences", []):
-                    location = ref.get("location", {})
-                    if location.get("type") == "WEB":
-                        url = location.get("webLocation", {}).get("url")
-                        if url and url not in cited_urls:
-                            cited_urls.append(url)
-                        sources_used.add("DOCS")
 
         # Trace events for orchestration steps
         if "trace" in event:
@@ -102,6 +97,11 @@ def invoke_agent(
     completion_stripped = completion.strip()
     if "<actions><redirect>" in completion_stripped:
         sources_used.add("REDIRECT")
+
+    # Extract URLs from Markdown links in the response text
+    for url in re.findall(r'\[(?:[^\]]+)\]\((https?://[^)]+)\)', completion_stripped):
+        if url not in cited_urls:
+            cited_urls.append(url)
 
     return completion_stripped, cited_urls, sources_used
 
@@ -370,7 +370,12 @@ def run_evaluation(args: argparse.Namespace) -> None:
     with open(dataset_path) as f:
         dataset = json.load(f)
 
-    if args.n is not None:
+    if args.session is not None:
+        dataset = [s for s in dataset if s["session_id"] == args.session]
+        if not dataset:
+            print(f"ERROR: no session with id {args.session!r}", file=sys.stderr)
+            sys.exit(1)
+    elif args.n is not None:
         dataset = dataset[:args.n]
     total_turns = sum(len(s["turns"]) for s in dataset)
     print(f"Loaded {len(dataset)} sessions ({total_turns} turns) from {dataset_path.name}")
@@ -490,6 +495,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         type=int,
         default=None,
         help="Only run the first N sessions (for quick test runs)",
+    )
+    parser.add_argument(
+        "--session",
+        default=None,
+        metavar="SESSION_ID",
+        help="Run a single session by its ID (e.g. s-docs-single-01); overrides -n",
     )
     parser.add_argument(
         "--judge",
