@@ -1,45 +1,45 @@
 ```mermaid
 graph TD
-    A[Knowledgebase] --> D[😎 Agent]
-    P[Prompts] --> D
-    L[Other Functional Tools] -->D
-    
-    D --> E[🧪 Agent Testing & Evaluation]
-    E --> R[📊 Results]
-    R --> G{Evaluation Decision}
-    G --> |Needs More Work| F[⚙️ Agent Reconfiguration]
-    F --> E
-    G --> |Passes Benchmarks| H[Register Agent]
-    
+    subgraph "Knowledge Sources"
+        KB[📚 Docs KB<br/>help.nf.synapse.org]
+        KG[🔗 Knowledge Graph<br/>metadata + indexed pubs<br/>]
+    end
+
+    subgraph "CloudFormation"
+        Instructions[Prompt / Instructions]
+        Lambda[Lambda<br/>SPARQL adapter]
+        Instructions --> Agent[😎 Agent]
+        Alias[Agent Alias]
+    end
+
+    KB --> Agent
+    KG --> Lambda --> Agent
+    Agent --> Alias
+
     subgraph "Feedback Loop"
-        E
-        R
-        G
-        F
+        Eval[🧪 Evaluation]
+        Results[📊 Results]
+        Decision{Passes?}
+        Reconfig[⚙️ Revise ]
     end
-    
-    subgraph "Data Sources"
-        I[📚 NF Help Docs]
-        J[📚 Data Model Docs]
-        K[📑 Selected Publications]
+
+    Alias --> Eval
+    Eval --> Results --> Decision
+    Decision --> |Needs work| Reconfig --> Eval
+
+    subgraph "CI/CD"
+        Dev[Dev Stack<br/>manual dispatch]
+        Prod[Prod Stack<br/>merge to main]
     end
-    
-    I --> A
-    J --> A
-    K --> A
-    
-    H --> I1[Update Frontend Config]
-    H --> I2[Deploy to Production]
 
-    style I fill:#2F78B5,stroke:#333,stroke-width:2px
-    style J fill:#2F78B5,stroke:#333,stroke-width:2px
-    style K fill:#8B3A62,stroke:#333,stroke-width:2px
+    Reconfig --> Dev
+    Decision --> |Ready| Prod
+    Prod --> Register[Update registration/frontend config<br/>if needed]
 
-    classDef webcrawler color:white,fill:#2F78B5,stroke:#333,stroke-width:2px;
-    classDef s3storage color:white,fill:#8B3A62,stroke:#333,stroke-width:2px;
-    classDef agent color:white,fill:black
-
-    class D agent;
-    class I,J webcrawler;
-    class K s3storage;
+    style KB fill:#2F78B5,stroke:#333,stroke-width:2px,color:white
+    style KG fill:#8B3A62,stroke:#333,stroke-width:2px,color:white
+    style Agent fill:black,stroke:#333,stroke-width:2px,color:white
+    style Lambda fill:#333,stroke:#333,stroke-width:2px,color:white
+    style Dev fill:#555,stroke:#333,stroke-width:2px,color:white
+    style Prod fill:#2F78B5,stroke:#333,stroke-width:2px,color:white
 ```

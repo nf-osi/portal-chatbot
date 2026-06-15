@@ -1,0 +1,82 @@
+name: Deploy Copilot stack
+
+on:
+  workflow_dispatch:  # manually trigger dev deploys from any branch
+  push:
+    branches: [main]
+    paths:
+      - agents/nf-portal-copilot/**
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      TEMPLATE: agents/nf-portal-copilot/cloudformation.yaml
+      LAMBDA_DIR: agents/nf-portal-copilot/lambda/nfGraphRag
+      S3_BUCKET: nf-portal-chatbot
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Set environment
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "STACK_NAME=nf-portal-copilot-prod" >> "$GITHUB_ENV"
+            echo "AGENT_NAME=nf-portal-copilot" >> "$GITHUB_ENV"
+            echo "LAMBDA_FN=nf-portal-copilot-graphrag" >> "$GITHUB_ENV"
+            echo "S3_KEY=lambda/nfGraphRag.zip" >> "$GITHUB_ENV"
+          else
+            echo "STACK_NAME=nf-portal-copilot-dev" >> "$GITHUB_ENV"
+            echo "AGENT_NAME=nf-portal-copilot-dev" >> "$GITHUB_ENV"
+            echo "LAMBDA_FN=nf-portal-copilot-dev-graphrag" >> "$GITHUB_ENV"
+            echo "S3_KEY=lambda/nfGraphRag-dev.zip" >> "$GITHUB_ENV"
+          fi
+
+      - name: Detect what changed
+        id: changes
+        run: |
+          CHANGED=$(git diff --name-only HEAD~1 HEAD)
+          if echo "$CHANGED" | grep -q "$LAMBDA_DIR/lambda_function.py"; then
+            echo "lambda=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "lambda=false" >> "$GITHUB_OUTPUT"
+          fi
+          if echo "$CHANGED" | grep "agents/nf-portal-copilot/" | grep -qv "$LAMBDA_DIR/lambda_function.py"; then
+            echo "stack=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "stack=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Update Lambda code
+        if: steps.changes.outputs.lambda == 'true'
+        run: |
+          cd "$LAMBDA_DIR"
+          zip /tmp/nfGraphRag.zip lambda_function.py
+          aws s3 cp /tmp/nfGraphRag.zip "s3://${S3_BUCKET}/${S3_KEY}"
+          aws lambda update-function-code \
+            --function-name "$LAMBDA_FN" \
+            --s3-bucket "$S3_BUCKET" \
+            --s3-key "$S3_KEY"
+
+      - name: Deploy stack
+        if: steps.changes.outputs.stack == 'true'
+        run: |
+          aws cloudformation deploy \
+            --template-file "$TEMPLATE" \
+            --stack-name "$STACK_NAME" \
+            --parameter-overrides \
+                AgentName="$AGENT_NAME" \
+                LambdaS3Bucket="$S3_BUCKET" \
+                LambdaS3Key="$S3_KEY" \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --no-fail-on-empty-changeset

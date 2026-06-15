@@ -1,6 +1,15 @@
 # Changelog
 
-## nf-portal-pilot
+## nf-portal-copilot
+
+### 2026-06-14 — Harriet
+
+- CloudFormation template for the full Copilot stack, replacing the one removed in #39 (#40)
+- Two-stack deployment: `nf-portal-copilot-dev` and `nf-portal-copilot-prod`
+- CI/CD workflow: manual dispatch deploys to dev, merge to main deploys to prod
+- Added docs KB source selection instructions (#41)
+- Optional SPARQL auth token support in Lambda
+- Renamed `nf-portal-pilot` → `nf-portal-copilot`
 
 ### 2026-04-21 — Amelia (`B0GQQL40PY`)
 

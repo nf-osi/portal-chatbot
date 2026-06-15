@@ -9,6 +9,7 @@ from typing import Any, Dict
 
 
 SPARQL_ENDPOINT = os.environ.get("SPARQL_ENDPOINT", "http://localhost:7001")
+SPARQL_AUTH_TOKEN = os.environ.get("SPARQL_AUTH_TOKEN", "")
 
 # LAMBDA_TIMEOUT should match the Lambda function's configured timeout (seconds).
 # SPARQL_TIMEOUT is kept shorter so the Lambda always has time to return a clean
@@ -134,10 +135,13 @@ def sparql_request(query: str, include_default_prefixes: bool = True) -> str:
     data = urllib.parse.urlencode(
         {"query": full_query, "action": "tsv_export"}
     ).encode("utf-8")
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+    if SPARQL_AUTH_TOKEN:
+        headers["Authorization"] = f"Bearer {SPARQL_AUTH_TOKEN}"
     req = urllib.request.Request(
         SPARQL_ENDPOINT,
         data=data,
-        headers={"Content-Type": "application/x-www-form-urlencoded"},
+        headers=headers,
         method="POST",
     )
     try:
