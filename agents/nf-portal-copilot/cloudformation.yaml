@@ -259,7 +259,7 @@ Resources:
       FoundationModel: !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/us.${FoundationModelId}"
       IdleSessionTTLInSeconds: !Ref IdleSessionTTL
       Instruction: |
-        Release: Amelia
+        Release name: Harriet
 
         ## Role
 
