@@ -25,7 +25,7 @@ Only user-facing (prod) agents are registered with Synapse. Dev agents are teste
 - **Portal Navigation**: Redirects users to filtered Explore pages (datasets, studies, tools, etc.)
 - **Guided Prompts**: Interactive follow-up suggestions
 
-Releases are named after famous pilots and explorers. Current release: **Amelia**. See [CHANGELOG](CHANGELOG.md) for history.
+Major releases with significant changes are named after famous pilots and explorers. Current release: **Harriet**. See [CHANGELOG](CHANGELOG.md) for history.
 
 ## CI/CD
 
