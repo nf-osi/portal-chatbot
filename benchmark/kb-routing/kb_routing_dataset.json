@@ -1,381 +1,401 @@
 [
   {
-    "session_id": "s-docs-single-01",
-    "session_type": "DOCS",
-    "description": "How long is the standard data embargo period",
-    "n_turns": 1,
+    "session_id": "embargo-period",
+    "session_type": "MIXED",
+    "description": "Embargo policy, then count of studies that have released data",
+    "n_turns": 2,
     "turns": [
       {
-        "id": "s-docs-single-01-t1",
-        "question": "How long is the standard data embargo period on the NF portal?",
-        "expected_kb": "DOCS",
+        "id": "embargo-period-t1",
+        "question": "How long is the standard data embargo period on the portal?",
+        "expected": "DOCS",
         "persona": "CONTRIBUTOR",
         "notes": "Embargo policy is defined in documentation."
+      },
+      {
+        "id": "embargo-period-t2",
+        "question": "How many studies have released data?",
+        "expected": "GRAPH",
+        "persona": "CONTRIBUTOR",
+        "notes": "Live count of studies with released data requires querying the KG."
       }
     ]
   },
   {
-    "session_id": "s-docs-single-02",
-    "session_type": "DOCS",
-    "description": "Requirements for submitting human data",
-    "n_turns": 1,
+    "session_id": "human-data-irb",
+    "session_type": "MIXED",
+    "description": "IRB requirements for human data, then access controls, then a real example",
+    "n_turns": 3,
     "turns": [
       {
-        "id": "s-docs-single-02-t1",
+        "id": "human-data-irb-t1",
         "question": "What consent and IRB documentation is required when submitting human data?",
-        "expected_kb": "DOCS",
+        "expected": "DOCS",
         "persona": "CONTRIBUTOR",
         "notes": "Regulatory submission requirements are covered in the help docs."
+      },
+      {
+        "id": "human-data-irb-t2",
+        "question": "How do I control access to sensitive human data?",
+        "expected": "DOCS",
+        "persona": "CONTRIBUTOR",
+        "notes": "Access tier configuration and controlled-access process is documented in the help docs."
+      },
+      {
+        "id": "human-data-irb-t3",
+        "question": "Can you give an example of a controlled access dataset on the portal?",
+        "expected": "GRAPH",
+        "persona": "CONTRIBUTOR",
+        "notes": "Retrieving a real example requires querying the KG for a controlled-access dataset."
       }
     ]
   },
   {
-    "session_id": "s-graph-single-01",
-    "session_type": "GRAPH",
-    "description": "Count of biobanks on the portal",
-    "n_turns": 1,
+    "session_id": "biobank-count",
+    "session_type": "MIXED",
+    "description": "Count of biobanks, then whether NF-OSI helps with sample requests",
+    "n_turns": 2,
     "turns": [
       {
-        "id": "s-graph-single-01-t1",
-        "question": "How many biobanks are listed on the NF portal?",
-        "expected_kb": "GRAPH",
+        "id": "biobank-count-t1",
+        "question": "How many biobanks are listed on the portal?",
+        "expected": "GRAPH",
         "persona": "REUSER",
         "notes": "Current count requires querying the KG; docs won't have live numbers."
-      }
-    ]
-  },
-  {
-    "session_id": "s-graph-single-02",
-    "session_type": "GRAPH",
-    "description": "Count of animal model tools",
-    "n_turns": 1,
-    "turns": [
+      },
       {
-        "id": "s-graph-single-02-t1",
-        "question": "How many animal model tools are on the portal?",
-        "expected_kb": "GRAPH",
+        "id": "biobank-count-t2",
+        "question": "Does NF-OSI help with requesting samples from a biobank?",
+        "expected": "DOCS",
         "persona": "REUSER",
-        "notes": "Current count requires querying the KG."
+        "notes": "Should sound like a doc question."
       }
     ]
   },
   {
-    "session_id": "s-graph-single-03",
-    "session_type": "GRAPH",
-    "description": "Study with the most associated files",
-    "n_turns": 1,
+    "session_id": "study-data-types",
+    "session_type": "MIXED",
+    "description": "Accepted data types from docs, then which study has the most data types",
+    "n_turns": 2,
     "turns": [
       {
-        "id": "s-graph-single-03-t1",
-        "question": "Which study on the portal has the most associated data files?",
-        "expected_kb": "GRAPH",
-        "persona": "FUNDER",
-        "notes": "Ranking studies by file count requires aggregating over the KG."
+        "id": "study-data-types-t1",
+        "question": "What data types are accepted by the portal?",
+        "expected": "DOCS",
+        "persona": "CONTRIBUTOR",
+        "notes": "Accepted data types are defined in the documentation."
+      },
+      {
+        "id": "study-data-types-t2",
+        "question": "Which study has the most data types?",
+        "expected": "GRAPH",
+        "persona": "CONTRIBUTOR",
+        "notes": "Ranking studies by number of distinct data types requires aggregating over the KG."
       }
     ]
   },
   {
-    "session_id": "s-none-single-01",
-    "session_type": "NONE",
-    "description": "General programming question unrelated to the portal",
-    "n_turns": 1,
+    "session_id": "analysis-platforms",
+    "session_type": "MIXED",
+    "description": "Out-of-scope analysis request pivots to docs on supported analysis platforms",
+    "n_turns": 2,
     "turns": [
       {
-        "id": "s-none-single-01-t1",
-        "question": "Help me write a Python script to reverse a string",
-        "expected_kb": "NONE",
-        "persona": "X",
-        "notes": "General coding question; no portal KB needed. Assistant should ideally decline this question."
+        "id": "analysis-platforms-t1",
+        "question": "Can you help me write a script to analyze a portal dataset?",
+        "expected": "NONE",
+        "persona": "REUSER",
+        "notes": "Direct analysis is out of scope; agent should decline and point to supported platforms."
+      },
+      {
+        "id": "analysis-platforms-t2",
+        "question": "OK, what's the difference between cavatica, pluto.bio, cbioportal?",
+        "expected": "DOCS",
+        "persona": "REUSER",
+        "notes": "Comparison of supported analysis platforms is covered in the help docs."
       }
     ]
   },
   {
-    "session_id": "s-none-single-02",
+    "session_id": "nf-disease-basics",
     "session_type": "NONE",
     "description": "General background question about neurofibromatosis",
     "n_turns": 1,
     "turns": [
       {
-        "id": "s-none-single-02-t1",
+        "id": "nf-disease-basics-t1",
         "question": "hi, is neurofibromatosis a cancer or autoimmune disease?",
-        "expected_kb": "NONE",
+        "expected": "NONE",
         "persona": "X",
         "notes": "General medical background answerable from model knowledge; no portal KB needed."
       }
     ]
   },
   {
-    "session_id": "s-docs-01",
+    "session_id": "data-contribution-steps",
     "session_type": "DOCS",
     "description": "Data contribution process for a new contributor",
     "n_turns": 2,
     "turns": [
       {
-        "id": "s-docs-01-t1",
+        "id": "data-contribution-steps-t1",
         "question": "What are the steps to contribute data to the NF Data Portal?",
-        "expected_kb": "DOCS",
+        "expected": "DOCS",
         "persona": "CONTRIBUTOR",
         "notes": "High-level contribution workflow; answer is entirely in help docs."
       },
       {
-        "id": "s-docs-01-t2",
+        "id": "data-contribution-steps-t2",
         "question": "What metadata fields are required when submitting files?",
-        "expected_kb": "DOCS",
+        "expected": "DOCS",
         "persona": "CONTRIBUTOR",
         "notes": "Metadata requirements are documented; cannot be answered by querying the graph."
       }
     ]
   },
   {
-    "session_id": "s-docs-02",
+    "session_id": "license-policy",
     "session_type": "MIXED",
     "description": "Licensing policy from docs, then actual license distribution from graph",
     "n_turns": 2,
     "turns": [
       {
-        "id": "s-docs-02-t1",
+        "id": "license-policy-t1",
         "question": "What is the default license applied to non-human data submitted to the portal?",
-        "expected_kb": "DOCS",
+        "expected": "DOCS",
         "persona": "REUSER",
         "notes": "License policy is in the docs; no need to query the graph."
       },
       {
-        "id": "s-docs-02-t2",
+        "id": "license-policy-t2",
         "question": "What's the most common dataset license?",
-        "expected_kb": "GRAPH",
+        "expected": "GRAPH",
         "persona": "REUSER",
         "notes": "Requires aggregating license values across dataset entities in the KG; docs only describe the default policy, not actual distribution."
       }
     ]
   },
   {
-    "session_id": "s-graph-01",
+    "session_id": "nf1-cell-lines",
     "session_type": "GRAPH",
     "description": "Exploring available NF1 cell line tools",
     "n_turns": 3,
     "turns": [
       {
-        "id": "s-graph-01-t1",
+        "id": "nf1-cell-lines-t1",
         "question": "How many NF1 cell line tools are available in the portal?",
-        "expected_kb": "GRAPH",
+        "expected": "GRAPH",
         "persona": "REUSER",
         "notes": "Requires counting instances in the knowledge graph; docs won't have current counts."
       },
       {
-        "id": "s-graph-01-t2",
+        "id": "nf1-cell-lines-t2",
         "question": "Show me NF1 cell lines derived from human donors",
-        "expected_kb": "GRAPH",
+        "expected": "GRAPH",
         "persona": "REUSER",
         "notes": "Filtering by donor type requires a SPARQL query over the KG."
       },
       {
-        "id": "s-graph-01-t3",
+        "id": "nf1-cell-lines-t3",
         "question": "Which of those cell lines have loss-of-function NF1 mutations?",
-        "expected_kb": "GRAPH",
+        "expected": "GRAPH",
         "persona": "REUSER",
         "notes": "Follow-up filtering on mutation type; still a graph query. Uses conversation context."
       }
     ]
   },
   {
-    "session_id": "s-graph-02",
+    "session_id": "schwannomatosis-nf2-datasets",
     "session_type": "GRAPH",
     "description": "Dataset discovery and publication search",
     "n_turns": 2,
     "turns": [
       {
-        "id": "s-graph-02-t1",
+        "id": "schwannomatosis-nf2-datasets-t1",
         "question": "How many studies on the portal are focused on schwannomatosis?",
-        "expected_kb": "GRAPH",
+        "expected": "GRAPH",
         "persona": "FUNDER",
         "notes": "Requires querying the graph for disease-specific study counts."
       },
       {
-        "id": "s-graph-02-t2",
+        "id": "schwannomatosis-nf2-datasets-t2",
         "question": "What RNA-seq datasets are available for NF2 research?",
-        "expected_kb": "GRAPH",
+        "expected": "GRAPH",
         "persona": "REUSER",
         "notes": "Dataset listing by data type and disease; requires SPARQL over KG."
       }
     ]
   },
   {
-    "session_id": "s-mixed-docs-then-graph",
+    "session_id": "embargo-to-browse",
     "session_type": "MIXED",
     "description": "Contributor asks about embargo policy, then pivots to data inventory",
     "n_turns": 2,
     "turns": [
       {
-        "id": "s-mixed-01-t1",
+        "id": "embargo-to-browse-t1",
         "question": "What is the data embargo policy for newly submitted datasets?",
-        "expected_kb": "DOCS",
+        "expected": "DOCS",
         "persona": "CONTRIBUTOR",
         "notes": "Policy/process question; clearly a documentation lookup."
       },
       {
-        "id": "s-mixed-01-t2",
-        "question": "Now show me all the datasets that are currently publicly available",
-        "expected_kb": "GRAPH",
+        "id": "embargo-to-browse-t2",
+        "question": "Take me to all the datasets that are currently publicly available",
+        "expected": "REDIRECT",
         "persona": "REUSER",
-        "notes": "Pivot to actual data inventory; requires querying the KG."
+        "notes": "Navigation request; agent can redirect to filtered Datasets page directly without querying any KB."
       }
     ]
   },
   {
-    "session_id": "s-mixed-graph-then-docs",
+    "session_id": "pediatric-data-to-contribution",
     "session_type": "MIXED",
     "description": "Researcher explores data, then asks how to contribute",
     "n_turns": 3,
     "turns": [
       {
-        "id": "s-mixed-02-t1",
+        "id": "pediatric-data-to-contribution-t1",
         "question": "How many datasets on the portal involve pediatric patients?",
-        "expected_kb": "GRAPH",
+        "expected": "GRAPH",
         "persona": "FUNDER",
         "notes": "Requires querying the KG for patient age-related attributes."
       },
       {
-        "id": "s-mixed-02-t2",
+        "id": "pediatric-data-to-contribution-t2",
         "question": "I'd like to add my pediatric NF1 study data to the portal. What do I need to prepare?",
-        "expected_kb": "DOCS",
+        "expected": "DOCS",
         "persona": "CONTRIBUTOR",
         "notes": "Pivot to contribution guidance; clearly a documentation topic despite prior graph context."
       },
       {
-        "id": "s-mixed-02-t3",
+        "id": "pediatric-data-to-contribution-t3",
         "question": "What is the maximum file size for a single upload?",
-        "expected_kb": "DOCS",
+        "expected": "DOCS",
         "persona": "CONTRIBUTOR",
         "notes": "Technical upload constraint is in documentation."
       }
     ]
   },
   {
-    "session_id": "s-mixed-interleaved",
+    "session_id": "nf-model-systems",
     "session_type": "MIXED",
     "description": "Alternating docs and graph turns about NF model systems",
-    "n_turns": 4,
+    "n_turns": 3,
     "turns": [
       {
-        "id": "s-mixed-03-t1",
+        "id": "nf-model-systems-t1",
         "question": "What types of NF model systems are supported by the portal?",
-        "expected_kb": "BOTH",
+        "expected": "BOTH",
         "persona": "REUSER",
         "notes": "Docs describe supported resource categories; graph can enumerate actual types present. Either source gives a valid answer."
       },
       {
-        "id": "s-mixed-03-t2",
-        "question": "How many mouse models are currently listed?",
-        "expected_kb": "GRAPH",
+        "id": "nf-model-systems-t2",
+        "question": "How many mouse models are there rn?",
+        "expected": "GRAPH",
         "persona": "REUSER",
         "notes": "Current count requires querying the KG."
       },
       {
-        "id": "s-mixed-03-t3",
+        "id": "nf-model-systems-t3",
         "question": "How is info for these mouse models collected?",
-        "expected_kb": "DOCS",
+        "expected": "DOCS",
         "persona": "REUSER",
         "notes": "Should be in documentation."
-      },
-      {
-        "id": "s-mixed-03-t4",
-        "question": "Find animal models with both NF1 and TP53 mutations",
-        "expected_kb": "GRAPH",
-        "persona": "REUSER",
-        "notes": "Filtering by co-occurring mutations requires SPARQL."
       }
     ]
   },
   {
-    "session_id": "s-both-01",
+    "session_id": "schwannomatosis-download",
     "session_type": "BOTH",
     "description": "Compound question requiring both sources",
     "n_turns": 1,
     "turns": [
       {
-        "id": "s-both-01-t1",
-        "question": "What's the largest available dataset? Is there an applicable guide that walks me through how to download it?",
-        "expected_kb": "BOTH",
+        "id": "schwannomatosis-download-t1",
+        "question": "Can you walk me through downloading a real dataset on the portal, preferably one related to schwannomatosis?",
+        "expected": "BOTH",
         "persona": "REUSER",
-        "notes": "Two-part question: identifying the largest dataset requires GRAPH; the download guide is in DOCS."
+        "notes": "Two-part question: identifying a real existing requires GRAPH; the download guide is in DOCS."
       }
     ]
   },
   {
-    "session_id": "s-ambiguous-01",
+    "session_id": "nf1-research-overview",
     "session_type": "BOTH",
     "description": "Ambiguous queries that could reasonably route to either source",
     "n_turns": 2,
     "turns": [
       {
-        "id": "s-ambig-01-t1",
+        "id": "nf1-research-overview-t1",
         "question": "Tell me about NF1 research on the portal",
-        "expected_kb": "BOTH",
+        "expected": "BOTH",
         "persona": "X",
         "notes": "Vague overview question; agent might use docs for context or graph for data inventory. BOTH is acceptable."
       },
       {
-        "id": "s-ambig-01-t2",
+        "id": "nf1-research-overview-t2",
         "question": "Which clients are available for programmatic access?",
-        "expected_kb": "DOCS",
+        "expected": "DOCS",
         "persona": "REUSER",
         "notes": "Available clients (e.g. Synapse Python/R clients) are described in the docs."
       }
     ]
   },
   {
-    "session_id": "s-none-01",
+    "session_id": "offtopic-multiturn",
     "session_type": "NONE",
     "description": "Off-topic or general requests that should not trigger any KB lookup",
     "n_turns": 2,
     "turns": [
       {
-        "id": "s-none-01-t1",
+        "id": "offtopic-multiturn-t1",
         "question": "Help me write a Python script to reverse a string",
-        "expected_kb": "NONE",
+        "expected": "NONE",
         "persona": "X",
         "notes": "General programming question unrelated to the NF portal; no KB lookup needed."
       },
       {
-        "id": "s-none-01-t2",
+        "id": "offtopic-multiturn-t2",
         "question": "OK, can you submit a support ticket on my behalf?",
-        "expected_kb": "NONE",
+        "expected": "NONE",
         "persona": "X",
         "notes": "Requesting action assistant doesn't have"
       }
     ]
   },
   {
-    "session_id": "s-funder-overview",
+    "session_id": "funder-overview",
     "session_type": "MIXED",
     "description": "Funder asking for portfolio inventory counts and governance details",
     "n_turns": 4,
     "turns": [
       {
-        "id": "s-funder-01-t1",
+        "id": "funder-overview-t1",
         "question": "How many NTAP-funded datasets are currently on the NF Data Portal?",
-        "expected_kb": "GRAPH",
+        "expected": "GRAPH",
         "persona": "FUNDER",
         "notes": "Current inventory counts require querying the KG."
       },
       {
-        "id": "s-funder-01-t2",
+        "id": "funder-overview-t2",
         "question": "I'm trying to get a complete picture of which funders have contributed datasets aside from the historical main funders",
-        "expected_kb": "BOTH",
+        "expected": "BOTH",
         "persona": "FUNDER",
         "notes": "Intentionally open-ended. A well-routing agent should consult the docs for named major funders/initiatives and the KG to enumerate all funder entities directly on dataset entities. Neither source alone gives the complete picture."
       },
       {
-        "id": "s-funder-01-t3",
+        "id": "funder-overview-t3",
         "question": "Which funder has the most initiatives?",
-        "expected_kb": "GRAPH",
+        "expected": "GRAPH",
         "persona": "FUNDER",
         "notes": "Ranking funders by initiative count requires aggregating over the KG."
       },
       {
-        "id": "s-funder-01-t4",
+        "id": "funder-overview-t4",
         "question": "Who should I contact to provide potential support for the portal?",
-        "expected_kb": "DOCS",
+        "expected": "DOCS",
         "persona": "FUNDER",
         "notes": "Contact information for portal support/partnerships is in the docs; no KG lookup needed."
       }

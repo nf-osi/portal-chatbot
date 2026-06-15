@@ -31,7 +31,7 @@
         "minItems": 1,
         "items": {
           "type": "object",
-          "required": ["id", "question", "expected_kb", "persona"],
+          "required": ["id", "question", "expected", "persona"],
           "additionalProperties": false,
           "properties": {
             "id": {
@@ -42,10 +42,10 @@
               "type": "string",
               "description": "The user's question as it would appear in the chat."
             },
-            "expected_kb": {
+            "expected": {
               "type": "string",
-              "enum": ["DOCS", "GRAPH", "BOTH", "NONE"],
-              "description": "Which KB source(s) the agent should use. DOCS = documentation KB; GRAPH = KG action groups (SPARQL); BOTH = either is acceptable or both should be used; NONE = no KB lookup expected (agent should answer from general knowledge or decline)."
+              "enum": ["DOCS", "GRAPH", "BOTH", "REDIRECT", "NONE"],
+              "description": "Which source(s) the agent should use. DOCS = documentation KB; GRAPH = KG action groups (SPARQL); BOTH = either is acceptable or both should be used; REDIRECT = agent should navigate via redirect action; NONE = no KB lookup expected (agent should answer from general knowledge or decline)."
             },
             "persona": {
               "type": "string",
