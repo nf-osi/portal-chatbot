@@ -103,9 +103,12 @@ Parameters:
   FoundationModelId:
     Type: String
     Default: anthropic.claude-haiku-4-5-20251001-v1:0
+    AllowedPattern: "^(?!us\\.).*"
+    ConstraintDescription: >
+      Do not include the "us." cross-region prefix — the template prepends it automatically.
     Description: >
-      Foundation model ID. Used to construct both the inference-profile
-      and foundation-model ARNs.
+      Bare foundation model ID (e.g. anthropic.claude-haiku-4-5-20251001-v1:0).
+      The template prepends "us." to construct the inference-profile ARN.
 
   IdleSessionTTL:
     Type: Number
