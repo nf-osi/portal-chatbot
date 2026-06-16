@@ -76,6 +76,7 @@ jobs:
             --stack-name "$STACK_NAME" \
             --parameter-overrides \
                 AgentName="$AGENT_NAME" \
+                FoundationModelId="anthropic.claude-haiku-4-5-20251001-v1:0" \
                 LambdaS3Bucket="$S3_BUCKET" \
                 LambdaS3Key="$S3_KEY" \
             --capabilities CAPABILITY_NAMED_IAM \
