@@ -13,7 +13,7 @@ The Copilot is deployed as two CloudFormation stacks from the same template (`nf
 
 Currently, only user-facing (prod) agents are registered with Synapse. Dev agents are tested internally. This includes historical registrations:
 
-- **nf-portal-copilot (Harriet)** — Registration `247` by `nf-service` — [Chat](https://www.synapse.org/Chat:initialMessage=hello&agentRegistrationId=247).
+- **nf-portal-copilot (Harriet)** — Registration `312` by `nf-service` — [Chat](https://www.synapse.org/Chat:initialMessage=hello&agentRegistrationId=312). Agent `R7WZ38JGKX`.
 - **nf-portal-copilot (Amelia)** — Registration `247` by `nf-service` — [Chat](https://www.synapse.org/Chat:initialMessage=hello&agentRegistrationId=247).
 - **nf-portal-chatbot (legacy)** — Registration `197` by `allaway` — [Chat](https://www.synapse.org/Chat:initialMessage=hello&agentRegistrationId=197). Hackathon version.
 - **v0 (legacy)** — Registration `11` by `allaway`. Original test deployment.
