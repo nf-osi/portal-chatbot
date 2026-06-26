@@ -13,10 +13,13 @@ The Copilot is deployed as two CloudFormation stacks from the same template (`nf
 
 Currently, only user-facing (prod) agents are registered with Synapse. Dev agents are tested internally. This includes historical registrations:
 
-- **nf-portal-copilot (Harriet)** — Registration `312` by `nf-service` — [Chat](https://www.synapse.org/Chat:initialMessage=hello&agentRegistrationId=312). Agent `R7WZ38JGKX`.
-- **nf-portal-copilot (Amelia)** — Registration `247` by `nf-service` — [Chat](https://www.synapse.org/Chat:initialMessage=hello&agentRegistrationId=247).
-- **nf-portal-chatbot (legacy)** — Registration `197` by `allaway` — [Chat](https://www.synapse.org/Chat:initialMessage=hello&agentRegistrationId=197). Hackathon version.
-- **v0 (legacy)** — Registration `11` by `allaway`. Original test deployment.
+- **nf-portal-copilot (Harriet ~ current prod)**
+  - Registration `312` by `nf-service` — [Chat](https://www.synapse.org/Chat:initialMessage=hello&agentRegistrationId=312). Agent `R7WZ38JGKX`. Alias `TSALIASID`
+- **nf-portal-copilot (Amelia ~ Q1 2026)**
+  - Registration `248` by `nf-service` — [Chat](https://www.synapse.org/Chat:initialMessage=hello&agentRegistrationId=248). Agent `WU3QRWA0FQ`. Alias `TSALIASID`
+  - Registration `247` by `nf-service` — [Chat](https://www.synapse.org/Chat:initialMessage=hello&agentRegistrationId=247). Agent `WU3QRWA0FQ`. Alias `B0GQQL40PY`
+- **nf-portal-chatbot (legacy ~ late 2025)** — Registration `197` by `allaway` — [Chat](https://www.synapse.org/Chat:initialMessage=hello&agentRegistrationId=197). Hackathon version.
+- **v0 (legacy ~ 2025)** — Registration `11` by `allaway`. Original test deployment.
 
 ## Copilot Capabilities
 
@@ -26,7 +29,7 @@ Currently, only user-facing (prod) agents are registered with Synapse. Dev agent
 - **Portal Navigation**: Redirects users to filtered Explore pages (datasets, studies, tools, etc.)
 - **Guided Prompts**: Interactive follow-up suggestions
 
-Major releases with significant changes are named after famous pilots and explorers. See [CHANGELOG](CHANGELOG.md) for history.
+Major releases with significant changes are named after famous female pilots/explorers. See [CHANGELOG](CHANGELOG.md) for more detailed history.
 
 ## CI/CD
 
