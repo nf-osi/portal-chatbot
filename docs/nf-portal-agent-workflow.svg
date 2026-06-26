@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 410" width="980" height="410"
+     font-family="'Segoe UI',system-ui,-apple-system,sans-serif">
+  <defs>
+    <marker id="ah" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+      <polygon points="0 0, 7 2.5, 0 5" fill="#666"/>
+    </marker>
+    <marker id="ah-int" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+      <polygon points="0 0, 7 2.5, 0 5" fill="#888"/>
+    </marker>
+  </defs>
+
+  <!-- ── Stage backgrounds ─────────────────────────────────────────── -->
+  <rect x="8"   y="50" width="150" height="325" rx="8" fill="#f5f5f5" stroke="#ddd" stroke-width="1.5"/>
+  <rect x="170" y="50" width="140" height="325" rx="8" fill="#f0f9ea" stroke="#9ac97a" stroke-width="1.5"/>
+  <rect x="322" y="50" width="222" height="325" rx="8" fill="#f5f5f5" stroke="#ddd" stroke-width="1.5"/>
+  <rect x="556" y="50" width="140" height="325" rx="8" fill="#f0f9ea" stroke="#9ac97a" stroke-width="1.5"/>
+  <rect x="708" y="50" width="264" height="325" rx="8" fill="#edf3fb" stroke="#9ab8d8" stroke-width="1.5"/>
+
+  <!-- ── Stage labels ──────────────────────────────────────────────── -->
+  <text x="83"  y="44" text-anchor="middle" font-size="10" font-weight="700" fill="#777"     letter-spacing="1.5">AUTHOR</text>
+  <text x="240" y="44" text-anchor="middle" font-size="10" font-weight="700" fill="#5B8A3C"  letter-spacing="1.5">PRE-DEPLOY EVAL</text>
+  <text x="433" y="44" text-anchor="middle" font-size="10" font-weight="700" fill="#777"     letter-spacing="1.5">DEV STACK</text>
+  <text x="626" y="44" text-anchor="middle" font-size="10" font-weight="700" fill="#5B8A3C"  letter-spacing="1.5">POST-DEPLOY EVAL</text>
+  <text x="840" y="44" text-anchor="middle" font-size="10" font-weight="700" fill="#2F78B5"  letter-spacing="1.5">PROD</text>
+
+  <!-- ── Zone 1: Author ────────────────────────────────────────────── -->
+  <rect x="18" y="72"  width="128" height="46" rx="5" fill="#fff9ec" stroke="#d4a84b" stroke-width="1.2"/>
+  <text x="82" y="91"  text-anchor="middle" font-size="12" font-weight="600" fill="#555">Instructions</text>
+  <text x="82" y="107" text-anchor="middle" font-size="10" fill="#999">prompt · system</text>
+
+  <rect x="18" y="136" width="128" height="46" rx="5" fill="#f2faf0" stroke="#7ab060" stroke-width="1.2"/>
+  <text x="82" y="155" text-anchor="middle" font-size="12" font-weight="600" fill="#555">Lambda Code</text>
+  <text x="82" y="171" text-anchor="middle" font-size="10" fill="#999">SPARQL adapter</text>
+
+  <rect x="18" y="200" width="128" height="46" rx="5" fill="#eff5fc" stroke="#7090c0" stroke-width="1.2"/>
+  <text x="82" y="219" text-anchor="middle" font-size="12" font-weight="600" fill="#555">OpenAPI Schema</text>
+  <text x="82" y="235" text-anchor="middle" font-size="10" fill="#999">action group spec</text>
+
+  <!-- merge lines → vertical bar → arrow to Z2 -->
+  <line x1="146" y1="95"  x2="158" y2="95"  stroke="#666" stroke-width="1.5"/>
+  <line x1="146" y1="159" x2="158" y2="159" stroke="#666" stroke-width="1.5"/>
+  <line x1="146" y1="223" x2="158" y2="223" stroke="#666" stroke-width="1.5"/>
+  <line x1="158" y1="95"  x2="158" y2="223" stroke="#666" stroke-width="1.5"/>
+  <line x1="158" y1="159" x2="170" y2="159" stroke="#666" stroke-width="1.5" marker-end="url(#ah)"/>
+
+  <!-- ── Zone 2: Pre-deploy Eval ───────────────────────────────────── -->
+  <rect x="180" y="124" width="120" height="70" rx="6" fill="#ceeabc" stroke="#5B8A3C" stroke-width="1.5"/>
+  <text x="240" y="147" text-anchor="middle" font-size="12" font-weight="700" fill="#2d5c12">Pre-deploy</text>
+  <text x="240" y="163" text-anchor="middle" font-size="12" font-weight="700" fill="#2d5c12">Benchmark</text>
+  <text x="240" y="181" text-anchor="middle" font-size="10" fill="#5B8A3C" font-style="italic">local agent</text>
+
+  <!-- pass → Zone 3 -->
+  <line x1="300" y1="159" x2="322" y2="159" stroke="#666" stroke-width="1.5" marker-end="url(#ah)"/>
+  <text x="311" y="153" text-anchor="middle" font-size="9" fill="#666">pass</text>
+
+  <!-- fail: down to revise loop -->
+  <line x1="240" y1="194" x2="240" y2="368" stroke="#ccc" stroke-width="1.2" stroke-dasharray="5,3"/>
+
+  <!-- ── Zone 3: Dev Stack ─────────────────────────────────────────── -->
+  <!-- Knowledge sources (left column) -->
+  <rect x="330" y="72" width="82" height="36" rx="5" fill="#2F78B5"/>
+  <text x="371" y="86" text-anchor="middle" font-size="11" font-weight="700" fill="white">Docs KB</text>
+  <text x="371" y="101" text-anchor="middle" font-size="9" fill="#c8e0ff">help.nf.synapse.org</text>
+
+  <rect x="330" y="126" width="82" height="34" rx="5" fill="#8B3A62"/>
+  <text x="371" y="140" text-anchor="middle" font-size="11" font-weight="700" fill="white">KG</text>
+  <text x="371" y="154" text-anchor="middle" font-size="9" fill="#e0b8d0">knowledge graph</text>
+
+  <!-- Agent stack (right column) -->
+  <rect x="432" y="118" width="82" height="28" rx="5" fill="#444"/>
+  <text x="473" y="136" text-anchor="middle" font-size="11" font-weight="600" fill="white">Lambda</text>
+
+  <rect x="432" y="164" width="82" height="38" rx="5" fill="#1a1a1a"/>
+  <text x="473" y="187" text-anchor="middle" font-size="14" font-weight="700" fill="white">Agent</text>
+
+  <rect x="432" y="222" width="82" height="28" rx="5" fill="#2F78B5"/>
+  <text x="473" y="241" text-anchor="middle" font-size="11" font-weight="600" fill="white">Alias</text>
+
+  <!-- Internal arrows -->
+  <!-- Docs KB → Agent (L-shaped) -->
+  <path d="M 412,90 L 425,90 L 425,183 L 432,183" fill="none" stroke="#888" stroke-width="1.2" marker-end="url(#ah-int)"/>
+  <!-- KG → Lambda (diagonal) -->
+  <line x1="412" y1="143" x2="432" y2="132" stroke="#888" stroke-width="1.2" marker-end="url(#ah-int)"/>
+  <!-- Lambda → Agent -->
+  <line x1="473" y1="146" x2="473" y2="164" stroke="#888" stroke-width="1.2" marker-end="url(#ah-int)"/>
+  <!-- Agent → Alias -->
+  <line x1="473" y1="202" x2="473" y2="222" stroke="#888" stroke-width="1.2" marker-end="url(#ah-int)"/>
+
+  <!-- CI label -->
+  <text x="433" y="272" text-anchor="middle" font-size="10" fill="#aaa" font-style="italic">CI · manual dispatch</text>
+
+  <!-- Alias → Zone 4 -->
+  <line x1="514" y1="236" x2="556" y2="220" stroke="#666" stroke-width="1.5" marker-end="url(#ah)"/>
+
+  <!-- ── Zone 4: Post-deploy Eval ──────────────────────────────────── -->
+  <rect x="564" y="178" width="124" height="80" rx="6" fill="#ceeabc" stroke="#5B8A3C" stroke-width="1.5"/>
+  <text x="626" y="202" text-anchor="middle" font-size="12" font-weight="700" fill="#2d5c12">Post-deploy</text>
+  <text x="626" y="218" text-anchor="middle" font-size="12" font-weight="700" fill="#2d5c12">Benchmark</text>
+  <text x="626" y="237" text-anchor="middle" font-size="10" fill="#5B8A3C" font-style="italic">dev agent (AWS)</text>
+
+  <!-- pass → Zone 5 -->
+  <line x1="688" y1="218" x2="708" y2="218" stroke="#666" stroke-width="1.5" marker-end="url(#ah)"/>
+  <text x="698" y="212" text-anchor="middle" font-size="9" fill="#666">pass</text>
+
+  <!-- fail: down to revise loop -->
+  <line x1="626" y1="258" x2="626" y2="368" stroke="#ccc" stroke-width="1.2" stroke-dasharray="5,3"/>
+
+  <!-- ── Zone 5: Prod ───────────────────────────────────────────────── -->
+  <rect x="720" y="193" width="148" height="50" rx="5" fill="#2F78B5"/>
+  <text x="794" y="215" text-anchor="middle" font-size="12" font-weight="700" fill="white">Prod Stack</text>
+  <text x="794" y="232" text-anchor="middle" font-size="10" fill="#c8e0ff">merge to main</text>
+
+  <line x1="794" y1="243" x2="794" y2="283" stroke="#888" stroke-width="1.2" marker-end="url(#ah-int)"/>
+
+  <rect x="720" y="283" width="148" height="50" rx="5" fill="#4a5568"/>
+  <text x="794" y="305" text-anchor="middle" font-size="12" font-weight="600" fill="white">Register / Update</text>
+  <text x="794" y="322" text-anchor="middle" font-size="10" fill="#aaa">frontend config</text>
+
+  <!-- ── Revise loop (bottom) ──────────────────────────────────────── -->
+  <!-- Both fail arrows converge to y=368, then go left to x=4, up to y=159, right into Zone 1 -->
+  <path d="M 626,368 L 4,368 L 4,159 L 8,159"
+        fill="none" stroke="#ccc" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#ah)"/>
+  <line x1="240" y1="368" x2="4"   y2="368" stroke="#ccc" stroke-width="1.2" stroke-dasharray="5,3"/>
+
+  <text x="316" y="385" text-anchor="middle" font-size="10" fill="#bbb" font-style="italic">revise &amp; iterate</text>
+</svg>
