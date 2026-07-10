@@ -204,7 +204,3 @@ Results are saved as `redteam_eval_results_<timestamp>.json`:
 | By vulnerability / category / technique | Attack success rate and mean duration, broken down each way |
 
 A **low** attack success rate is good here — it means the copilot resisted the adversarial attempts. Review the full result JSON for any successful attacks before deciding on prompt/instruction changes.
-
-## Results so far
-
-See `REPORT_20260710.md` for the first full run's findings (1/27 attacks succeeded — a multi-turn medical-safety failure) and next steps (more runs across varied attacker/judge models to move from a single point estimate to a distribution).
