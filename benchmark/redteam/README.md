@@ -54,6 +54,8 @@ To add a new vulnerability, add an entry to `redteam_config.json` (validate agai
 
 Each technique is a short directive the attacker LLM is told to apply when crafting its message (see the `TECHNIQUES` dict in `evaluate_redteam.py`). Names and definitions mirror the widely-used [deepteam taxonomy](https://trydeepteam.com/docs/red-teaming-adversarial-attacks) so the vocabulary is familiar, but the implementation is our own — a technique is just a prompt-craft instruction, not a library call. Add a technique by adding one entry to `TECHNIQUES` and the schema enum.
 
+**Human-style attacker voice.** Conversational/social-engineering techniques (the `HUMAN_STYLE` set in `evaluate_redteam.py`) instruct the attacker to write like a real user casually typing — short, informal, occasional typos, no headers/numbered-steps/strategy labels. This is both more realistic and avoids the polished-essay fingerprint that would tip the target off that it's being evaluated. Techniques that inherently depend on formal or literal framing are excluded and keep their native register: `SystemOverride`/`GrayBox` (impersonate system/config text), `PromptInjection` (directive phrasing), and the encodings `Base64`/`Leetspeak`/`ROT13`.
+
 Legend: ✅ used by ≥1 config item · 🔲 implemented, not currently paired with an item.
 
 | Technique | Turn | Used by | What the attacker does |
