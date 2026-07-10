@@ -315,24 +315,42 @@ def run_test_case(clients, models, agent_id, alias_id, item, technique):
 
     history = []          # [{"attacker":, "agent":}]
     sources_used = set()
+    turn_error = None     # non-fatal per-turn failure (e.g. agent context overflow)
 
     start = time.monotonic()
     for _turn in range(max_turns):
-        attack_msg = craft_attack(
-            bedrock_client, attacker_model, item, technique,
-            history=history if multi else None,
-        )
-        agent_resp, turn_sources = invoke_agent(
-            agent_client, agent_id, alias_id, attack_msg, session_id
-        )
+        # A per-turn failure (most commonly the agent's own context window
+        # overflowing late in a multi-turn escalation) is non-fatal: stop
+        # escalating and judge on the turns collected so far, rather than
+        # discarding the whole test case.
+        try:
+            attack_msg = craft_attack(
+                bedrock_client, attacker_model, item, technique,
+                history=history if multi else None,
+            )
+            agent_resp, turn_sources = invoke_agent(
+                agent_client, agent_id, alias_id, attack_msg, session_id
+            )
+        except Exception as e:
+            turn_error = str(e)
+            break
         sources_used |= turn_sources
         history.append({"attacker": attack_msg, "agent": agent_resp})
 
-    transcript = "\n\n".join(
-        f"[Attacker] {h['attacker']}\n[Agent] {h['agent']}" for h in history
-    )
-    verdict = judge_response(bedrock_client, judge_model, item, transcript, sources_used)
     duration = round(time.monotonic() - start, 1)
+
+    if history:
+        transcript = "\n\n".join(
+            f"[Attacker] {h['attacker']}\n[Agent] {h['agent']}" for h in history
+        )
+        verdict = judge_response(bedrock_client, judge_model, item, transcript, sources_used)
+    else:
+        # First turn failed outright — nothing to judge.
+        verdict = {"passed": None, "reason": f"NO_TURNS_COMPLETED: {turn_error}"}
+
+    reason = verdict["reason"]
+    if turn_error and history:
+        reason = f"{reason} [judged on {len(history)} turn(s); escalation stopped early: {turn_error}]"
 
     return {
         "vulnerability_id": item["vulnerability_id"],
@@ -341,12 +359,13 @@ def run_test_case(clients, models, agent_id, alias_id, item, technique):
         "mode": item["mode"],
         "n_turns": len(history),
         "duration_seconds": duration,
+        "turn_error": turn_error,
         "turns": history,
         "sources_used": sorted(sources_used),
         # attack_succeeded is the natural framing for the metrics; passed=agent-resisted.
         "passed": verdict["passed"],
         "attack_succeeded": (verdict["passed"] is False),
-        "reason": verdict["reason"],
+        "reason": reason,
     }
 
 
@@ -360,9 +379,12 @@ def print_metrics(results, total_duration=None):
     scorable = [r for r in results if r["passed"] is not None]
     n = len(results)
     n_err = n - len(scorable)
+    n_degraded = sum(1 for r in results if r.get("turn_error"))
 
     print(f"\n{'='*60}")
-    print(f"REDTEAM EVALUATION RESULTS  ({n} test cases, {n_err} judge failures)")
+    print(f"REDTEAM EVALUATION RESULTS  ({n} test cases, {n_err} without a verdict)")
+    if n_degraded:
+        print(f"  ({n_degraded} degraded: a turn errored mid-run — judged on turns completed so far where possible)")
     print(f"{'='*60}")
 
     # --- Timing (useful for planning / resource allocation) ---
@@ -457,11 +479,13 @@ def run_evaluation(args):
                 )
                 results.append(result)
                 if result["passed"] is None:
-                    status = "JUDGE-FAIL"
+                    status = "NO VERDICT"
                 elif result["attack_succeeded"]:
                     status = "ATTACK SUCCEEDED (agent failed)"
                 else:
                     status = "resisted"
+                if result.get("turn_error"):
+                    status += " [degraded]"
                 print(f"    -> {status}: {result['reason'][:120]}")
             except Exception as e:
                 errors.append({"vulnerability_id": vid, "technique": technique, "error": str(e)})
