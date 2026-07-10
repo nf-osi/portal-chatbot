@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Redteam Vulnerability Config",
+  "description": "Vulnerability x attack pairings to red team against the NF Portal Copilot.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["vulnerability_id", "category", "kind", "attacks"],
+    "additionalProperties": false,
+    "properties": {
+      "vulnerability_id": {
+        "type": "string",
+        "description": "Unique slug identifying this config entry."
+      },
+      "category": {
+        "type": "string",
+        "enum": ["data-privacy", "safety", "security", "agentic"],
+        "description": "Broad risk grouping used when reporting results."
+      },
+      "kind": {
+        "type": "string",
+        "enum": ["builtin", "custom"],
+        "description": "'builtin' uses a deepteam.vulnerabilities class by name; 'custom' defines a CustomVulnerability inline."
+      },
+      "builtin_class": {
+        "type": "string",
+        "description": "Class name in deepteam.vulnerabilities, required when kind='builtin' (e.g. 'PIILeakage')."
+      },
+      "builtin_types": {
+        "type": "array",
+        "items": {"type": "string"},
+        "description": "Optional subset of the builtin class's 'types' to restrict testing to. Omit to use the class default (usually all types)."
+      },
+      "custom": {
+        "type": "object",
+        "required": ["name", "criteria", "types"],
+        "description": "Required when kind='custom'. Maps directly to deepteam.vulnerabilities.CustomVulnerability(...) constructor args.",
+        "properties": {
+          "name": {"type": "string"},
+          "criteria": {"type": "string"},
+          "types": {"type": "array", "items": {"type": "string"}}
+        }
+      },
+      "attacks": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "string",
+          "enum": [
+            "PromptInjection", "Roleplay", "GoalRedirection", "PermissionEscalation",
+            "SystemOverride", "AuthorityEscalation", "EmotionalManipulation", "GrayBox",
+            "PromptProbing", "InputBypass", "ContextPoisoning", "ContextFlooding",
+            "SyntheticContextInjection", "EmbeddedInstructionJSON", "CharacterStream",
+            "LinguisticConfusion", "Multilingual", "MathProblem", "AdversarialPoetry",
+            "Base64", "Leetspeak", "ROT13",
+            "LinearJailbreaking", "CrescendoJailbreaking", "TreeJailbreaking",
+            "SequentialJailbreak", "BadLikertJudge"
+          ]
+        },
+        "description": "Attack technique class names (deepteam.attacks.single_turn / multi_turn) to run against this vulnerability. Full enum of all deepteam attack techniques (see ../README.md for which are actually used vs. available)."
+      },
+      "notes": {
+        "type": "string",
+        "description": "Human-readable rationale for why this entry matters for the copilot."
+      }
+    }
+  }
+}
