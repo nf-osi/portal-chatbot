@@ -1,11 +1,11 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Redteam Vulnerability Config",
-  "description": "Vulnerability x attack pairings to red team against the NF Portal Copilot.",
+  "title": "Redteam Config",
+  "description": "Vulnerability items to red team against the NF Portal Copilot. Each item pairs a goal + judging criteria with a set of attack techniques.",
   "type": "array",
   "items": {
     "type": "object",
-    "required": ["vulnerability_id", "category", "kind", "attacks"],
+    "required": ["vulnerability_id", "category", "goal", "criteria", "techniques", "mode"],
     "additionalProperties": false,
     "properties": {
       "vulnerability_id": {
@@ -17,51 +17,46 @@
         "enum": ["data-privacy", "safety", "security", "agentic"],
         "description": "Broad risk grouping used when reporting results."
       },
-      "kind": {
+      "goal": {
         "type": "string",
-        "enum": ["builtin", "custom"],
-        "description": "'builtin' uses a deepteam.vulnerabilities class by name; 'custom' defines a CustomVulnerability inline."
+        "description": "What the attacker is trying to make the agent do (the adversarial objective)."
       },
-      "builtin_class": {
+      "criteria": {
         "type": "string",
-        "description": "Class name in deepteam.vulnerabilities, required when kind='builtin' (e.g. 'PIILeakage')."
+        "description": "What the judge checks. Describes the behavior the agent MUST uphold; the attack succeeds (agent fails) if the response violates this."
       },
-      "builtin_types": {
-        "type": "array",
-        "items": {"type": "string"},
-        "description": "Optional subset of the builtin class's 'types' to restrict testing to. Omit to use the class default (usually all types)."
-      },
-      "custom": {
-        "type": "object",
-        "required": ["name", "criteria", "types"],
-        "description": "Required when kind='custom'. Maps directly to deepteam.vulnerabilities.CustomVulnerability(...) constructor args.",
-        "properties": {
-          "name": {"type": "string"},
-          "criteria": {"type": "string"},
-          "types": {"type": "array", "items": {"type": "string"}}
-        }
-      },
-      "attacks": {
+      "techniques": {
         "type": "array",
         "minItems": 1,
         "items": {
           "type": "string",
           "enum": [
             "PromptInjection", "Roleplay", "GoalRedirection", "PermissionEscalation",
-            "SystemOverride", "AuthorityEscalation", "EmotionalManipulation", "GrayBox",
-            "PromptProbing", "InputBypass", "ContextPoisoning", "ContextFlooding",
-            "SyntheticContextInjection", "EmbeddedInstructionJSON", "CharacterStream",
-            "LinguisticConfusion", "Multilingual", "MathProblem", "AdversarialPoetry",
-            "Base64", "Leetspeak", "ROT13",
-            "LinearJailbreaking", "CrescendoJailbreaking", "TreeJailbreaking",
-            "SequentialJailbreak", "BadLikertJudge"
+            "SystemOverride", "GrayBox", "ContextPoisoning", "AuthorityEscalation",
+            "EmotionalManipulation", "Base64", "Leetspeak", "ROT13",
+            "Crescendo", "Direct"
           ]
         },
-        "description": "Attack technique class names (deepteam.attacks.single_turn / multi_turn) to run against this vulnerability. Full enum of all deepteam attack techniques (see ../README.md for which are actually used vs. available)."
+        "description": "Attack techniques to run against this item. Each becomes one test case (single mode) or one escalating conversation (multi mode). See README for what each technique does."
+      },
+      "mode": {
+        "type": "string",
+        "enum": ["single", "multi"],
+        "description": "single = attacker crafts one message per technique; multi = attacker escalates adaptively over up to max_turns, reusing the Bedrock session."
+      },
+      "max_turns": {
+        "type": "integer",
+        "minimum": 2,
+        "maximum": 10,
+        "description": "Only used when mode=multi. Max escalation turns (default 4)."
+      },
+      "persona": {
+        "type": "string",
+        "description": "Optional persona framing the attacker adopts (e.g. PATIENT, CONTRIBUTOR), passed to the attacker LLM as context."
       },
       "notes": {
         "type": "string",
-        "description": "Human-readable rationale for why this entry matters for the copilot."
+        "description": "Human-readable rationale for why this item matters for the copilot."
       }
     }
   }
