@@ -28,6 +28,7 @@ import argparse
 import json
 import re
 import sys
+import time
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -293,6 +294,7 @@ def run_test_case(clients, models, agent_id, alias_id, item, technique):
     history = []          # [{"attacker":, "agent":}]
     sources_used = set()
 
+    start = time.monotonic()
     for _turn in range(max_turns):
         attack_msg = craft_attack(
             bedrock_client, attacker_model, item, technique,
@@ -308,6 +310,7 @@ def run_test_case(clients, models, agent_id, alias_id, item, technique):
         f"[Attacker] {h['attacker']}\n[Agent] {h['agent']}" for h in history
     )
     verdict = judge_response(bedrock_client, judge_model, item, transcript, sources_used)
+    duration = round(time.monotonic() - start, 1)
 
     return {
         "vulnerability_id": item["vulnerability_id"],
@@ -315,6 +318,7 @@ def run_test_case(clients, models, agent_id, alias_id, item, technique):
         "technique": technique,
         "mode": item["mode"],
         "n_turns": len(history),
+        "duration_seconds": duration,
         "turns": history,
         "sources_used": sorted(sources_used),
         # attack_succeeded is the natural framing for the metrics; passed=agent-resisted.
@@ -328,7 +332,7 @@ def run_test_case(clients, models, agent_id, alias_id, item, technique):
 # Metrics
 # ---------------------------------------------------------------------------
 
-def print_metrics(results):
+def print_metrics(results, total_duration=None):
     import pandas as pd
 
     scorable = [r for r in results if r["passed"] is not None]
@@ -338,6 +342,16 @@ def print_metrics(results):
     print(f"\n{'='*60}")
     print(f"REDTEAM EVALUATION RESULTS  ({n} test cases, {n_err} judge failures)")
     print(f"{'='*60}")
+
+    # --- Timing (useful for planning / resource allocation) ---
+    durations = [r["duration_seconds"] for r in results if r.get("duration_seconds") is not None]
+    if durations:
+        print("\nTiming:")
+        if total_duration is not None:
+            mins = total_duration / 60
+            print(f"  Total wall-clock:      {total_duration:.0f}s ({mins:.1f} min)")
+        print(f"  Per test case (sec):   min {min(durations):.0f}  "
+              f"mean {sum(durations)/len(durations):.0f}  max {max(durations):.0f}")
 
     if not scorable:
         print("\nNo scorable test cases.")
@@ -353,9 +367,11 @@ def print_metrics(results):
         print(f"\nBy {label}:")
         g = (df.groupby(group_col)
                .agg(attack_success_rate=("attack_succeeded", "mean"),
-                    n=("attack_succeeded", "count"))
+                    n=("attack_succeeded", "count"),
+                    mean_seconds=("duration_seconds", "mean"))
                .sort_values("attack_success_rate", ascending=False))
         g["attack_success_rate"] = g["attack_success_rate"].map("{:.1%}".format)
+        g["mean_seconds"] = g["mean_seconds"].map("{:.0f}".format)
         print(g.to_string())
 
     _table("vulnerability_id", "vulnerability")
@@ -404,6 +420,7 @@ def run_evaluation(args):
     results = []
     errors = []
 
+    run_start = time.monotonic()
     for item in config:
         vid = item["vulnerability_id"]
         for technique in item["techniques"]:
@@ -428,7 +445,9 @@ def run_evaluation(args):
                 errors.append({"vulnerability_id": vid, "technique": technique, "error": str(e)})
                 print(f"    ERROR: {e}")
 
-    print(f"\nCompleted: {len(results)} test cases, {len(errors)} errors")
+    total_duration = round(time.monotonic() - run_start, 1)
+    print(f"\nCompleted: {len(results)} test cases, {len(errors)} errors "
+          f"in {total_duration:.0f}s")
 
     output_path = Path(args.output)
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
@@ -436,6 +455,7 @@ def run_evaluation(args):
 
     payload = {
         "timestamp": timestamp,
+        "duration_seconds": total_duration,
         "config": {
             "agent_id": args.agent_id,
             "agent_alias_id": args.alias_id,
@@ -452,7 +472,7 @@ def run_evaluation(args):
     print(f"Results saved to {dated_path}")
 
     if results:
-        print_metrics(results)
+        print_metrics(results, total_duration=total_duration)
     else:
         print("No results to report.")
 
