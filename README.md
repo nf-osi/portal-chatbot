@@ -6,6 +6,10 @@ Development and configuration for NF Portal-flavored Synapse chatbots.
 
 This repository contains configuration, test datasets, and other resources for NF Portal-tailored Synapse chatbots.
 
+## Documentation
+
+Guides and architecture notes live in [`docs/`](docs/). The docs site is built with [Astro Starlight](https://starlight.astro.build); the site tooling lives separately on the `docs` branch under `site/`, which is built by copying this folder's content into place. See [`site/README.md` on the `docs` branch](https://github.com/nf-osi/portal-chatbot/blob/docs/site/README.md) for local dev setup. Deploys to GitHub Pages automatically via `.github/workflows/deploy-docs.yml` on changes to `docs/`.
+
 ## Agent Registrations
 
 For details on all registered agents (including legacy v0 and other versions in development), see [agents/README.md](agents/README.md). 
