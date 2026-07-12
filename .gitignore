@@ -7,11 +7,9 @@ site/.astro/
 site/node_modules/
 
 # content copied in from main's docs/ at build time (see site/README.md) —
-# never commit real content to this branch, only the .gitkeep placeholders
+# never commit real content to this branch, only the .gitkeep placeholder
 site/src/content/docs/*
 !site/src/content/docs/.gitkeep
-site/public/diagrams/*
-!site/public/diagrams/.gitkeep
 
 # logs
 npm-debug.log*

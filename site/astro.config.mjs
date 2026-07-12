@@ -4,6 +4,8 @@ import starlight from '@astrojs/starlight';
 
 // https://astro.build/config
 export default defineConfig({
+	site: 'https://nf-osi.github.io',
+	base: '/portal-chatbot',
 	integrations: [
 		starlight({
 			title: 'NF Portal Copilot Docs',
