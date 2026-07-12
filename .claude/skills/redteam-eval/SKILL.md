@@ -3,11 +3,11 @@ name: redteam-eval
 description: Run the NF Portal copilot adversarial redteam experiment and refresh docs/red-team-latest-report.md (use when user indicates updated report needed, such as upon changes to the benchmark, or agent's model or instructions)
 ---
 
-You rerun `benchmark/redteam/evaluate_redteam.py` against the live dev Bedrock agent and refresh the aggregate report at `docs/red-team-latest-report.md`. This is a **live adversarial test against a real Bedrock Agent** — confirm scope with the user before running (which vulnerabilities, how many runs, which models) since each run takes ~15-25 min and makes real Bedrock calls.
+You run `benchmark/redteam/evaluate_redteam.py` against the live dev Bedrock agent and refresh the aggregate report at `docs/red-team-latest-report.md`. This is a **live adversarial test against a real Bedrock Agent** — confirm scope with the user before running (which vulnerabilities, how many runs, which models) since each run takes ~15-25 min and makes real Bedrock calls.
 
 ## Background
 
-Read `benchmark/redteam/README.md` for the full harness design and `benchmark/redteam/REPORT.md` for the baseline run's findings and known limitations. In short: an attacker LLM crafts adversarial messages against the dev agent (`ERAAPKTD4Q` / `TSTALIASID`), a judge LLM scores whether each attack succeeded, and results are saved to `benchmark/redteam/redteam_eval_results_<timestamp>.json`. **Never target the prod agent id (`R7WZ38JGKX`)** — the harness itself refuses this without `--allow-prod`.
+Read `benchmark/redteam/README.md` for the full harness design and any previous artifacts such as `docs/red-team-latest-report.md` for the last run's findings and known limitations. In short: an attacker LLM crafts adversarial messages against the dev agent (`ERAAPKTD4Q` / `TSTALIASID`), a judge LLM scores whether each attack succeeded, and results are saved to `benchmark/redteam/redteam_eval_results_<timestamp>.json`. **Never target the prod agent id (`R7WZ38JGKX`)** — the harness itself refuses this without `--allow-prod`.
 
 ## Known environment gotcha
 
@@ -22,7 +22,7 @@ If a run comes back with every case showing `NO VERDICT [degraded]: NO_TURNS_COM
 
 ## Protocol
 
-1. **Confirm scope with the user**: which vulnerability item(s) (default: all), how many runs, and which attacker/judge model pairing(s). The existing baseline used `us.anthropic.claude-sonnet-5` for both roles; varying models across runs (e.g. pairing `us.anthropic.claude-opus-4-8` against `us.anthropic.claude-sonnet-5` in both directions) reduces correlated-blind-spot risk — see REPORT.md Limitations. Check available Bedrock model/inference-profile ids in this account before assuming a model id works:
+1. **Confirm scope with the user**: full run or selected vulnerability item(s) to augment data only (default: all), how many runs, which attacker/judge model pairing(s). The existing baseline used `us.anthropic.claude-sonnet-5` for both roles; varying models across runs (e.g. pairing `us.anthropic.claude-opus-4-8` against `us.anthropic.claude-sonnet-5` in both directions) reduces correlated-blind-spot risk. Check available Bedrock model/inference-profile ids in this account before assuming a model id works:
    ```bash
    env -u AWS_BEARER_TOKEN_BEDROCK aws bedrock list-inference-profiles --region us-east-1 \
      --query 'inferenceProfileSummaries[].inferenceProfileId' --output text
@@ -46,15 +46,13 @@ If a run comes back with every case showing `NO VERDICT [degraded]: NO_TURNS_COM
 
 5. **Review the successful-attack transcripts** in each new result file (`results[].attack_succeeded == true`) before writing anything up — read the actual `turns` transcript and judge `reason`, don't just report the rate.
 
-6. **Rewrite `docs/red-team-latest-report.md`** from the aggregate output plus your review of any successful attacks. Structure it like `benchmark/redteam/REPORT.md` but reflecting the full multi-run picture:
-   - Headline aggregate attack success rate (mean ± std across runs), not a single run's number.
-   - Table of runs included (timestamp, attacker model, judge model, n cases).
-   - Per-vulnerability / per-category / per-technique breakdown with mean/std and pooled counts.
-   - Full detail on every distinct successful attack found across all runs (dedupe if the same failure mode recurs across runs — note recurrence as a signal of a stable weakness rather than a fluke).
-   - Carry forward or update the Limitations section — note if this run round changed model diversity, added runs, etc.
-   - Suggested mitigations for anything that recurred across runs (recurring = worth a prompt/instruction change; a single-run one-off is weaker evidence per the Limitations discussion in REPORT.md).
+6. **Revise `docs/red-team-latest-report.md`** from the new aggregate output plus your review of any successful attacks. Expected structure:
+   - Background section: Context about the scope and purpose of the redteam eval, which **can stay the same** unless user specifies updates needed.
+   - Methodology section: Concise summary explaining vulnerability and attack taxonomy covered, table of runs included (timestamp, attacker model, judge model, n cases), reference to relevant scripts. 
+   - Results section: Headline aggregate attack success rate (mean ± std across runs), per-vulnerability / per-category / per-technique breakdown with mean/std and pooled counts. Full detail on every distinct successful attack found across all runs (dedupe if the same failure mode recurs across runs, analyze whether recurrence is a consistent weakness or chance).
+   - Discussion section: Highlight and offer reasoning for most pertinent results, summarize overall risk, suggest mitigations/solutions, note limitations, and optionally propose experiment enhancements to implement.
 
-7. **Do not commit** unless the user asks — surface the new result files, the updated `docs/red-team-latest-report.md`, and a summary of what changed, and let the user decide.
+7. **Do not commit** unless the user asks — surface the new result files, the updated `docs/red-team-latest-report.md`, a summary of what changed, and let the user review and edit.
 
 ## Reference files
 
@@ -62,5 +60,4 @@ If a run comes back with every case showing `NO VERDICT [degraded]: NO_TURNS_COM
 - `benchmark/redteam/aggregate_redteam.py` — cross-run aggregation
 - `benchmark/redteam/redteam_config.json` — vulnerability items being tested
 - `benchmark/redteam/README.md` — full design doc, technique taxonomy, flags
-- `benchmark/redteam/REPORT.md` — original single-run baseline report and limitations
-- `docs/red-team-latest-report.md` — the aggregate report this skill maintains
+- `docs/red-team-latest-report.md` — the latest aggregate report this skill maintains
