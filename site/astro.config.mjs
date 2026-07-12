@@ -4,14 +4,6 @@ import starlight from '@astrojs/starlight';
 
 // https://astro.build/config
 export default defineConfig({
-	// content/docs and public/diagrams are symlinks to the sibling docs/ checkout
-	// (see README) — preserveSymlinks keeps module resolution anchored to site/
-	// instead of following the link to a real path outside node_modules' reach.
-	vite: {
-		resolve: {
-			preserveSymlinks: true,
-		},
-	},
 	integrations: [
 		starlight({
 			title: 'NF Portal Copilot Docs',

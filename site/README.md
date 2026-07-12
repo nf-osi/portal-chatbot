@@ -2,42 +2,31 @@
 
 Astro + Starlight site tooling for the docs at [`docs/`](https://github.com/nf-osi/portal-chatbot/tree/main/docs) on `main`. This branch (`docs`) holds only the site scaffold; the actual content lives on `main`.
 
-`src/content/docs` and `public/diagrams` are **symlinks** pointing at `../../docs` and `../docs/diagrams` respectively (relative to this `site/` directory) — i.e. they expect a `docs/` checkout of `main` to exist as a sibling of `site/`:
+`src/content/docs` and `public/diagrams` are empty (just `.gitkeep`) in this branch. Before building, copy `main`'s `docs/` folder into place:
 
 ```
-<some parent dir>/
-  docs/     <- from main, content only
-  site/     <- this directory, from the docs branch
+site/
+  src/content/docs/   <- copy main's docs/*.md, docs/*.mdx here
+  public/diagrams/    <- copy main's docs/diagrams/* here
 ```
 
 ## Local development
 
-Use two `git worktree`s to get both branches checked out as sibling directories, without disturbing your primary clone:
-
 ```sh
 git clone https://github.com/nf-osi/portal-chatbot.git repo
 cd repo
+git worktree add ../site docs        # this branch, as a sibling dir
+git worktree add ../main-docs main   # main, for its docs/ folder
 
-# 1. Check out this branch's site/ as a sibling of repo/
-git worktree add ../site docs
-
-# 2. Check out main's docs/ folder only, as a sibling of ../site/
-git worktree add ../main-docs main
-cd ../main-docs
-git sparse-checkout init --cone
-git sparse-checkout set docs
-
-# 3. Point the symlink target at that docs/ checkout
-ln -s ../main-docs/docs ../site/docs
+cp ../main-docs/docs/*.md ../main-docs/docs/*.mdx ../site/site/src/content/docs/
+cp ../main-docs/docs/diagrams/* ../site/site/public/diagrams/
 
 cd ../site/site
 npm install
 npm run dev
 ```
 
-After step 3, `../site/docs` is a real directory (`../main-docs/docs`) sitting next to `../site/site`, which is what the committed symlinks (`../../docs` from `site/src/content/docs`, `../docs/diagrams` from `site/public/diagrams`) resolve to.
-
-To pick up new content later, just `git -C ../main-docs pull`.
+Re-run the two `cp` commands (after a `git -C ../main-docs pull`) whenever `main`'s docs content changes.
 
 ## Build
 
@@ -46,6 +35,6 @@ cd site
 npm run build   # outputs to site/dist/
 ```
 
-## Why `preserveSymlinks: true`
+## CI / GitHub Pages
 
-`astro.config.mjs` sets `vite.resolve.preserveSymlinks: true`. Without it, Vite resolves the symlinked content files to their real path outside `site/` before resolving imports (like `@astrojs/starlight/components`), and can't find `site/node_modules` from there. This setting keeps resolution anchored to the symlinked path inside `site/`.
+`.github/workflows/deploy-docs.yml` on `main` does the same copy step in CI: it checks out this `docs` branch plus `main`'s `docs/` folder, copies content into place, builds, and deploys via `actions/deploy-pages`.
