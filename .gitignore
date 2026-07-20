@@ -15,5 +15,5 @@ benchmark/redteam/taxonomy_explorer.html
 node_modules
 
 # docs site build output
-site/dist/
-site/.astro/
+docs/dist/
+docs/.astro/
