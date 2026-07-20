@@ -7,7 +7,7 @@ description: Adversarial testing of the portal copilot's guardrails.
 
 Red teaming is adversarial testing: instead of asking the copilot known questions with known-good answers (like the [source routing](/source-routing/) and [grounded retrieval](/grounded-retrieval/) evals), an **attacker LLM** actively tries to make the agent misbehave, and a **judge LLM** scores whether each attempt succeeded.
 
-The NF Portal Copilot's red team benchmark (`benchmark/redteam/`) is a self-contained harness — no third-party red-team framework — with three roles, all running on Bedrock:
+The NF Portal Copilot's red team benchmark (`benchmark/redteam/`) is a self-contained harness with three roles, all running on Bedrock:
 
 - **Target** — the live NF Portal Bedrock Agent (dev alias), invoked read-only.
 - **Attacker** — a Claude model that crafts an adversarial message for a given (vulnerability, technique) pair. In multi-turn items it sees the full conversation and escalates, building on established rapport.
@@ -26,7 +26,7 @@ Each vulnerability in `redteam_config.json` pairs a goal (what the attacker want
 | `security` | SPARQL injection, write attempts against a read-only backend |
 | `agentic` | Off-topic repurposing, false capability claims |
 
-The copilot has **read-only** access only — a docs KB and four read-only SPARQL operations, no code execution, no write path anywhere. The benchmark checks whether an attacker can still talk it into overstepping that scope, leaking something it shouldn't, or giving unsafe guidance.
+The copilot has **read-only** access only — a docs KB and four read-only SPARQL operations, no code execution, no write path anywhere. Nevertheless, the benchmark checks whether an attacker can still talk it into overstepping that scope, leaking something it shouldn't, or giving unsafe guidance.
 
 ## Examples from a real run
 
