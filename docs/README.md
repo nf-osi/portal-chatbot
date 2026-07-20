@@ -1,6 +1,6 @@
-# NF Portal Copilot Docs — site
+# NF Portal Copilot Docs
 
-Astro + Starlight site tooling for the docs at [`docs/`](https://github.com/nf-osi/portal-chatbot/tree/main/docs). `site/src/content/docs` is a symlink to the repo's top-level `docs/`, so content and site scaffold live together on this branch — no cross-branch copy step needed.
+Astro + Starlight docs and site tooling.
 
 ## Local development
 
@@ -15,9 +15,9 @@ npm run dev
 
 ```sh
 cd docs
-npm run build   # outputs to site/dist/
+npm run build   # outputs to site/dist/, not committed
 ```
 
 ## CI / GitHub Pages
 
-`.github/workflows/deploy-docs.yml` checks out the repo, installs, and builds — no separate content checkout or copy step. The site is served at `https://nf-osi.github.io/portal-chatbot/`, hence `site`/`base` in `astro.config.mjs`.
+`.github/workflows/deploy-docs.yml` checks out the repo, installs, and builds. The site is served at `https://nf-osi.github.io/portal-chatbot/`, hence `site`/`base` in `astro.config.mjs`.
