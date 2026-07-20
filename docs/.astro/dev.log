@@ -1,0 +1,18 @@
+{"message":"connected.","label":"vite","level":"info"}
+{"message":"Generated 0ms","label":"types","level":"info"}
+{"message":"connected.","label":"vite","level":"info"}
+{"message":"Syncing content","label":"content","level":"info"}
+{"message":"Astro config changed","label":"content","level":"info"}
+{"message":"Clearing content store","label":"content","level":"info"}
+{"message":"Synced content","label":"content","level":"info"}
+{"message":" astro  v7.0.7 ready in 1396 ms\n┃ Local    http://localhost:4321/portal-chatbot\n┃ Network  use --host to expose","label":"SKIP_FORMAT","level":"info"}
+{"message":"watching for file changes...","label":null,"level":"info"}
+{"message":"[200] / 111ms","label":null,"level":"info"}
+{"message":"[200] /so-you-want-a-portal-copilot/ 19ms","label":null,"level":"info"}
+{"message":"[200] HEAD / 12ms","label":null,"level":"info"}
+{"message":"[200] / 9ms","label":null,"level":"info"}
+{"message":"[200] / 9ms","label":null,"level":"info"}
+{"message":"[200] / 7ms","label":null,"level":"info"}
+{"message":"Reloaded data from index.mdx","label":"starlight-docs-loader","level":"info"}
+{"message":"[200] / 56ms","label":null,"level":"info"}
+{"message":"[200] /so-you-want-a-portal-copilot/ 20ms","label":null,"level":"info"}
