@@ -6,17 +6,15 @@ Astro + Starlight site tooling for the docs at [`docs/`](https://github.com/nf-o
 
 ```sh
 git clone https://github.com/nf-osi/portal-chatbot.git
-cd portal-chatbot/site
+cd portal-chatbot/docs
 npm install
 npm run dev
 ```
 
-Editing files under `docs/` at the repo root is picked up directly — no copy or rebuild step required.
-
 ## Build
 
 ```sh
-cd site
+cd docs
 npm run build   # outputs to site/dist/
 ```
 

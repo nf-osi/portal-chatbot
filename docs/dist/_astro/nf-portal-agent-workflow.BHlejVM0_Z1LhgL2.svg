@@ -1,0 +1,163 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 1360" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <title>NF Portal Agent Workflow</title>
+  <desc>Knowledge sources feed a Bedrock agent, which is evaluated, revised, and promoted through dev and prod stacks.</desc>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#94a3b8" />
+    </marker>
+    <marker id="arrowAmber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#b45309" />
+    </marker>
+  </defs>
+
+  <style>
+    .band-label { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; fill: #64748b; text-transform: uppercase; }
+    .node-label { font-size: 15px; font-weight: 600; fill: #ffffff; }
+    .node-sub { font-size: 11px; font-weight: 400; fill: #ffffff; opacity: 0.85; }
+    .hero-label { font-size: 18px; font-weight: 700; fill: #ffffff; }
+    .hero-sub { font-size: 11.5px; font-weight: 400; fill: #ffffff; opacity: 0.85; }
+    .diamond-label { font-size: 16px; font-weight: 700; fill: #ffffff; }
+    .branch-label { font-size: 12px; font-weight: 600; fill: #475569; }
+    .edge { fill: none; stroke: #94a3b8; stroke-width: 2; marker-end: url(#arrow); }
+    .edge-loop { fill: none; stroke: #b45309; stroke-width: 2; stroke-dasharray: 6 5; marker-end: url(#arrowAmber); }
+  </style>
+
+  <!-- card background -->
+  <rect x="6" y="6" width="868" height="1348" rx="24" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
+
+  <!-- Band 1: Knowledge Sources -->
+  <rect x="30" y="40" width="820" height="150" rx="16" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5 5" />
+  <text x="50" y="64" class="band-label">Knowledge Sources</text>
+
+  <!-- KB -->
+  <rect x="60" y="80" width="350" height="90" rx="14" fill="#2563eb" />
+  <g transform="translate(84,113)">
+    <rect x="0" y="0" width="20" height="24" rx="3" fill="none" stroke="#ffffff" stroke-width="1.6" />
+    <line x1="4" y1="7" x2="16" y2="7" stroke="#ffffff" stroke-width="1.6" />
+    <line x1="4" y1="12" x2="16" y2="12" stroke="#ffffff" stroke-width="1.6" />
+    <line x1="4" y1="17" x2="12" y2="17" stroke="#ffffff" stroke-width="1.6" />
+  </g>
+  <text x="120" y="118" class="node-label">Docs KB</text>
+  <text x="120" y="136" class="node-sub">help.nf.synapse.org</text>
+
+  <!-- KG -->
+  <rect x="470" y="80" width="350" height="90" rx="14" fill="#7c3aed" />
+  <g transform="translate(494,105)">
+    <circle cx="4" cy="4" r="4" fill="#ffffff" />
+    <circle cx="20" cy="2" r="4" fill="#ffffff" />
+    <circle cx="14" cy="20" r="4" fill="#ffffff" />
+    <line x1="4" y1="4" x2="20" y2="2" stroke="#ffffff" stroke-width="1.4" />
+    <line x1="4" y1="4" x2="14" y2="20" stroke="#ffffff" stroke-width="1.4" />
+    <line x1="20" y1="2" x2="14" y2="20" stroke="#ffffff" stroke-width="1.4" />
+  </g>
+  <text x="530" y="118" class="node-label">Knowledge Graph</text>
+  <text x="530" y="136" class="node-sub">metadata + indexed publications</text>
+
+  <!-- Band 2: Copilot Stack -->
+  <rect x="30" y="210" width="820" height="430" rx="16" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5 5" />
+  <text x="50" y="234" class="band-label">Copilot Stack (CloudFormation)</text>
+
+  <!-- Instructions -->
+  <rect x="60" y="250" width="350" height="80" rx="14" fill="#475569" />
+  <text x="235" y="284" text-anchor="middle" class="node-label">Prompt / Instructions</text>
+  <text x="235" y="302" text-anchor="middle" class="node-sub">System prompt, source-selection rules</text>
+
+  <!-- Lambda -->
+  <rect x="470" y="250" width="350" height="80" rx="14" fill="#475569" />
+  <text x="645" y="284" text-anchor="middle" class="node-label">Lambda</text>
+  <text x="645" y="302" text-anchor="middle" class="node-sub">SPARQL adapter</text>
+
+  <!-- Agent (hero) -->
+  <rect x="290" y="370" width="300" height="100" rx="18" fill="#0f172a" stroke="#38bdf8" stroke-width="2" />
+  <g transform="translate(420,388)">
+    <rect x="0" y="0" width="20" height="20" rx="5" fill="none" stroke="#38bdf8" stroke-width="1.8" />
+    <circle cx="6.5" cy="9" r="2" fill="#38bdf8" />
+    <circle cx="13.5" cy="9" r="2" fill="#38bdf8" />
+    <line x1="10" y1="-6" x2="10" y2="0" stroke="#38bdf8" stroke-width="1.8" />
+  </g>
+  <text x="440" y="432" text-anchor="middle" class="hero-label">Agent</text>
+  <text x="440" y="452" text-anchor="middle" class="hero-sub">Bedrock foundation model + tools</text>
+
+  <!-- Alias -->
+  <rect x="315" y="510" width="250" height="80" rx="14" fill="#475569" />
+  <text x="440" y="544" text-anchor="middle" class="node-label">Agent Alias</text>
+  <text x="440" y="562" text-anchor="middle" class="node-sub">Dev (DRAFT) &amp; prod pointers</text>
+
+  <!-- Band 3: Feedback Loop -->
+  <rect x="30" y="660" width="820" height="400" rx="16" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5 5" />
+  <text x="50" y="684" class="band-label">Evaluation &amp; Feedback Loop</text>
+
+  <!-- Eval -->
+  <rect x="315" y="700" width="250" height="80" rx="14" fill="#0d9488" />
+  <g transform="translate(339,724)">
+    <circle cx="10" cy="10" r="10" fill="none" stroke="#ffffff" stroke-width="1.6" />
+    <path d="M5,10 L9,14 L15,6" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+  <text x="375" y="736" class="node-label">Evaluation</text>
+  <text x="375" y="754" class="node-sub">Routing + quality benchmarks</text>
+
+  <!-- Results -->
+  <rect x="315" y="820" width="250" height="80" rx="14" fill="#0d9488" />
+  <g transform="translate(339,844)">
+    <rect x="0" y="10" width="5" height="10" fill="#ffffff" />
+    <rect x="7.5" y="4" width="5" height="16" fill="#ffffff" />
+    <rect x="15" y="0" width="5" height="20" fill="#ffffff" />
+  </g>
+  <text x="375" y="856" class="node-label">Results</text>
+  <text x="375" y="874" class="node-sub">Pass/fail metrics</text>
+
+  <!-- Decision diamond -->
+  <polygon points="440,910 540,975 440,1040 340,975" fill="#d97706" />
+  <text x="440" y="981" text-anchor="middle" class="diamond-label">Passes?</text>
+
+  <!-- Reconfig -->
+  <rect x="60" y="935" width="230" height="80" rx="14" fill="#b45309" />
+  <g transform="translate(84,959)">
+    <path d="M17,4 A12,12 0 1 0 20,14" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" />
+    <path d="M17,0 L17,6 L23,6 Z" fill="#ffffff" />
+  </g>
+  <text x="120" y="972" class="node-label">Revise</text>
+  <text x="120" y="990" class="node-sub">Instructions, routing, dataset</text>
+
+  <!-- Band 4: CI/CD -->
+  <rect x="30" y="1080" width="820" height="260" rx="16" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5 5" />
+  <text x="50" y="1104" class="band-label">CI/CD</text>
+
+  <!-- Dev -->
+  <rect x="60" y="1120" width="250" height="80" rx="14" fill="#64748b" />
+  <text x="185" y="1154" text-anchor="middle" class="node-label">Dev Stack</text>
+  <text x="185" y="1172" text-anchor="middle" class="node-sub">Manual dispatch → TSTALIASID</text>
+
+  <!-- Prod -->
+  <rect x="520" y="1120" width="250" height="80" rx="14" fill="#2563eb" />
+  <text x="645" y="1154" text-anchor="middle" class="node-label">Prod Stack</text>
+  <text x="645" y="1172" text-anchor="middle" class="node-sub">Auto-deploy on merge to main</text>
+
+  <!-- Register -->
+  <rect x="520" y="1220" width="250" height="80" rx="14" fill="#334155" />
+  <text x="645" y="1254" text-anchor="middle" class="node-label">Update Registration</text>
+  <text x="645" y="1272" text-anchor="middle" class="node-sub">Synapse agent registration/config</text>
+
+  <!-- Connectors -->
+  <path class="edge" d="M235,170 V200 H430 V370" />
+  <path class="edge" d="M645,170 V250" />
+  <path class="edge" d="M235,330 V350 H380 V370" />
+  <path class="edge" d="M645,330 V350 H500 V370" />
+  <path class="edge" d="M440,470 V510" />
+  <path class="edge" d="M440,590 V700" />
+  <path class="edge" d="M440,780 V820" />
+  <path class="edge" d="M440,900 V910" />
+  <path class="edge" d="M340,975 H290" />
+  <path class="edge-loop" d="M60,975 H20 V740 H315" />
+  <path class="edge" d="M540,975 H645 V1120" />
+  <path class="edge" d="M175,1015 V1070 H185 V1120" />
+  <path class="edge" d="M645,1200 V1220" />
+
+  <!-- Branch labels -->
+  <rect x="270" y="950" width="90" height="18" fill="#ffffff" />
+  <text x="315" y="963" text-anchor="middle" class="branch-label">Needs work</text>
+
+  <rect x="562" y="950" width="60" height="18" fill="#ffffff" />
+  <text x="592" y="963" text-anchor="middle" class="branch-label">Ready</text>
+</svg>
