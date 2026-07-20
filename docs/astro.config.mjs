@@ -24,7 +24,7 @@ export default defineConfig({
 					items: [
 						{ label: 'So you want a portal copilot?', slug: 'so-you-want-a-portal-copilot' },
 						{ label: 'Reference workflow', slug: 'nf-portal-agent-workflow' },
-						{ label: 'Reusable pieces', slug: 'reusable-pieces' },
+						{ label: 'Templates', slug: 'templates' },
 						{ label: 'Deployment', slug: 'deployment' },
 					],
 				},
