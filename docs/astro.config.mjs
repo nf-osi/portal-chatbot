@@ -37,12 +37,6 @@ export default defineConfig({
 						{ label: 'Red teaming', slug: 'red-teaming' },
 					],
 				},
-				{
-					label: 'Architecture',
-					items: [
-						{ label: 'Bedrock Agent Session Storage', slug: 'bedrock-agent-session-storage' },
-					],
-				},
 			],
 		}),
 	],
