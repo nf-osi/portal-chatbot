@@ -23,5 +23,8 @@
   "homepage": "https://github.com/nf-osi/portal-chatbot#readme",
   "dependencies": {
     "openai": "^4.91.0"
+  },
+  "overrides": {
+    "form-data": "^4.0.6"
   }
 }
