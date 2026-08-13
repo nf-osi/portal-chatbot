@@ -201,10 +201,12 @@ Results are saved as `redteam_eval_results_<timestamp>.json`:
 - `results` — per (item, technique) test cases: `vulnerability_id`, `category`, `technique`, `mode`, `n_turns`, `duration_seconds`, `turn_error` (if degraded), `turns` (the full attacker/agent transcript), `sources_used`, `passed`, `attack_succeeded`, `reason`
 - `errors` — cases where the harness itself failed unexpectedly (rare; most per-turn failures degrade gracefully instead of erroring — see above)
 
-Result files (`redteam_eval_results_*.json`, `redteam_aggregate_results.json`) are gitignored — they can contain content an attack successfully extracted from the agent, so they aren't committed to this public repo. Instead, upload them to the permissioned [Synapse project](https://www.synapse.org/Synapse:syn76878333):
+Result files (`redteam_eval_results_*.json`, `redteam_aggregate_results.json`) are gitignored — they can contain content an attack successfully extracted from the agent, so they aren't committed to this public repo. Instead, upload them to the permissioned [Synapse project](https://www.synapse.org/Synapse:syn76878333) with the generic uploader in `scripts/`:
 
 ```bash
-python upload_redteam_results.py                # uploads all result files in this directory
+python ../../scripts/upload_logs_to_synapse.py \
+    --pattern 'redteam_eval_results_*.json' --pattern 'redteam_aggregate_results.json' \
+    --parent-id syn76878333
 ```
 
 Any report that cites numbers from a run should link the corresponding Synapse file(s) so the numbers are independently checkable.
