@@ -1,0 +1,25 @@
+baseURL = 'https://nf-osi.github.io/portal-chatbot/'
+title = 'NF Portal Copilot Docs'
+theme = 'hugo-book'
+
+disablePathToLower = true
+
+[markup.goldmark.renderer]
+  unsafe = true
+
+[markup.tableOfContents]
+  startLevel = 1
+
+[params]
+  BookTheme = 'light'
+  BookSection = 'docs'
+  BookFavicon = 'favicon.svg'
+  BookRepo = 'https://github.com/nf-osi/portal-chatbot'
+  BookSearch = true
+  BookComments = false
+  BookPortableLinks = 'warning'
+
+[[menu.after]]
+  name = 'GitHub'
+  url = 'https://github.com/nf-osi/portal-chatbot'
+  weight = 10

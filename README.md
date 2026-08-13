@@ -6,6 +6,10 @@ Development and configuration for NF Portal-flavored Synapse chatbots.
 
 This repository contains configuration, test datasets, and other resources for NF Portal-tailored Synapse chatbots.
 
+## Documentation
+
+Guides and architecture notes live in [`docs/`](docs/). The docs site is built with [Hugo](https://gohugo.io) and the [hugo-book](https://themes.gohugo.io/themes/hugo-book/) theme; see [`docs/README.md`](docs/README.md) for local dev setup. Deploys to GitHub Pages automatically via [`.github/workflows/deploy-docs.yml`](.github/workflows/deploy-docs.yml) on changes to `docs/`.
+
 ## Agent Registrations
 
 For details on all registered agents (including legacy v0 and other versions in development), see [agents/README.md](agents/README.md). 

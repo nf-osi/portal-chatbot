@@ -1,13 +1,13 @@
 ---
 name: redteam-eval
-description: Run the NF Portal copilot adversarial redteam experiment and refresh docs/red-team-latest-report.md (use when user indicates updated report needed, such as upon changes to the benchmark, or agent's model or instructions)
+description: Run the NF Portal copilot adversarial redteam experiment and refresh docs/content/docs/benchmarking-and-evaluation/red-team-report.md (use when user indicates updated report needed, such as upon changes to the benchmark, or agent's model or instructions)
 ---
 
-You run `benchmark/redteam/evaluate_redteam.py` against the live dev Bedrock agent and refresh the aggregate report at `docs/red-team-latest-report.md`. This is a **live adversarial test against a real Bedrock Agent** — confirm scope with the user before running (which vulnerabilities, how many runs, which models) since each run takes ~15-25 min and makes real Bedrock calls.
+You run `benchmark/redteam/evaluate_redteam.py` against the live dev Bedrock agent and refresh the aggregate report at `docs/content/docs/benchmarking-and-evaluation/red-team-report.md`. This is a **live adversarial test against a real Bedrock Agent** — confirm scope with the user before running (which vulnerabilities, how many runs, which models) since each run takes ~15-25 min and makes real Bedrock calls.
 
 ## Background
 
-Read `benchmark/redteam/README.md` for the full harness design and any previous artifacts such as `docs/red-team-latest-report.md` for the last run's findings and known limitations. In short: an attacker LLM crafts adversarial messages against the dev agent (`ERAAPKTD4Q` / `TSTALIASID`), a judge LLM scores whether each attack succeeded, and results are saved to `benchmark/redteam/redteam_eval_results_<timestamp>.json`. **Never target the prod agent id (`R7WZ38JGKX`)** — the harness itself refuses this without `--allow-prod`.
+Read `benchmark/redteam/README.md` for the full harness design and any previous artifacts such as `docs/content/docs/benchmarking-and-evaluation/red-team-report.md` for the last run's findings and known limitations. In short: an attacker LLM crafts adversarial messages against the dev agent (`ERAAPKTD4Q` / `TSTALIASID`), a judge LLM scores whether each attack succeeded, and results are saved to `benchmark/redteam/redteam_eval_results_<timestamp>.json`. **Never target the prod agent id (`R7WZ38JGKX`)** — the harness itself refuses this without `--allow-prod`.
 
 ## Known environment gotcha
 
@@ -46,13 +46,14 @@ If a run comes back with every case showing `NO VERDICT [degraded]: NO_TURNS_COM
 
 5. **Review the successful-attack transcripts** in each new result file (`results[].attack_succeeded == true`) before writing anything up — read the actual `turns` transcript and judge `reason`, don't just report the rate.
 
-6. **Revise `docs/red-team-latest-report.md`** from the new aggregate output plus your review of any successful attacks. Expected structure:
+6. **Revise `docs/content/docs/benchmarking-and-evaluation/red-team-report.md`** from the new aggregate output plus your review of any successful attacks. Expected structure:
+   - Title: `# NF Portal Copilot Red Team — Latest Report`
    - Background section: Context about the scope and purpose of the redteam eval, which **can stay the same** unless user specifies updates needed.
    - Methodology section: Concise summary explaining vulnerability and attack taxonomy covered, table of runs included (timestamp, attacker model, judge model, n cases), reference to relevant scripts. 
    - Results section: Headline aggregate attack success rate (mean ± std across runs), per-vulnerability / per-category / per-technique breakdown with mean/std and pooled counts. Full detail on every distinct successful attack found across all runs (dedupe if the same failure mode recurs across runs, analyze whether recurrence is a consistent weakness or chance).
    - Discussion section: Highlight and offer reasoning for most pertinent results, summarize overall risk, suggest mitigations/solutions, note limitations, and optionally propose experiment enhancements to implement.
 
-7. **Do not commit** unless the user asks — surface the new result files, the updated `docs/red-team-latest-report.md`, a summary of what changed, and let the user review and edit.
+7. **Do not commit** unless the user asks — surface the new result files, the updated `docs/content/docs/benchmarking-and-evaluation/red-team-report.md`, a summary of what changed, and let the user review and edit.
 
 ## Reference files
 
@@ -60,4 +61,4 @@ If a run comes back with every case showing `NO VERDICT [degraded]: NO_TURNS_COM
 - `benchmark/redteam/aggregate_redteam.py` — cross-run aggregation
 - `benchmark/redteam/redteam_config.json` — vulnerability items being tested
 - `benchmark/redteam/README.md` — full design doc, technique taxonomy, flags
-- `docs/red-team-latest-report.md` — the latest aggregate report this skill maintains
+- `docs/content/docs/benchmarking-and-evaluation/red-team-report.md` — the latest aggregate report this skill maintains
