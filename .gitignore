@@ -9,4 +9,6 @@ datasets/*
 !datasets/batch_api_pipeline.js
 benchmark/general-help/eval_results.json
 benchmark/general-help/eval_results.png
+benchmark/redteam/redteam_eval_results_*.json
+benchmark/redteam/redteam_aggregate_results.json
 node_modules
