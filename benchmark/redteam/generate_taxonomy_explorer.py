@@ -138,13 +138,23 @@ def build_examples(runs: list[dict]) -> dict:
     return examples
 
 
-def build_techniques(config_items: list[dict]) -> list[dict]:
+def stats_for_cases(cases: list[dict]) -> dict:
+    return {
+        "attempts": len(cases),
+        "succeeded": sum(1 for c in cases if c.get("attackSucceeded") is True),
+        "resisted": sum(1 for c in cases if c.get("passed") is True),
+        "noVerdict": sum(1 for c in cases if c.get("passed") is None),
+    }
+
+
+def build_techniques(config_items: list[dict], examples: dict) -> list[dict]:
     used_by: dict[str, list[str]] = {name: [] for name in TECHNIQUE_META}
     for item in config_items:
         for t in item["techniques"]:
             used_by.setdefault(t, []).append(item["vulnerability_id"])
     techniques = []
     for name, (turn, directive) in TECHNIQUE_META.items():
+        cases = [c for v in used_by.get(name, []) for c in examples.get(f"{v}::{name}", [])]
         techniques.append({
             "id": name,
             "turn": turn,
@@ -152,14 +162,18 @@ def build_techniques(config_items: list[dict]) -> list[dict]:
             "humanStyle": name in HUMAN_STYLE,
             "usedBy": used_by.get(name, []),
             "status": "used" if used_by.get(name) else "unpaired",
+            "stats": stats_for_cases(cases),
         })
     return techniques
 
 
-def build_vulnerabilities(config_items: list[dict]) -> list[dict]:
-    return [
-        {
-            "id": item["vulnerability_id"],
+def build_vulnerabilities(config_items: list[dict], examples: dict) -> list[dict]:
+    vulnerabilities = []
+    for item in config_items:
+        vuln_id = item["vulnerability_id"]
+        cases = [c for t in item["techniques"] for c in examples.get(f"{vuln_id}::{t}", [])]
+        vulnerabilities.append({
+            "id": vuln_id,
             "category": item["category"],
             "goal": item["goal"],
             "criteria": item["criteria"],
@@ -168,16 +182,20 @@ def build_vulnerabilities(config_items: list[dict]) -> list[dict]:
             "maxTurns": item.get("max_turns"),
             "persona": item.get("persona"),
             "techniques": item["techniques"],
-        }
-        for item in config_items
-    ]
+            "stats": stats_for_cases(cases),
+        })
+    return vulnerabilities
 
 
-def build_taxonomy() -> list[dict]:
-    return [
-        {"group": g, "name": n, "status": s, "notes": notes, "mappedIds": mapped}
-        for g, n, s, notes, mapped in DEEPTEAM_TAXONOMY
-    ]
+def build_taxonomy(vuln_stats: dict) -> list[dict]:
+    taxonomy = []
+    for g, n, s, notes, mapped in DEEPTEAM_TAXONOMY:
+        combined = {"attempts": 0, "succeeded": 0, "resisted": 0, "noVerdict": 0}
+        for vuln_id in mapped:
+            for k, v in vuln_stats.get(vuln_id, {}).items():
+                combined[k] += v
+        taxonomy.append({"group": g, "name": n, "status": s, "notes": notes, "mappedIds": mapped, "stats": combined})
+    return taxonomy
 
 
 TEMPLATE_PATH = Path(__file__).with_name("taxonomy_explorer_template.html")
@@ -203,14 +221,20 @@ def main() -> None:
     if not runs:
         print(f"Warning: no result files matched {args.glob!r} in {directory} — examples will be empty")
 
+    examples = build_examples(runs)
+    vulnerabilities = build_vulnerabilities(config_items, examples)
+    vuln_stats = {v["id"]: v["stats"] for v in vulnerabilities}
+    all_cases = [c for cases in examples.values() for c in cases]
+
     data = {
-        "techniques": build_techniques(config_items),
-        "vulnerabilities": build_vulnerabilities(config_items),
-        "taxonomy": build_taxonomy(),
-        "examples": build_examples(runs),
+        "techniques": build_techniques(config_items, examples),
+        "vulnerabilities": vulnerabilities,
+        "taxonomy": build_taxonomy(vuln_stats),
+        "examples": examples,
         "meta": {
             "nRuns": len(runs),
             "runFiles": [r["_file"] for r in runs],
+            "overallStats": stats_for_cases(all_cases),
         },
     }
 
