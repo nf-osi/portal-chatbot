@@ -1,17 +1,18 @@
 ---
 title: Source routing
-description: Testing whether the agent queries the correct knowledge source. Only relevant if your agent has more than one source.
+weight: 30
 ---
 
-:::note
-This benchmark only applies if your agent has **more than one** knowledge source (e.g. a docs KB plus a knowledge graph). If you only have a single docs KB, you would only need [grounded retrieval](/grounded-retrieval/) and can skip this page.
-:::
+# Source routing
+
+> [!NOTE]
+> This benchmark only applies if your agent has **more than one** knowledge source (e.g. a docs KB plus a knowledge graph). If you only have a single docs KB, you would only need [grounded retrieval](/docs/benchmarking-and-evaluation/grounded-retrieval/) and can skip this page.
 
 ## What this tests
 
 Source routing tests whether the agent efficiently consults the **correct** knowledge source for a given question. The agent has to be a good orchestrator, recognizing which is the best source to utitilize without unnecessary diversions that add time and money costs. Aside from the underlying model intelligence, the system may include routing rules in the system prompt (or other methods, depending on the framework) that influence overall performance; this benchmark is how to validate and iterate whether the overall system is working sufficiently well.
 
-The NF Portal Copilot has two sources — a documentation KB and a SPARQL-backed knowledge graph — so it needs this eval in addition to [grounded retrieval](/grounded-retrieval/) on each source individually. The **kb-routing benchmark** (`benchmark/kb-routing/`) covers this.
+The NF Portal Copilot has two sources — a documentation KB and a SPARQL-backed knowledge graph — so it needs this eval in addition to [grounded retrieval](/docs/benchmarking-and-evaluation/grounded-retrieval/) on each source individually. The **kb-routing benchmark** (`benchmark/kb-routing/`) covers this.
 
 ## How the dataset is built
 

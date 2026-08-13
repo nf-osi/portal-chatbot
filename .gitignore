@@ -15,5 +15,5 @@ benchmark/redteam/taxonomy_explorer.html
 node_modules
 
 # docs site build output
-docs/dist/
-docs/.astro/
+docs/public/
+docs/.hugo_build.lock

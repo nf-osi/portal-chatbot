@@ -1,13 +1,16 @@
 ---
-title: Benchmarking and evaluation
-description: Where most of the ongoing effort for a portal copilot goes, and how to build your own benchmarks.
+title: Benchmarking and Evaluation
+weight: 20
+bookFlatSection: true
+bookCollapseSection: false
+bookIcon: bar-chart
 ---
 
-import { Steps } from '@astrojs/starlight/components';
+# Benchmarking and evaluation
 
 This is where the bulk of the effort goes. The core loop is:
 
-<Steps>
+{{% steps %}}
 1. **Deploy** instruction or model changes to the dev stack, then prepare the agent so the DRAFT version picks them up:
 
    ```bash
@@ -30,7 +33,7 @@ This is where the bulk of the effort goes. The core loop is:
 3. **Review** failures and over-queries to understand what went wrong — inspect the per-turn scores in the generated `*_eval_results_<timestamp>.json` file.
 4. **Revise** instructions, source selection rules, or the benchmark dataset.
 5. **Repeat** until metrics stabilize.
-</Steps>
+{{% /steps %}}
 
 ## What to benchmark
 
@@ -38,13 +41,13 @@ Each knowledge source should have its own benchmark that tests whether the agent
 
 If you have multiple sources, you should also have a **source selection benchmark** — a dataset that tests whether the agent routes questions to the correct source. This is critical because the best instructions in the world won't help if the agent queries the wrong source. The source selection benchmark is how you validate and iterate on the routing rules in your system prompt.
 
-You should also have an **adversarial benchmark** — the above benchmarks test whether the agent behaves well on ordinary questions; a [red teaming](/red-teaming/) benchmark tests whether it holds up against a user actively trying to make it misbehave (leak internal details, give unsafe guidance, exceed its intended scope).
+You should also have an **adversarial benchmark** — the above benchmarks test whether the agent behaves well on ordinary questions; a [red teaming](/docs/benchmarking-and-evaluation/red-teaming/) benchmark tests whether it holds up against a user actively trying to make it misbehave (leak internal details, give unsafe guidance, exceed its intended scope).
 
 In the NF Portal Copilot, we have:
 
-- **Source selection eval** (`benchmark/kb-routing/`) — multi-turn sessions labeled with the expected source per turn (docs, graph, redirect, or none). Measures whether the agent consults the right source, and whether it over-queries by consulting unnecessary sources. See [Source routing](/source-routing/).
-- **Docs KB eval** (`benchmark/general-help/`) — multiple-choice questions generated from help documentation, scored by an LLM judge against known correct answers. See [Grounded retrieval](/grounded-retrieval/).
-- **Adversarial eval** (`benchmark/redteam/`) — an attacker LLM probes the agent with techniques like prompt injection, roleplay, and multi-turn escalation, and a judge LLM scores whether each attack succeeded. See [Red teaming](/red-teaming/).
+- **Source selection eval** (`benchmark/kb-routing/`) — multi-turn sessions labeled with the expected source per turn (docs, graph, redirect, or none). Measures whether the agent consults the right source, and whether it over-queries by consulting unnecessary sources. See [Source routing](/docs/benchmarking-and-evaluation/source-routing/).
+- **Docs KB eval** (`benchmark/general-help/`) — multiple-choice questions generated from help documentation, scored by an LLM judge against known correct answers. See [Grounded retrieval](/docs/benchmarking-and-evaluation/grounded-retrieval/).
+- **Adversarial eval** (`benchmark/redteam/`) — an attacker LLM probes the agent with techniques like prompt injection, roleplay, and multi-turn escalation, and a judge LLM scores whether each attack succeeded. See [Red teaming](/docs/benchmarking-and-evaluation/red-teaming/).
 
 ## Building your own benchmarks
 
@@ -52,7 +55,7 @@ For the **source selection dataset**, curate sessions that cover each source ind
 
 For **per-source datasets**, generate questions from your actual content. `benchmark/general-help/generate_dataset.py` can produce a synthetic multiple-choice dataset from crawled documentation. Human validation before use is strongly recommended — synthetic datasets always have quality issues that need manual review.
 
-For the **adversarial dataset**, define vulnerabilities (what the attacker is trying to make the agent do) and pair each with attack techniques (direct ask, roleplay, prompt injection, multi-turn escalation, etc.). See `benchmark/redteam/redteam_config.json` for the format and the [Red teaming](/red-teaming/) page for the full taxonomy.
+For the **adversarial dataset**, define vulnerabilities (what the attacker is trying to make the agent do) and pair each with attack techniques (direct ask, roleplay, prompt injection, multi-turn escalation, etc.). See `benchmark/redteam/redteam_config.json` for the format and the [Red teaming](/docs/benchmarking-and-evaluation/red-teaming/) page for the full taxonomy.
 
 ## Running evals
 

@@ -1,23 +1,28 @@
 # NF Portal Copilot Docs
 
-Astro + Starlight docs and site tooling.
+Hugo + [hugo-book](https://themes.gohugo.io/themes/hugo-book/) docs site.
 
 ## Local development
 
 ```sh
-git clone https://github.com/nf-osi/portal-chatbot.git
+git clone --recurse-submodules https://github.com/nf-osi/portal-chatbot.git
 cd portal-chatbot/docs
-npm install
-npm run dev
+hugo server
+```
+
+If you already cloned without `--recurse-submodules`, fetch the theme with:
+
+```sh
+git submodule update --init --recursive
 ```
 
 ## Build
 
 ```sh
 cd docs
-npm run build   # outputs to site/dist/, not committed
+hugo --minify   # outputs to docs/public/, not committed
 ```
 
 ## CI / GitHub Pages
 
-`.github/workflows/deploy-docs.yml` checks out the repo, installs, and builds. The site is served at `https://nf-osi.github.io/portal-chatbot/`, hence `site`/`base` in `astro.config.mjs`.
+`.github/workflows/deploy-docs.yml` checks out the repo (with submodules), installs Hugo, and builds. The site is served at `https://nf-osi.github.io/portal-chatbot/`, hence `baseURL` in `hugo.toml`.

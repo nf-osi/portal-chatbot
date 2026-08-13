@@ -1,11 +1,13 @@
 ---
 title: Grounded retrieval
-description: Testing whether the agent's answers are grounded in the correct source material.
+weight: 20
 ---
+
+# Grounded retrieval
 
 ## What this tests
 
-Grounded retrieval evaluates a single knowledge source in isolation: given a question with a known correct answer, does the agent retrieve the right document and produce an answer consistent with it? This is the baseline eval every portal copilot needs — any agent with at least one docs knowledge base should have one of these, even before adding [source routing](/source-routing/) for multi-source setups.
+Grounded retrieval evaluates a single knowledge source in isolation: given a question with a known correct answer, does the agent retrieve the right document and produce an answer consistent with it? This is the baseline eval every portal copilot needs — any agent with at least one docs knowledge base should have one of these, even before adding [source routing](/docs/benchmarking-and-evaluation/source-routing/) for multi-source setups.
 
 The NF Portal Copilot's version of this is the **general-help benchmark** (`benchmark/general-help/`), which evaluates the docs KB built from help.nf.synapse.org.
 

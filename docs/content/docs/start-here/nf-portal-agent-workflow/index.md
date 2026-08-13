@@ -1,7 +1,9 @@
 ---
 title: Reference workflow
-description: Diagram of the NF Portal agent architecture, feedback loop, and CI/CD flow.
+weight: 20
 ---
+
+# Reference workflow
 
 The NF Portal Copilot combines documentation and knowledge-graph sources behind a Bedrock agent, then iterates through evaluation before promoting changes from dev to prod.
 

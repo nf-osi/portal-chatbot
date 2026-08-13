@@ -1,7 +1,9 @@
 ---
 title: Deployment
-description: The dev/prod stack workflow, CI/CD, knowledge base setup, and Synapse agent registration.
+weight: 40
 ---
+
+# Deployment
 
 ## Two stacks: dev and prod
 

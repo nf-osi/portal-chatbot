@@ -1,0 +1,10 @@
+:root {
+  --color-link: #6d28d9;
+  --color-visited-link: #6d28d9;
+}
+
+/* plain markdown quotes (not GFM alerts) shouldn't pick up hint-box coloring */
+.book-hint:not(.note):not(.tip):not(.important):not(.warning):not(.caution):not(.default):not(.info):not(.success):not(.danger) {
+  border-color: var(--gray-200);
+  background: none;
+}

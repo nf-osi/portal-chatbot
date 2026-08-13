@@ -1,9 +1,15 @@
 ---
 title: So you want a portal copilot?
-description: Building a Bedrock-based portal copilot, with lessons from the NF Portal Copilot.
+weight: 10
+bookFlatSection: true
+bookCollapseSection: false
+bookIcon: flag
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+# So you want a portal copilot?
+
+> [!NOTE]
+> This guide covers the **Classic Agent** framework (console/CloudFormation-managed, Bedrock-orchestrated) — see [Available custom agent frameworks](#available-custom-agent-frameworks) below for how it compares to AgentCore Agent.
 
 This guide builds on [Adding Custom Agents to Synapse](https://sagebionetworks.jira.com/wiki/spaces/PLFM/pages/3711303683/Adding+Custom+Agents+to+Synapse), which covers the basics of creating a Bedrock Agent and registering it with the Synapse chat interface. Start there if you're new to the framework.
 
@@ -13,14 +19,13 @@ This goes further with lessons from the NF Portal Copilot, an agent with multipl
 
 Custom agents are really built upon AWS Bedrock, and Bedrock offers two agent frameworks. This guide covers the **Classic Agent**, what's available now. **AgentCore Agent** will be available for Synapse custom agents in the near future.
 
-<CardGrid>
-	<Card title="Classic Agent" icon="approve-check">
-		Console/CloudFormation-managed. Bedrock handles orchestration; configure behavior via instructions, action groups, and KB associations. Little to no custom orchestration code required. **This guide's focus.**
-	</Card>
-	<Card title="AgentCore Agent" icon="rocket">
-		A code-first runtime for agents built on Strands, LangGraph, or CrewAI, with modular services for memory, identity, gateway, and observability. Full control over orchestration, more implementation work. **Available for Synapse custom agents soon.**
-	</Card>
-</CardGrid>
+{{% columns %}}
+- ### Classic Agent
+  Console/CloudFormation-managed. Bedrock handles orchestration; configure behavior via instructions, action groups, and KB associations. Little to no custom orchestration code required. **This guide's focus.**
+
+- ### AgentCore Agent
+  A code-first runtime for agents built on Strands, LangGraph, or CrewAI, with modular services for memory, identity, gateway, and observability. Full control over orchestration, more implementation work. **Available for Synapse custom agents soon.**
+{{% /columns %}}
 
 See [Amazon Bedrock Classic Agent vs AgentCore Agent](https://builder.aws.com/content/37CiyFazLQbrG6RC7lR6c1a2fPQ/amazon-bedrock-classic-agent-vs-agentcore-agent) for the full comparison, including migration considerations.
 
@@ -35,17 +40,17 @@ Getting a "base" Copilot running is mostly domain and data science work, with so
 | **Evaluation** | 50% | Creating benchmark datasets, writing eval scripts, running evals, **iterating** | Domain knowledge, basic data science (Python, metrics) |
 | **DevOps** | 20% | CloudFormation deployment, Lambda packaging, S3, IAM roles, creating Bedrock KB from crawlable help docs, GitHub Actions CI/CD | AWS, basic shell/CLI |
 
-**Notes** 
-- Design and scoping effort can be even larger than estimated; the decisions here directly shape evaluation and prompt engineering. 
-From there the biggest ongoing investment will be evaluation, since creating a meaningful benchmark dataset that reflects real user questions requires domain expertise or more user research. 
-DevOps is largely one-time setup made easier by the template and CI/CD workflow. 
+**Notes**
+- Design and scoping effort can be even larger than estimated; the decisions here directly shape evaluation and prompt engineering.
+From there the biggest ongoing investment will be evaluation, since creating a meaningful benchmark dataset that reflects real user questions requires domain expertise or more user research.
+DevOps is largely one-time setup made easier by the template and CI/CD workflow.
 Prompt engineering is ongoing but the reference instructions give a solid starting point.
 - This **does not** account for setup of additional custom knowledgebases (KBs) that are not simply crawlable docs.
 
 ## What you're building
 
-At minimum you can have a Bedrock Agent with a docs KB for the first iteration of a useful Copilot. 
-The other optional features depend on scoping and availability. 
+At minimum you can have a Bedrock Agent with a docs KB for the first iteration of a useful Copilot.
+The other optional features depend on scoping and availability.
 
 The Copilot:
 - Answers questions from documentation knowledgebase(s)
@@ -55,7 +60,7 @@ The Copilot:
 
 ## Where to go next
 
-- [Reference workflow](/nf-portal-agent-workflow/) — diagram of the agent architecture, feedback loop, and CI/CD flow
-- [Templates](/templates/) — the Lambda function and CloudFormation template you can adapt for your own portal
-- [Deployment](/deployment/) — the dev/prod stack workflow, CI/CD, knowledge base setup, and Synapse registration
-- [Benchmarking and evaluation](/benchmarking-and-evaluation/) — where most of the ongoing effort goes
+- [Reference workflow](/docs/start-here/nf-portal-agent-workflow/) — diagram of the agent architecture, feedback loop, and CI/CD flow
+- [Templates](/docs/start-here/templates/) — the Lambda function and CloudFormation template you can adapt for your own portal
+- [Deployment](/docs/start-here/deployment/) — the dev/prod stack workflow, CI/CD, knowledge base setup, and Synapse registration
+- [Benchmarking and evaluation](/docs/benchmarking-and-evaluation/) — where most of the ongoing effort goes

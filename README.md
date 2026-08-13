@@ -8,7 +8,7 @@ This repository contains configuration, test datasets, and other resources for N
 
 ## Documentation
 
-Guides and architecture notes live in [`docs/`](docs/). The docs site is built with [Astro Starlight](https://starlight.astro.build); the site tooling lives separately on the `docs` branch under `site/`, which is built by copying this folder's content into place. See [`site/README.md` on the `docs` branch](https://github.com/nf-osi/portal-chatbot/blob/docs/site/README.md) for local dev setup. Deploys to GitHub Pages automatically via `.github/workflows/deploy-docs.yml` on changes to `docs/`.
+Guides and architecture notes live in [`docs/`](docs/). The docs site is built with [Hugo](https://gohugo.io) and the [hugo-book](https://themes.gohugo.io/themes/hugo-book/) theme; see [`docs/README.md`](docs/README.md) for local dev setup. Deploys to GitHub Pages automatically via [`.github/workflows/deploy-docs.yml`](.github/workflows/deploy-docs.yml) on changes to `docs/`.
 
 ## Agent Registrations
 

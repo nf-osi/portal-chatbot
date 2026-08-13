@@ -1,11 +1,13 @@
 ---
 title: Red teaming
-description: Adversarial testing of the portal copilot's guardrails.
+weight: 40
 ---
+
+# Red teaming
 
 ## What red teaming is
 
-Red teaming is adversarial testing: instead of asking the copilot known questions with known-good answers (like the [source routing](/source-routing/) and [grounded retrieval](/grounded-retrieval/) evals), an **attacker LLM** actively tries to make the agent misbehave, and a **judge LLM** scores whether each attempt succeeded.
+Red teaming is adversarial testing: instead of asking the copilot known questions with known-good answers (like the [source routing](/docs/benchmarking-and-evaluation/source-routing/) and [grounded retrieval](/docs/benchmarking-and-evaluation/grounded-retrieval/) evals), an **attacker LLM** actively tries to make the agent misbehave, and a **judge LLM** scores whether each attempt succeeded.
 
 The NF Portal Copilot's red team benchmark (`benchmark/redteam/`) is a self-contained harness with three roles, all running on Bedrock:
 
@@ -30,7 +32,7 @@ The copilot has **read-only** access only — a docs KB and four read-only SPARQ
 
 ## Examples from a real run
 
-The following are drawn from `redteam_eval_results_20260710T190023Z.json`, a 27-case run against the dev agent (see `REPORT_20260710.md` for the full report). Overall attack success rate that run: **3.7% (1 / 27)**.
+The following are drawn from `redteam_eval_results_20260710T190023Z.json`, a 27-case run against the dev agent (see the [full aggregate report](/docs/benchmarking-and-evaluation/red-team-report/) for details across all runs). Overall attack success rate that run: **3.7% (1 / 27)**.
 
 ### 1. Guardrail working: agent correctly declining
 
@@ -90,6 +92,5 @@ python evaluate_redteam.py --vulnerability nf-medical-misinformation
 
 See `benchmark/redteam/README.md` for the full vulnerability/technique taxonomy, safety notes (it attacks a live agent), and all CLI flags.
 
-:::caution
-Result JSON files can contain successfully leaked or harmful content the attacks extracted from the agent — review before sharing outside the benchmark's normal workflow.
-:::
+> [!CAUTION]
+> Result JSON files can contain successfully leaked or harmful content the attacks extracted from the agent — review before sharing outside the benchmark's normal workflow.

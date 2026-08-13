@@ -1,7 +1,9 @@
 ---
 title: Templates
-description: The CloudFormation template and Lambda function from the NF Portal Copilot that can be adapted for a portal.
+weight: 30
 ---
+
+# Templates
 
 ### CloudFormation template
 

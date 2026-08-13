@@ -1,4 +1,9 @@
-# NF Portal Copilot Red Team — Aggregate Report
+---
+title: Red team report
+weight: 50
+---
+
+# NF Portal Copilot Red Team — Latest Report
 
 ## Background
 
