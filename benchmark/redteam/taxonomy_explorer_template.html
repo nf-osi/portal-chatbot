@@ -75,6 +75,13 @@
   .stat-pill.good .stat-num{color:var(--good);}
   .stat-pill.muted .stat-num{color:var(--text-faint);}
 
+  .runs-table{width:100%; border-collapse:collapse; font-size:13px; background:var(--panel); border:1px solid var(--border); border-radius:10px; overflow:hidden;}
+  .runs-table th, .runs-table td{padding:10px 14px; text-align:left; border-bottom:1px solid var(--border-soft);}
+  .runs-table th{font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--text-faint); background:#fafbfe;}
+  .runs-table tr:last-child td{border-bottom:none;}
+  .runs-table tr:hover td{background:#fafbfe;}
+  .runs-table td.mono{font-family:var(--mono); font-size:12.5px;}
+
   /* Master-detail split: list on the left, example panel pinned on the right */
   .split{display:flex; gap:18px; align-items:flex-start;}
   .split-list{flex:0 0 340px; min-width:0;}
@@ -180,6 +187,7 @@
   <nav class="tabs">
     <button class="tab-btn active" data-tab="techniques">Attack Techniques</button>
     <button class="tab-btn" data-tab="taxonomy">Vulnerability Taxonomy</button>
+    <button class="tab-btn" data-tab="runs">Runs</button>
   </nav>
 
   <main class="content">
@@ -201,6 +209,11 @@
         <div class="split-list" id="taxList"></div>
         <div class="split-detail" id="taxDetail"></div>
       </div>
+    </section>
+
+    <section id="runs-panel" class="tab-panel">
+      <p class="result-count" id="runsCount"></p>
+      <div id="runsTableHost"></div>
     </section>
   </main>
 
@@ -294,8 +307,7 @@
     var o = DATA.meta.overallStats;
     var rate = o.attempts ? (100 * o.succeeded / o.attempts).toFixed(1) : '0.0';
     document.getElementById('metaLine').textContent =
-      DATA.meta.nRuns + ' run(s) aggregated: ' + DATA.meta.runFiles.join(', ') +
-      '  ·  ' + o.attempts + ' attack attempts, ' + o.succeeded + ' succeeded (' + rate + '%)';
+      DATA.meta.nRuns + ' run(s) aggregated  ·  ' + o.attempts + ' attack attempts, ' + o.succeeded + ' succeeded (' + rate + '%) — see the Runs tab for per-run detail';
   })();
 
   // -------------------------------------------------------------------
@@ -639,10 +651,41 @@
     renderTaxDetail(items.find(function(i){ return taxRowId(i) === taxState.selected; }) || null);
   }
 
+  // -------------------------------------------------------------------
+  // Runs tab
+  // -------------------------------------------------------------------
+  function renderRuns(){
+    document.getElementById('runsCount').textContent = DATA.runs.length + ' run(s) aggregated into the stats above';
+    var host = document.getElementById('runsTableHost');
+    if (!DATA.runs.length){
+      host.innerHTML = '<p class="empty-note">No result files were found when this page was generated.</p>';
+      return;
+    }
+    var rows = DATA.runs.map(function(r){
+      var rate = r.stats.attempts ? (100 * r.stats.succeeded / r.stats.attempts).toFixed(1) : '0.0';
+      return ''
+        + '<tr>'
+        +   '<td class="mono">' + escapeHtml(r.file) + '</td>'
+        +   '<td class="mono">' + escapeHtml(r.timestamp) + '</td>'
+        +   '<td class="mono">' + escapeHtml(r.attackerModel) + '</td>'
+        +   '<td class="mono">' + escapeHtml(r.judgeModel) + '</td>'
+        +   '<td>' + r.stats.attempts + '</td>'
+        +   '<td>' + outcomeBadge(r.stats) + '</td>'
+        +   '<td>' + r.stats.noVerdict + '</td>'
+        +   '<td>' + (r.nErrors || 0) + '</td>'
+        + '</tr>';
+    }).join('');
+    host.innerHTML = ''
+      + '<table class="runs-table"><thead><tr>'
+      +   '<th>File</th><th>Timestamp</th><th>Attacker</th><th>Judge</th><th>Cases</th><th>Outcome</th><th>No verdict</th><th>Errors</th>'
+      + '</tr></thead><tbody>' + rows + '</tbody></table>';
+  }
+
   renderTechFilters();
   renderTechList();
   renderTaxFilters();
   renderTaxList();
+  renderRuns();
 })();
 </script>
 </body>

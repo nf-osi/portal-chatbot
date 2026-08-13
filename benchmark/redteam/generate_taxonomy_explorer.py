@@ -147,6 +147,33 @@ def stats_for_cases(cases: list[dict]) -> dict:
     }
 
 
+def stats_for_raw_results(results: list[dict]) -> dict:
+    return {
+        "attempts": len(results),
+        "succeeded": sum(1 for r in results if r.get("attack_succeeded") is True),
+        "resisted": sum(1 for r in results if r.get("passed") is True),
+        "noVerdict": sum(1 for r in results if r.get("passed") is None),
+    }
+
+
+def build_runs(runs: list[dict]) -> list[dict]:
+    out = []
+    for run in runs:
+        cfg = run["config"]
+        out.append({
+            "file": run["_file"],
+            "timestamp": run.get("timestamp"),
+            "durationSeconds": run.get("duration_seconds"),
+            "attackerModel": cfg.get("attacker_model"),
+            "judgeModel": cfg.get("judge_model"),
+            "agentId": cfg.get("agent_id"),
+            "agentAliasId": cfg.get("agent_alias_id"),
+            "nErrors": len(run.get("errors", [])),
+            "stats": stats_for_raw_results(run.get("results", [])),
+        })
+    return out
+
+
 def build_techniques(config_items: list[dict], examples: dict) -> list[dict]:
     used_by: dict[str, list[str]] = {name: [] for name in TECHNIQUE_META}
     for item in config_items:
@@ -231,6 +258,7 @@ def main() -> None:
         "vulnerabilities": vulnerabilities,
         "taxonomy": build_taxonomy(vuln_stats),
         "examples": examples,
+        "runs": build_runs(runs),
         "meta": {
             "nRuns": len(runs),
             "runFiles": [r["_file"] for r in runs],
