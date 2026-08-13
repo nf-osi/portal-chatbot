@@ -8,7 +8,7 @@ The NF Portal Copilot's design already reduces several attack surfaces. It has r
 
 ## Methodology 
 
-We aggregated 3 runs against the dev Bedrock agent (`ERAAPKTD4Q` / `TSTALIASID`), which currently has the same configuration as prod. See `benchmark/redteam/README.md` for the harness design and `benchmark/redteam/aggregate_redteam.py` for how these numbers are computed.
+We aggregated 3 runs against the dev Bedrock agent (`ERAAPKTD4Q` / `TSTALIASID`). Dev is typically kept in sync with the prod `live` alias, but dev is ahead of prod by design — changes land there first — so the two can diverge for periods of time, and at the time of this report's runs they did (dev's instructions differed from prod's). These results characterize the dev configuration tested, not a verified equivalent of prod; treat prod validation as a follow-up before citing these numbers as representative of prod behavior. See `benchmark/redteam/README.md` for the harness design and `benchmark/redteam/aggregate_redteam.py` for how these numbers are computed.
 
 ### Taxonomy covered
 
