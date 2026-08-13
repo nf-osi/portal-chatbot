@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NF Portal Copilot — Red Team Taxonomy Explorer</title>
+<style>
+  :root{
+    --bg:#f5f6fa; --panel:#ffffff; --border:#e2e5ec; --border-soft:#edeef3;
+    --text:#1b1f27; --text-muted:#667085; --text-faint:#98a1b3;
+    --accent:#3654d6; --accent-ink:#22399e; --accent-soft:#eaeeff;
+    --good:#157a4c; --good-soft:#e3f7ec; --good-border:#bfe8d3;
+    --bad:#b3261e; --bad-soft:#fdeaea; --bad-border:#f3c6c4;
+    --warn:#9a5b00; --warn-soft:#fdf1de; --warn-border:#f0dcae;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg); color:var(--text); font-family:var(--sans);
+    font-size:14.5px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent);}
+
+  .topbar{background:linear-gradient(180deg,#20264a,#171b36); color:#f2f4ff; padding:28px 24px 22px;}
+  .topbar-inner{max-width:980px; margin:0 auto;}
+  .topbar h1{margin:0 0 6px; font-size:22px; font-weight:650; letter-spacing:-0.01em;}
+  .topbar .subtitle{margin:0; color:#c3c9ec; font-size:14px; max-width:720px;}
+  .meta-line{margin-top:14px; font-size:12.5px; color:#9aa3d6; font-family:var(--mono);}
+
+  .tabs{
+    max-width:980px; margin:0 auto; display:flex; gap:4px; padding:16px 24px 0;
+  }
+  .tab-btn{
+    appearance:none; border:none; background:transparent; color:var(--text-muted);
+    font:inherit; font-weight:600; font-size:13.5px; padding:10px 16px; border-radius:8px 8px 0 0;
+    cursor:pointer; border:1px solid transparent;
+  }
+  .tab-btn.active{
+    background:var(--panel); color:var(--text); border-color:var(--border);
+    border-bottom-color:var(--panel); position:relative; top:1px;
+  }
+  .tab-btn:not(.active):hover{color:var(--text); background:#eceefa;}
+
+  .content{max-width:980px; margin:0 auto; padding:0 24px 60px;}
+  .tab-panel{display:none; border-top:1px solid var(--border); padding-top:18px;}
+  .tab-panel.active{display:block;}
+
+  .filters{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:16px;}
+  .filter-group{display:flex; gap:6px; align-items:center; background:var(--panel); border:1px solid var(--border);
+    border-radius:9px; padding:4px;}
+  .filter-group .glabel{font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.04em; padding:0 8px 0 6px;}
+  .chip{
+    appearance:none; border:1px solid transparent; background:transparent; color:var(--text-muted);
+    font:inherit; font-size:12.5px; font-weight:600; padding:6px 11px; border-radius:6px; cursor:pointer;
+    white-space:nowrap;
+  }
+  .chip:hover{background:var(--border-soft); color:var(--text);}
+  .chip.active{background:var(--accent); color:#fff;}
+  .search-input{
+    flex:1; min-width:180px; background:var(--panel); border:1px solid var(--border); border-radius:9px;
+    padding:9px 12px; font:inherit; font-size:13px; color:var(--text);
+  }
+  .search-input:focus{outline:2px solid var(--accent-soft); border-color:var(--accent);}
+  .result-count{font-size:12px; color:var(--text-faint); margin:0 0 10px;}
+
+  .card{
+    background:var(--panel); border:1px solid var(--border); border-radius:10px; margin-bottom:10px;
+    overflow:hidden;
+  }
+  .card-head{
+    display:flex; align-items:flex-start; gap:12px; padding:13px 16px; cursor:pointer;
+  }
+  .card-head:hover{background:#fafbfe;}
+  .chevron{flex:0 0 auto; margin-top:2px; color:var(--text-faint); transition:transform .15s ease; font-size:11px;}
+  .card.open .chevron{transform:rotate(90deg); color:var(--accent);}
+  .card-head-main{flex:1; min-width:0;}
+  .card-title-row{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .card-id{font-family:var(--mono); font-weight:650; font-size:13.5px;}
+  .badge{
+    display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:650; padding:2px 8px;
+    border-radius:100px; border:1px solid transparent; text-transform:uppercase; letter-spacing:.02em;
+  }
+  .badge-dot{width:6px;height:6px;border-radius:50%;display:inline-block;}
+  .st-covered{background:var(--good-soft); color:var(--good); border-color:var(--good-border);}
+  .st-deferred{background:var(--warn-soft); color:var(--warn); border-color:var(--warn-border);}
+  .st-na{background:#eef0f4; color:var(--text-faint); border-color:var(--border);}
+  .badge-plain{background:var(--border-soft); color:var(--text-muted);}
+  .badge-group{background:var(--accent-soft); color:var(--accent-ink);}
+  .card-desc{margin:5px 0 0; color:var(--text-muted); font-size:13px;}
+  .used-by{margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;}
+  .used-by .tagpill{
+    font-family:var(--mono); font-size:11.5px; background:var(--border-soft); color:var(--text-muted);
+    padding:2px 8px; border-radius:100px;
+  }
+
+  .card-body{padding:2px 16px 18px 43px; display:none; border-top:1px solid var(--border-soft);}
+  .card.open .card-body{display:block; padding-top:14px;}
+  .body-block{margin-bottom:14px;}
+  .body-block h4{margin:0 0 4px; font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--text-faint);}
+  .body-block p{margin:0; font-size:13.5px; color:var(--text);}
+  .human-style-note{font-size:12.5px; color:var(--accent-ink); background:var(--accent-soft); border-radius:6px; padding:6px 10px; display:inline-block;}
+
+  .pill-tabs{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;}
+  .pill-tab{
+    font-family:var(--mono); font-size:12px; font-weight:600; padding:5px 11px; border-radius:100px;
+    border:1px solid var(--border); background:var(--panel); color:var(--text-muted); cursor:pointer;
+  }
+  .pill-tab.active{background:var(--accent); border-color:var(--accent); color:#fff;}
+  .pill-tab:hover:not(.active){border-color:var(--accent); color:var(--accent-ink);}
+
+  .empty-note{font-size:13px; color:var(--text-faint); font-style:italic; padding:6px 0;}
+
+  .coverage-block{border:1px solid var(--border-soft); border-radius:8px; padding:12px; margin-bottom:10px; background:#fbfbfd;}
+  .coverage-head{display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap;}
+  .coverage-goal{font-size:12.5px; color:var(--text-muted); margin:0 0 10px;}
+
+  .run-select{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;}
+  .run-chip{
+    display:flex; align-items:center; gap:6px; font-size:12px; font-weight:600; padding:5px 10px;
+    border-radius:100px; border:1px solid var(--border); background:var(--panel); color:var(--text-muted); cursor:pointer;
+  }
+  .run-chip.active{border-color:var(--accent); color:var(--accent-ink); background:var(--accent-soft);}
+  .run-dot-pass{background:var(--good);} .run-dot-fail{background:var(--bad);} .run-dot-null{background:var(--text-faint);}
+
+  .verdict-banner{
+    display:flex; align-items:flex-start; gap:10px; padding:10px 12px; border-radius:8px; margin-bottom:10px; font-size:13px;
+  }
+  .verdict-banner.pass{background:var(--good-soft); border:1px solid var(--good-border); color:#0d5d38;}
+  .verdict-banner.fail{background:var(--bad-soft); border:1px solid var(--bad-border); color:#8c1d16;}
+  .verdict-banner.null{background:#f1f2f6; border:1px solid var(--border); color:var(--text-muted);}
+  .verdict-banner .vb-title{font-weight:700; display:block; margin-bottom:2px;}
+  .run-meta{font-size:11.5px; color:var(--text-faint); font-family:var(--mono); margin-bottom:12px;}
+
+  .transcript{display:flex; flex-direction:column; gap:10px;}
+  .turn{display:flex;}
+  .turn.attacker{justify-content:flex-end;}
+  .turn.agent{justify-content:flex-start;}
+  .bubble{max-width:82%; padding:10px 13px; border-radius:11px; font-size:13px;}
+  .bubble .role{display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px; opacity:.65; font-weight:700;}
+  .turn.attacker .bubble{background:#2c3050; color:#eef0ff; border-bottom-right-radius:3px;}
+  .turn.agent .bubble{background:#eef1f6; color:var(--text); border-bottom-left-radius:3px;}
+  .bubble a{color:#9db4ff;}
+  .turn.agent .bubble a{color:var(--accent-ink);}
+  .bubble code{background:rgba(0,0,0,.12); padding:1px 4px; border-radius:4px; font-family:var(--mono); font-size:12px;}
+  .turn.agent .bubble code{background:rgba(0,0,0,.06);}
+
+  .error-note{font-size:12px; color:var(--warn); margin-top:6px;}
+  footer{max-width:980px; margin:0 auto; padding:20px 24px 40px; color:var(--text-faint); font-size:11.5px;}
+</style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <h1>Red Team Taxonomy Explorer</h1>
+      <p class="subtitle">Attack techniques and the deepteam vulnerability taxonomy behind the NF Portal Copilot redteam benchmark, illustrated with real transcripts pulled from harness runs. Filter, then expand a row for the directive/notes and a live example.</p>
+      <div class="meta-line" id="metaLine"></div>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="techniques">Attack Techniques</button>
+    <button class="tab-btn" data-tab="taxonomy">Vulnerability Taxonomy</button>
+  </nav>
+
+  <main class="content">
+    <section id="techniques-panel" class="tab-panel active">
+      <div class="filters" id="techFilters"></div>
+      <p class="result-count" id="techCount"></p>
+      <div class="list" id="techList"></div>
+    </section>
+
+    <section id="taxonomy-panel" class="tab-panel">
+      <div class="filters" id="taxFilters"></div>
+      <p class="result-count" id="taxCount"></p>
+      <div class="list" id="taxList"></div>
+    </section>
+  </main>
+
+  <footer>Generated by <code>generate_taxonomy_explorer.py</code> from <code>redteam_config.json</code> and local <code>redteam_eval_results_*.json</code> runs. Contains real attacker/agent transcripts — handle with the same care as the raw result files (see benchmark/redteam/README.md Safety section).</footer>
+
+<script type="application/json" id="data-blob">__DATA__</script>
+<script>
+(function(){
+  "use strict";
+  var DATA = JSON.parse(document.getElementById('data-blob').textContent);
+  var vulnById = {};
+  DATA.vulnerabilities.forEach(function(v){ vulnById[v.id] = v; });
+
+  function escapeHtml(str){
+    return String(str == null ? '' : str).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function mdish(raw){
+    var s = escapeHtml(raw);
+    s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    s = s.replace(/`([^`]+?)`/g, '<code>$1</code>');
+    s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    s = s.replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>');
+    return s;
+  }
+  function el(html){
+    var d = document.createElement('div');
+    d.innerHTML = html;
+    return d.firstElementChild;
+  }
+  function statusBadge(status){
+    var map = {
+      covered: ['st-covered', 'Covered'], used: ['st-covered', 'Used'],
+      deferred: ['st-deferred', 'Deferred'], unpaired: ['st-deferred', 'Unpaired'],
+      na: ['st-na', 'N/A']
+    };
+    var m = map[status] || ['badge-plain', status];
+    return '<span class="badge ' + m[0] + '">' + m[1] + '</span>';
+  }
+
+  // -------------------------------------------------------------------
+  // Meta line
+  // -------------------------------------------------------------------
+  document.getElementById('metaLine').textContent =
+    DATA.meta.nRuns + ' run(s) aggregated: ' + DATA.meta.runFiles.join(', ');
+
+  // -------------------------------------------------------------------
+  // Tabs
+  // -------------------------------------------------------------------
+  document.querySelectorAll('.tab-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+      document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab + '-panel').classList.add('active');
+    });
+  });
+
+  // -------------------------------------------------------------------
+  // Example viewer (shared by both tabs)
+  // -------------------------------------------------------------------
+  function renderExampleBlock(vulnId, technique){
+    var key = vulnId + '::' + technique;
+    var cases = DATA.examples[key] || [];
+    if (!cases.length){
+      return '<p class="empty-note">No recorded run covers this exact pairing yet.</p>';
+    }
+    var wrap = document.createElement('div');
+    var runSelect = document.createElement('div');
+    runSelect.className = 'run-select';
+    var body = document.createElement('div');
+
+    function dotClass(c){
+      if (c.attackSucceeded === true) return 'run-dot-fail';
+      if (c.passed === true) return 'run-dot-pass';
+      return 'run-dot-null';
+    }
+    function renderCase(idx){
+      var c = cases[idx];
+      Array.prototype.forEach.call(runSelect.children, function(chip, i){
+        chip.classList.toggle('active', i === idx);
+      });
+      var verdictClass = c.attackSucceeded === true ? 'fail' : (c.passed === true ? 'pass' : 'null');
+      var verdictTitle = c.attackSucceeded === true ? 'Attack succeeded — agent failed to resist'
+        : (c.passed === true ? 'Attack resisted' : 'No verdict (' + (c.turnError || 'judge parse failure') + ')');
+      var html = ''
+        + '<div class="verdict-banner ' + verdictClass + '">'
+        +   '<div><span class="vb-title">' + escapeHtml(verdictTitle) + '</span>' + escapeHtml(c.reason || '') + '</div>'
+        + '</div>'
+        + '<div class="run-meta">' + escapeHtml(c.runFile) + ' · attacker=' + escapeHtml(c.attackerModel) + ' · judge=' + escapeHtml(c.judgeModel) + ' · ' + escapeHtml(c.mode) + ', ' + escapeHtml(c.nTurns) + ' turn(s)</div>'
+        + (c.turnError ? '<div class="error-note">Degraded run: ' + escapeHtml(c.turnError) + '</div>' : '')
+        + '<div class="transcript">';
+      (c.turns || []).forEach(function(t){
+        html += '<div class="turn attacker"><div class="bubble"><span class="role">Attacker</span>' + mdish(t.attacker) + '</div></div>';
+        if (t.agent){
+          html += '<div class="turn agent"><div class="bubble"><span class="role">Agent</span>' + mdish(t.agent) + '</div></div>';
+        }
+      });
+      html += '</div>';
+      body.innerHTML = html;
+    }
+    cases.forEach(function(c, idx){
+      var chip = document.createElement('button');
+      chip.className = 'run-chip';
+      chip.innerHTML = '<span class="badge-dot ' + dotClass(c) + '"></span> Run ' + (idx+1);
+      chip.title = c.runFile + ' (' + c.runTimestamp + ')';
+      chip.addEventListener('click', function(){ renderCase(idx); });
+      runSelect.appendChild(chip);
+    });
+    wrap.appendChild(runSelect);
+    wrap.appendChild(body);
+    renderCase(0);
+    return wrap;
+  }
+
+  function appendMaybeNode(container, htmlOrNode){
+    if (typeof htmlOrNode === 'string'){ container.insertAdjacentHTML('beforeend', htmlOrNode); }
+    else { container.appendChild(htmlOrNode); }
+  }
+
+  // -------------------------------------------------------------------
+  // Techniques tab
+  // -------------------------------------------------------------------
+  var techState = { search: '', turn: 'all', status: 'all' };
+
+  function renderTechFilters(){
+    var box = document.getElementById('techFilters');
+    box.innerHTML = '';
+    box.appendChild(el(
+      '<div class="filter-group"><span class="glabel">Turn</span>' +
+      ['all','single','multi'].map(function(v){
+        return '<button class="chip" data-k="turn" data-v="'+v+'">' + (v==='all'?'All':v) + '</button>';
+      }).join('') + '</div>'
+    ));
+    box.appendChild(el(
+      '<div class="filter-group"><span class="glabel">Status</span>' +
+      ['all','used','unpaired'].map(function(v){
+        return '<button class="chip" data-k="status" data-v="'+v+'">' + (v==='all'?'All':v) + '</button>';
+      }).join('') + '</div>'
+    ));
+    var search = document.createElement('input');
+    search.className = 'search-input';
+    search.placeholder = 'Search techniques…';
+    search.addEventListener('input', function(){ techState.search = search.value.toLowerCase(); renderTechList(); });
+    box.appendChild(search);
+
+    box.querySelectorAll('.chip[data-k]').forEach(function(chip){
+      chip.addEventListener('click', function(){
+        techState[chip.dataset.k] = chip.dataset.v;
+        syncChipActive(box, techState);
+        renderTechList();
+      });
+    });
+    syncChipActive(box, techState);
+  }
+  function syncChipActive(box, state){
+    box.querySelectorAll('.chip[data-k]').forEach(function(chip){
+      chip.classList.toggle('active', state[chip.dataset.k] === chip.dataset.v);
+    });
+  }
+
+  var techOpen = {};
+  function renderTechList(){
+    var list = document.getElementById('techList');
+    list.innerHTML = '';
+    var items = DATA.techniques.filter(function(t){
+      if (techState.turn !== 'all' && t.turn !== techState.turn) return false;
+      if (techState.status !== 'all' && t.status !== techState.status) return false;
+      if (techState.search && t.id.toLowerCase().indexOf(techState.search) === -1
+          && t.directive.toLowerCase().indexOf(techState.search) === -1) return false;
+      return true;
+    });
+    document.getElementById('techCount').textContent = items.length + ' of ' + DATA.techniques.length + ' techniques';
+
+    items.forEach(function(t){
+      var card = document.createElement('div');
+      card.className = 'card' + (techOpen[t.id] ? ' open' : '');
+      var head = document.createElement('div');
+      head.className = 'card-head';
+      head.innerHTML = ''
+        + '<span class="chevron">&#9656;</span>'
+        + '<div class="card-head-main">'
+        +   '<div class="card-title-row"><span class="card-id">' + t.id + '</span>'
+        +     statusBadge(t.status)
+        +     '<span class="badge badge-plain">' + t.turn + '-turn</span>'
+        +     (t.humanStyle ? '<span class="badge badge-plain">human-style voice</span>' : '')
+        +   '</div>'
+        +   '<p class="card-desc">' + escapeHtml(t.directive) + '</p>'
+        +   (t.usedBy.length ? '<div class="used-by">' + t.usedBy.map(function(v){ return '<span class="tagpill">' + v + '</span>'; }).join('') + '</div>' : '')
+        + '</div>';
+      head.addEventListener('click', function(){
+        techOpen[t.id] = !techOpen[t.id];
+        renderTechList();
+      });
+      card.appendChild(head);
+
+      var bodyEl = document.createElement('div');
+      bodyEl.className = 'card-body';
+      if (techOpen[t.id]){
+        if (!t.usedBy.length){
+          bodyEl.innerHTML = '<p class="empty-note">Implemented but not currently paired with a config item — no live example.</p>';
+        } else {
+          var activeVuln = t.usedBy[0];
+          var pillTabs = document.createElement('div');
+          pillTabs.className = 'pill-tabs';
+          var exampleHost = document.createElement('div');
+          function refresh(){
+            pillTabs.querySelectorAll('.pill-tab').forEach(function(p){
+              p.classList.toggle('active', p.dataset.v === activeVuln);
+            });
+            exampleHost.innerHTML = '';
+            appendMaybeNode(exampleHost, renderExampleBlock(activeVuln, t.id));
+          }
+          t.usedBy.forEach(function(v){
+            var pill = document.createElement('button');
+            pill.className = 'pill-tab';
+            pill.dataset.v = v;
+            pill.textContent = v;
+            pill.addEventListener('click', function(){ activeVuln = v; refresh(); });
+            pillTabs.appendChild(pill);
+          });
+          bodyEl.appendChild(pillTabs);
+          bodyEl.appendChild(exampleHost);
+          refresh();
+        }
+      }
+      card.appendChild(bodyEl);
+      list.appendChild(card);
+    });
+  }
+
+  // -------------------------------------------------------------------
+  // Taxonomy tab
+  // -------------------------------------------------------------------
+  var groups = [];
+  DATA.taxonomy.forEach(function(t){ if (groups.indexOf(t.group) === -1) groups.push(t.group); });
+  var taxState = { search: '', group: 'all', status: 'all' };
+
+  function renderTaxFilters(){
+    var box = document.getElementById('taxFilters');
+    box.innerHTML = '';
+    box.appendChild(el(
+      '<div class="filter-group"><span class="glabel">Group</span>' +
+      ['all'].concat(groups).map(function(v){
+        return '<button class="chip" data-k="group" data-v="'+v+'">' + (v==='all'?'All':v) + '</button>';
+      }).join('') + '</div>'
+    ));
+    box.appendChild(el(
+      '<div class="filter-group"><span class="glabel">Status</span>' +
+      ['all','covered','deferred','na'].map(function(v){
+        return '<button class="chip" data-k="status" data-v="'+v+'">' + (v==='all'?'All':(v==='na'?'N/A':v)) + '</button>';
+      }).join('') + '</div>'
+    ));
+    var search = document.createElement('input');
+    search.className = 'search-input';
+    search.placeholder = 'Search vulnerability taxonomy…';
+    search.addEventListener('input', function(){ taxState.search = search.value.toLowerCase(); renderTaxList(); });
+    box.appendChild(search);
+
+    box.querySelectorAll('.chip[data-k]').forEach(function(chip){
+      chip.addEventListener('click', function(){
+        taxState[chip.dataset.k] = chip.dataset.v;
+        syncChipActive(box, taxState);
+        renderTaxList();
+      });
+    });
+    syncChipActive(box, taxState);
+  }
+
+  var taxOpen = {};
+  function renderTaxList(){
+    var list = document.getElementById('taxList');
+    list.innerHTML = '';
+    var items = DATA.taxonomy.filter(function(t){
+      if (taxState.group !== 'all' && t.group !== taxState.group) return false;
+      if (taxState.status !== 'all' && t.status !== taxState.status) return false;
+      if (taxState.search && t.name.toLowerCase().indexOf(taxState.search) === -1
+          && t.notes.toLowerCase().indexOf(taxState.search) === -1) return false;
+      return true;
+    });
+    document.getElementById('taxCount').textContent = items.length + ' of ' + DATA.taxonomy.length + ' vulnerability types';
+
+    items.forEach(function(t, i){
+      var rowId = t.group + '::' + t.name;
+      var card = document.createElement('div');
+      card.className = 'card' + (taxOpen[rowId] ? ' open' : '');
+      var head = document.createElement('div');
+      head.className = 'card-head';
+      head.innerHTML = ''
+        + '<span class="chevron">&#9656;</span>'
+        + '<div class="card-head-main">'
+        +   '<div class="card-title-row"><span class="badge badge-group">' + escapeHtml(t.group) + '</span>'
+        +     '<span class="card-id">' + escapeHtml(t.name) + '</span>'
+        +     statusBadge(t.status)
+        +   '</div>'
+        +   '<p class="card-desc">' + escapeHtml(t.notes) + '</p>'
+        +   (t.mappedIds.length ? '<div class="used-by">' + t.mappedIds.map(function(v){ return '<span class="tagpill">' + v + '</span>'; }).join('') + '</div>' : '')
+        + '</div>';
+      head.addEventListener('click', function(){
+        taxOpen[rowId] = !taxOpen[rowId];
+        renderTaxList();
+      });
+      card.appendChild(head);
+
+      var bodyEl = document.createElement('div');
+      bodyEl.className = 'card-body';
+      if (taxOpen[rowId]){
+        if (!t.mappedIds.length){
+          bodyEl.innerHTML = '<p class="empty-note">' +
+            (t.status === 'na' ? 'Not applicable to this read-only, single-tenant, single-agent architecture.' : 'Not yet covered by a config item.') +
+            '</p>';
+        } else {
+          t.mappedIds.forEach(function(vulnId){
+            var v = vulnById[vulnId];
+            if (!v) return;
+            var block = document.createElement('div');
+            block.className = 'coverage-block';
+            block.innerHTML = ''
+              + '<div class="coverage-head"><span class="card-id">' + vulnId + '</span>'
+              +   '<span class="badge badge-plain">' + v.mode + '-turn' + (v.maxTurns ? ' (max ' + v.maxTurns + ')' : '') + '</span>'
+              +   (v.persona ? '<span class="badge badge-plain">' + v.persona + ' persona</span>' : '')
+              + '</div>'
+              + '<p class="coverage-goal"><strong>Goal:</strong> ' + escapeHtml(v.goal) + '</p>';
+            var pillTabs = document.createElement('div');
+            pillTabs.className = 'pill-tabs';
+            var exampleHost = document.createElement('div');
+            var activeTech = v.techniques[0];
+            function refresh(){
+              pillTabs.querySelectorAll('.pill-tab').forEach(function(p){
+                p.classList.toggle('active', p.dataset.v === activeTech);
+              });
+              exampleHost.innerHTML = '';
+              appendMaybeNode(exampleHost, renderExampleBlock(vulnId, activeTech));
+            }
+            v.techniques.forEach(function(tech){
+              var pill = document.createElement('button');
+              pill.className = 'pill-tab';
+              pill.dataset.v = tech;
+              pill.textContent = tech;
+              pill.addEventListener('click', function(){ activeTech = tech; refresh(); });
+              pillTabs.appendChild(pill);
+            });
+            block.appendChild(pillTabs);
+            block.appendChild(exampleHost);
+            bodyEl.appendChild(block);
+            refresh();
+          });
+        }
+      }
+      card.appendChild(bodyEl);
+      list.appendChild(card);
+    });
+  }
+
+  renderTechFilters();
+  renderTechList();
+  renderTaxFilters();
+  renderTaxList();
+})();
+</script>
+</body>
+</html>

@@ -60,6 +60,14 @@ v1 entries:
 
 To add a new vulnerability, add an entry to `redteam_config.json` (validate against `redteam_schema.json`). New attack techniques require adding an entry to both the `TECHNIQUES` dict in `evaluate_redteam.py` and the schema's `techniques` enum.
 
+**Interactive explorer.** The tables below (Attack techniques, All deepteam vulnerability categories) are also available as a filterable, expandable HTML view with real transcript examples pulled from local runs:
+
+```bash
+python generate_taxonomy_explorer.py   # writes taxonomy_explorer.html, open it in a browser
+```
+
+That file embeds real attack/response transcripts, so it's gitignored — regenerate it locally rather than sharing the file itself; the underlying result files live on Synapse (see [Output](#output)).
+
 ### Attack techniques
 
 Each technique is a short directive the attacker LLM is told to apply when crafting its message (see the `TECHNIQUES` dict in `evaluate_redteam.py`). Names and definitions mirror the widely-used [deepteam taxonomy](https://trydeepteam.com/docs/red-teaming-adversarial-attacks) so the vocabulary is familiar, but the implementation is our own — a technique is a prompt-craft instruction, nothing more.
