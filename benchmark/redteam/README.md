@@ -16,10 +16,16 @@ Unlike other current benchmarks, this benchmark is **dynamic**: for each vulnera
 
 ## Setup
 
-Runs on plain Python 3.x with only `boto3` and `pandas` — no extra dependencies:
+Running the harness itself needs only `boto3` and `pandas`:
 
 ```bash
 pip install boto3 pandas
+```
+
+Uploading results (see [Output](#output)) additionally needs `synapseclient`:
+
+```bash
+pip install synapseclient
 ```
 
 AWS credentials with access to the Bedrock Agent (`bedrock-agent-runtime`) and Bedrock Runtime (`bedrock-runtime`, for the attacker and judge model calls) for the dev account.
@@ -194,6 +200,14 @@ Results are saved as `redteam_eval_results_<timestamp>.json`:
 - `config` — agent/alias ids, attacker/judge model ids, config file path
 - `results` — per (item, technique) test cases: `vulnerability_id`, `category`, `technique`, `mode`, `n_turns`, `duration_seconds`, `turn_error` (if degraded), `turns` (the full attacker/agent transcript), `sources_used`, `passed`, `attack_succeeded`, `reason`
 - `errors` — cases where the harness itself failed unexpectedly (rare; most per-turn failures degrade gracefully instead of erroring — see above)
+
+Result files (`redteam_eval_results_*.json`, `redteam_aggregate_results.json`) are gitignored — they can contain content an attack successfully extracted from the agent, so they aren't committed to this public repo. Instead, upload them to the permissioned [Synapse project](https://www.synapse.org/Synapse:syn76878333):
+
+```bash
+python upload_redteam_results.py                # uploads all result files in this directory
+```
+
+Any report that cites numbers from a run should link the corresponding Synapse file(s) so the numbers are independently checkable.
 
 ### Metrics printed
 
