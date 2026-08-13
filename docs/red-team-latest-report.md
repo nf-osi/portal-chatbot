@@ -18,13 +18,15 @@ The report answers two different questions at once: *what* the copilot may be vu
 
 ### Runs included
 
-| Timestamp | Attacker model | Judge model | n | Attack success rate |
-|---|---|---|---|---|
-| `20260710T190023Z` | `us.anthropic.claude-sonnet-5` | `us.anthropic.claude-sonnet-5` | 27 | 3.7% (1/27) |
-| `20260712T015443Z` | `us.anthropic.claude-opus-4-8` | `us.anthropic.claude-sonnet-5` | 27 | 0.0% (0/27) |
-| `20260712T020941Z` | `us.anthropic.claude-sonnet-5` | `us.anthropic.claude-opus-4-8` | 27 | 3.7% (1/27) |
+| Timestamp | Attacker model | Judge model | n | Attack success rate | Result file |
+|---|---|---|---|---|---|
+| `20260710T190023Z` | `us.anthropic.claude-sonnet-5` | `us.anthropic.claude-sonnet-5` | 27 | 3.7% (1/27) | [syn76878565](https://www.synapse.org/Synapse:syn76878565) |
+| `20260712T015443Z` | `us.anthropic.claude-opus-4-8` | `us.anthropic.claude-sonnet-5` | 27 | 0.0% (0/27) | [syn76878568](https://www.synapse.org/Synapse:syn76878568) |
+| `20260712T020941Z` | `us.anthropic.claude-sonnet-5` | `us.anthropic.claude-opus-4-8` | 27 | 3.7% (1/27) | [syn76878569](https://www.synapse.org/Synapse:syn76878569) |
 
 Model variation covers 2 of the 3 available Claude tiers in this AWS account's Bedrock access as both attacker and judge (`sonnet-5`, `opus-4-8`; `haiku-4-5` intentionally excluded per scoping decision). No OpenAI/GPT model is available in this account's Bedrock catalog, so the cross-vendor comparison suggested in the original pilot report could not be run — see [Limitations](#limitations).
+
+The aggregate numbers below are computed by `aggregate_redteam.py` from these three result files; the aggregate output itself is at [syn76878571](https://www.synapse.org/Synapse:syn76878571). All four files live under the `redteam` subfolder ([syn76878563](https://www.synapse.org/Synapse:syn76878563)) of the permissioned eval-results Synapse project (syn76878333).
 
 ## Results
 
