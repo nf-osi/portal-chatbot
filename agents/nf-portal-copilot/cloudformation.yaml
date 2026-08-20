@@ -65,6 +65,11 @@
 #       key or object version changes.
 #
 #   Model        – Change the FoundationModelId parameter and redeploy.
+#       Note: the ORCHESTRATION prompt's AdditionalModelRequestFields pins an
+#       extended-thinking config compatible with the current model family.
+#       Newer Claude models require "thinking.type: adaptive" instead of the
+#       older "enabled" + budget_tokens shape — check the target model's
+#       requirements (a mismatch fails every InvokeAgent call with a 400).
 #
 #   OpenAPI schema – Edit the ApiSchema Payload in this file and redeploy.
 #
@@ -102,12 +107,12 @@ Parameters:
 
   FoundationModelId:
     Type: String
-    Default: anthropic.claude-haiku-4-5-20251001-v1:0
+    Default: anthropic.claude-sonnet-5
     AllowedPattern: "^(?!us\\.).*"
     ConstraintDescription: >
       Do not include the "us." cross-region prefix — the template prepends it automatically.
     Description: >
-      Bare foundation model ID (e.g. anthropic.claude-haiku-4-5-20251001-v1:0).
+      Bare foundation model ID (e.g. anthropic.claude-sonnet-5).
       The template prepends "us." to construct the inference-profile ARN.
 
   IdleSessionTTL:
@@ -261,6 +266,14 @@ Resources:
       Description: !Ref AgentDescription
       FoundationModel: !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/us.${FoundationModelId}"
       IdleSessionTTLInSeconds: !Ref IdleSessionTTL
+      PromptOverrideConfiguration:
+        PromptConfigurations:
+          - PromptType: ORCHESTRATION
+            PromptCreationMode: DEFAULT
+            ParserMode: DEFAULT
+            AdditionalModelRequestFields:
+              thinking:
+                type: adaptive
       Instruction: |
         Release name: Harriet
 
