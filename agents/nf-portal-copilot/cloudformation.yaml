@@ -270,31 +270,10 @@ Resources:
         PromptConfigurations:
           - PromptType: ORCHESTRATION
             PromptCreationMode: DEFAULT
-            PromptState: ENABLED
             ParserMode: DEFAULT
-            InferenceConfiguration:
-              Temperature: 1
-              StopSequences:
-                - "</answer>"
             AdditionalModelRequestFields:
               thinking:
                 type: adaptive
-          - PromptType: PRE_PROCESSING
-            PromptCreationMode: DEFAULT
-            PromptState: DISABLED
-            ParserMode: DEFAULT
-          - PromptType: KNOWLEDGE_BASE_RESPONSE_GENERATION
-            PromptCreationMode: DEFAULT
-            PromptState: DISABLED
-            ParserMode: DEFAULT
-          - PromptType: POST_PROCESSING
-            PromptCreationMode: DEFAULT
-            PromptState: DISABLED
-            ParserMode: DEFAULT
-          - PromptType: MEMORY_SUMMARIZATION
-            PromptCreationMode: DEFAULT
-            PromptState: DISABLED
-            ParserMode: DEFAULT
       Instruction: |
         Release name: Harriet
 
