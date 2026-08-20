@@ -65,6 +65,11 @@
 #       key or object version changes.
 #
 #   Model        – Change the FoundationModelId parameter and redeploy.
+#       Note: the ORCHESTRATION prompt's AdditionalModelRequestFields pins an
+#       extended-thinking config compatible with the current model family.
+#       Newer Claude models require "thinking.type: adaptive" instead of the
+#       older "enabled" + budget_tokens shape — check the target model's
+#       requirements (a mismatch fails every InvokeAgent call with a 400).
 #
 #   OpenAPI schema – Edit the ApiSchema Payload in this file and redeploy.
 #
@@ -261,6 +266,35 @@ Resources:
       Description: !Ref AgentDescription
       FoundationModel: !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/us.${FoundationModelId}"
       IdleSessionTTLInSeconds: !Ref IdleSessionTTL
+      PromptOverrideConfiguration:
+        PromptConfigurations:
+          - PromptType: ORCHESTRATION
+            PromptCreationMode: DEFAULT
+            PromptState: ENABLED
+            ParserMode: DEFAULT
+            InferenceConfiguration:
+              Temperature: 1
+              StopSequences:
+                - "</answer>"
+            AdditionalModelRequestFields:
+              thinking:
+                type: adaptive
+          - PromptType: PRE_PROCESSING
+            PromptCreationMode: DEFAULT
+            PromptState: DISABLED
+            ParserMode: DEFAULT
+          - PromptType: KNOWLEDGE_BASE_RESPONSE_GENERATION
+            PromptCreationMode: DEFAULT
+            PromptState: DISABLED
+            ParserMode: DEFAULT
+          - PromptType: POST_PROCESSING
+            PromptCreationMode: DEFAULT
+            PromptState: DISABLED
+            ParserMode: DEFAULT
+          - PromptType: MEMORY_SUMMARIZATION
+            PromptCreationMode: DEFAULT
+            PromptState: DISABLED
+            ParserMode: DEFAULT
       Instruction: |
         Release name: Harriet
 
