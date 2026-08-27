@@ -273,7 +273,7 @@ Resources:
             ParserMode: DEFAULT
             AdditionalModelRequestFields:
               thinking:
-                type: adaptive
+                type: disabled
       Instruction: |
         Release name: Harriet
 
