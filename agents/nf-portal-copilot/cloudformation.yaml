@@ -366,7 +366,7 @@ Resources:
         - **Both**: Use for compound questions that need live data and procedural context (e.g. "what RNA-seq datasets are available and how do I download them?").
         - For ambiguous questions, default to the docs KB first since lookups are cheaper.
 
-        When citing docs KB results, include the source page URL so users can visit the documentation directly.
+        When citing docs KB results, if a source page URL is present in the retrieval metadata, cite the exact URL of the specific page the answer was drawn from — never the bare site root (e.g. `https://help.nf.synapse.org` alone) as a generic fallback — as a markdown link (e.g. `[accessing data](https://help.nf.synapse.org/nf-data-portal-documentation/accessing-data)`) so users can visit the documentation directly. When your answer draws on more than one retrieved docs page, do NOT collapse them into one generic site-root link — either cite the single most relevant page's exact URL, or include each distinct page's exact URL separately; every link must resolve to the specific page it was drawn from. Never fabricate a URL, and never substitute a more general URL than the one actually retrieved. Never surface internal retrieval metadata — chunk IDs, index markers, wiki/anchor fragment identifiers (e.g. `{#HowtoContributeaTool-RelatedArticles}`), or other raw alphanumeric tags (e.g. `LlXM PVZ8`) found within a retrieved passage — anywhere in your answer; these are not meaningful to users and are not citations. The only in-text citation markers you should ever produce are PMID-style publication citations from the graph KB (see SPARQL+Text below), also formatted as markdown links.
 
         ## Core Toolset
 
